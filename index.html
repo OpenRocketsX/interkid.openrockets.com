@@ -1,0 +1,637 @@
+<title>InterKid — The Browser Built for Learning</title>
+<style>
+:root {
+  --ink:    #0D1421;
+  --paper:  #F6F3EF;
+  --sur:    #FFFFFF;
+  --or:     #FF5500;
+  --cy:     #00AAFF;
+  --li:     #5DD62C;
+  --muted:  #7A8DA8;
+  --border: #DDD8D1;
+  --hero:   #0D1421;
+  --f:      system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --mono:   'JetBrains Mono','Fira Code',ui-monospace,monospace;
+  --max:    1060px;
+}
+@media(prefers-color-scheme:dark){
+  :root{--ink:#EDE9E3;--paper:#0D1421;--sur:#111927;--border:#1C2538}
+}
+:root[data-theme="light"]{--ink:#0D1421;--paper:#F6F3EF;--sur:#FFFFFF;--border:#DDD8D1}
+:root[data-theme="dark"] {--ink:#EDE9E3;--paper:#0D1421;--sur:#111927;--border:#1C2538}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--f);background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 1.75rem}
+
+/* ── OR NAVBAR (matches openrockets.com) ── */
+/*
+  openrockets.com uses filter:invert(1) on the banner to flip white→black.
+  Here we set the dark background directly — same visual result, cleaner.
+  Logo image (/v/openrockets.png) is white-on-transparent, perfect for dark bg.
+*/
+.or-header{
+  position:sticky;top:0;z-index:1000;
+  background:#0a0a0a;
+  font-family:'sohne-var','SF Pro Display',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+.or-nav{
+  max-width:1200px;margin:0 auto;padding:0 1.5rem;
+  height:76px;
+  display:flex;align-items:center;justify-content:space-between;gap:1.5rem;
+}
+.or-logo{
+  flex-shrink:0;display:flex;align-items:center;
+  text-decoration:none;
+}
+.or-logo img{
+  height:50px;width:auto;display:block;
+}
+/* text fallback when image can't load (artifact preview) */
+.or-logo-fb{
+  display:none;
+  font-size:1.15rem;font-weight:900;letter-spacing:-.04em;
+  color:#fff;line-height:1.1;
+}
+.or-logo img[src=""], .or-logo img:not([src]) { display:none; }
+.or-logo img.broken + .or-logo-fb { display:block; }
+
+.or-nav-links{
+  display:flex;align-items:center;gap:0;list-style:none;flex:1;justify-content:flex-start;
+  padding-left:1.5rem;
+}
+.or-nav-links a{
+  display:inline-flex;align-items:center;
+  padding:.5rem .8rem;
+  font-size:.875rem;font-weight:450;
+  color:rgba(255,255,255,.6);
+  transition:color .15s;white-space:nowrap;
+}
+.or-nav-links a:hover{color:#fff}
+.or-nav-ctas{
+  display:flex;align-items:center;gap:.625rem;list-style:none;flex-shrink:0;
+}
+.or-nav-ctas a{
+  display:inline-flex;align-items:center;
+  padding:.45rem 1rem;border-radius:4px;
+  font-size:.875rem;font-weight:500;
+  color:rgba(255,255,255,.7);
+  border:1px solid rgba(255,255,255,.18);
+  transition:border-color .15s,color .15s;
+}
+.or-nav-ctas a:hover{border-color:rgba(255,255,255,.5);color:#fff}
+.or-nav-ctas a.apply{
+  background:#fff;color:#0a0a0a;border-color:transparent;font-weight:600;
+}
+.or-nav-ctas a.apply:hover{background:rgba(255,255,255,.88)}
+@media(max-width:900px){.or-nav-links{display:none}}
+@media(max-width:500px){.or-nav-ctas li:last-child{display:none}}
+
+/* ── HERO ── */
+.hero{
+  background:var(--hero);padding:5.5rem 0 4.5rem;
+  overflow:hidden;position:relative;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.055) 1px,transparent 1px);
+  background-size:28px 28px;pointer-events:none;
+}
+.hero-i{
+  position:relative;z-index:1;
+  max-width:var(--max);margin:0 auto;padding:0 1.75rem;
+  display:grid;grid-template-columns:1fr 1.05fr;gap:4rem;align-items:center;
+}
+.hero h1{
+  font-size:clamp(2.2rem,3.8vw,3.5rem);
+  font-weight:800;line-height:1.06;letter-spacing:-.04em;
+  color:#fff;text-wrap:balance;margin-bottom:1.25rem;
+}
+.hero h1 .ik{color:var(--or)}
+.hero-sub{
+  font-size:.975rem;color:rgba(255,255,255,.48);
+  max-width:42ch;line-height:1.75;margin-bottom:2rem;
+}
+.hero-sub strong{color:rgba(255,255,255,.78);font-weight:600}
+.hero-acts{display:flex;flex-wrap:wrap;gap:.875rem;align-items:center}
+.btn-p{
+  background:var(--or);color:#fff;font-weight:700;font-size:.875rem;
+  padding:.8rem 1.75rem;border-radius:4px;
+  display:inline-flex;align-items:center;gap:.5rem;
+  transition:opacity .15s,transform .15s;
+}
+.btn-p:hover{opacity:.88;transform:translateY(-1px)}
+.btn-t{
+  color:rgba(255,255,255,.4);font-size:.82rem;
+  display:inline-flex;align-items:center;gap:.375rem;
+  transition:color .15s;
+}
+.btn-t:hover{color:rgba(255,255,255,.75)}
+
+/* ── BROWSER MOCKUP ── */
+.bw{
+  transform:perspective(1100px) rotateY(-5deg) rotateX(2.5deg);
+  transition:transform .5s ease;will-change:transform;
+}
+.bw:hover{transform:perspective(1100px) rotateY(-1.5deg) rotateX(.5deg)}
+.bm{border-radius:10px;overflow:hidden;background:#1B2436;
+  box-shadow:0 0 0 1px rgba(255,255,255,.07),0 40px 80px rgba(0,0,0,.55),0 0 80px rgba(255,85,0,.06)}
+.bc2{background:#232D3F;padding:.5rem .75rem 0}
+.btr{display:flex;gap:6px;margin-bottom:.5rem}
+.dot{width:11px;height:11px;border-radius:50%}
+.dr{background:#FF5F57}.dy{background:#FFBD2E}.dg{background:#28CA41}
+.bta{display:flex;gap:2px;align-items:flex-end}
+.tab{
+  padding:.32rem .875rem;border-radius:6px 6px 0 0;
+  font-size:.67rem;font-weight:500;color:rgba(255,255,255,.33);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;
+  display:flex;align-items:center;gap:.375rem;
+}
+.tab.a{background:#1B2436;color:rgba(255,255,255,.88)}
+.tfav{width:12px;height:12px;border-radius:2px;flex-shrink:0}
+.btb{background:#1B2436;padding:.5rem .75rem;display:flex;align-items:center;gap:.5rem}
+.tbb{
+  width:22px;height:22px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.22);font-size:.7rem;
+}
+.addr{
+  flex:1;background:#111A28;border-radius:5px;
+  padding:.32rem .75rem;display:flex;align-items:center;gap:.5rem;min-width:0;
+}
+.al{color:var(--li);font-size:.68rem;flex-shrink:0}
+.at{font-family:var(--mono);font-size:.68rem;color:rgba(255,255,255,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.as{
+  margin-left:auto;flex-shrink:0;
+  background:rgba(93,214,44,.14);color:var(--li);
+  font-size:.56rem;font-weight:700;letter-spacing:.06em;
+  padding:2px 6px;border-radius:3px;text-transform:uppercase;
+}
+.bvp{background:#F6F3EF;padding:.875rem}
+.mph{background:var(--or);border-radius:4px;padding:.5rem .875rem;margin-bottom:.625rem;display:flex;align-items:center;justify-content:space-between}
+.mpl{font-size:.7rem;font-weight:800;color:#fff;letter-spacing:-.02em}
+.mpps{display:flex;gap:.375rem}
+.mpp{width:28px;height:6px;border-radius:3px;background:rgba(255,255,255,.3)}
+.mphe{background:#1B2436;border-radius:4px;padding:.75rem;margin-bottom:.625rem;display:flex;gap:.625rem;align-items:center}
+.mpls{flex:1}
+.mphh{height:7px;border-radius:3px;background:rgba(255,255,255,.7);margin-bottom:5px}
+.mppp{height:4px;border-radius:2px;background:rgba(255,255,255,.28);margin-bottom:4px}
+.mpim{width:55px;height:44px;border-radius:4px;background:linear-gradient(135deg,var(--or),var(--cy));opacity:.7;flex-shrink:0}
+.mpca{display:grid;grid-template-columns:repeat(3,1fr);gap:.375rem}
+.mpcd{background:#fff;border:1px solid #DDD8D1;border-radius:4px;padding:.4rem}
+.mpci{width:15px;height:15px;border-radius:3px;margin-bottom:4px}
+.mpcl{height:3px;border-radius:2px;background:#DDD8D1;margin-bottom:3px}
+
+/* ── FEATURES ── */
+.sec-ft{padding:5.5rem 0;border-top:1px solid var(--border)}
+.ft-hd{
+  display:grid;grid-template-columns:1fr 2fr;gap:4rem;
+  align-items:end;margin-bottom:3.5rem;
+}
+.ft-hd h2{
+  font-size:clamp(1.6rem,2.5vw,2.2rem);
+  font-weight:800;letter-spacing:-.035em;line-height:1.1;text-wrap:balance;
+}
+.ft-hd p{font-size:.9rem;color:var(--muted);line-height:1.75;max-width:50ch}
+.ft-list{border-top:1px solid var(--border)}
+.ft-row{
+  display:grid;grid-template-columns:220px 1fr;gap:3rem;
+  padding:1.375rem 0;border-bottom:1px solid var(--border);align-items:start;
+}
+.ft-name{font-size:.9rem;font-weight:700;letter-spacing:-.01em;padding-top:.1em}
+.ft-desc{font-size:.85rem;color:var(--muted);line-height:1.7}
+
+/* ── STATEMENT ── */
+.sec-st{
+  padding:5.5rem 0;background:var(--ink);
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.st-txt{
+  font-size:clamp(1.4rem,2.6vw,2.1rem);
+  font-weight:500;color:rgba(255,255,255,.5);
+  line-height:1.55;letter-spacing:-.02em;max-width:22em;
+}
+.st-txt strong{color:#fff;font-weight:700}
+.st-txt em{font-style:normal;color:var(--or)}
+.st-sub{
+  margin-top:2.5rem;padding-top:2rem;
+  border-top:1px solid rgba(255,255,255,.08);
+  font-size:.78rem;color:rgba(255,255,255,.28);letter-spacing:.01em;
+  display:flex;gap:2.5rem;flex-wrap:wrap;
+}
+
+/* ── SCHOOLS ── */
+.sec-sc{padding:5.5rem 0;border-top:1px solid var(--border)}
+.sc-g{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start}
+.sc-txt h2{
+  font-size:clamp(1.6rem,2.5vw,2.2rem);
+  font-weight:800;letter-spacing:-.035em;line-height:1.1;
+  text-wrap:balance;margin-bottom:1.25rem;
+}
+.sc-txt p{font-size:.9rem;color:var(--muted);line-height:1.75}
+.sc-list{list-style:none;margin-top:2.25rem}
+.sc-list li{
+  display:grid;grid-template-columns:14px 1fr;gap:.875rem;
+  padding:.875rem 0;border-bottom:1px solid var(--border);
+  font-size:.85rem;align-items:start;
+}
+.sc-list li:first-child{border-top:1px solid var(--border)}
+.sc-dot{
+  width:14px;height:14px;border-radius:50%;margin-top:.25em;flex-shrink:0;
+  border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+}
+.sc-dot::after{content:'';width:5px;height:5px;border-radius:50%;background:var(--or)}
+.sc-t strong{font-weight:600;display:block;margin-bottom:.2rem;font-size:.875rem}
+.sc-t span{color:var(--muted);font-size:.8rem}
+
+/* large number facts */
+.sc-facts{display:flex;flex-direction:column}
+.sc-fact{
+  padding:1.875rem 0;border-bottom:1px solid var(--border);
+  display:grid;grid-template-columns:auto 1fr;gap:1.5rem;align-items:center;
+}
+.sc-fact:first-child{border-top:1px solid var(--border)}
+.fn{font-size:3.5rem;font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums;line-height:1}
+.fn-or{color:var(--or)}.fn-li{color:var(--li)}.fn-cy{color:var(--cy)}
+.fl{font-size:.82rem;line-height:1.6;color:var(--muted)}
+.fl strong{display:block;font-weight:600;color:var(--ink);font-size:.875rem;margin-bottom:.15rem}
+
+/* ── OSS ── */
+.sec-os{padding:5.5rem 0;background:var(--sur);border-top:1px solid var(--border)}
+.os-g{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+.os-txt h2{
+  font-size:clamp(1.6rem,2.5vw,2.2rem);
+  font-weight:800;letter-spacing:-.035em;line-height:1.1;
+  text-wrap:balance;margin-bottom:1.25rem;
+}
+.os-txt p{font-size:.9rem;color:var(--muted);line-height:1.75}
+.os-links{margin-top:2rem;border-top:1px solid var(--border)}
+.os-lnk{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.825rem 0;border-bottom:1px solid var(--border);
+  font-size:.85rem;font-weight:500;transition:color .15s;
+}
+.os-lnk:hover{color:var(--or)}
+.os-lnk span{font-size:.75rem;color:var(--muted)}
+.os-code{background:#0A0E1A;border-radius:8px;overflow:hidden}
+.cd-hd{
+  padding:.65rem 1rem;background:rgba(255,255,255,.03);
+  border-bottom:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:center;gap:.5rem;
+}
+.cd-d{width:9px;height:9px;border-radius:50%}
+.cd-hd span{font-size:.68rem;color:rgba(255,255,255,.25);font-family:var(--mono);margin-left:.25rem}
+.cd-b{padding:1.25rem;font-family:var(--mono);font-size:.73rem;line-height:1.9;tab-size:2}
+.c-cm{color:rgba(255,255,255,.2)}.c-k{color:var(--cy)}.c-v{color:var(--li)}
+.c-s{color:#FFD070}.c-op{color:rgba(255,255,255,.35)}
+
+/* ── CTA ── */
+.sec-dl{padding:4rem 0;border-top:1px solid var(--border)}
+.dl-i{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:2rem}
+.dl-copy h2{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.375rem}
+.dl-copy p{font-size:.875rem;color:var(--muted)}
+.dl-acts{display:flex;gap:.875rem;flex-wrap:wrap;align-items:center}
+.btn-dl{
+  background:var(--or);color:#fff;font-weight:700;font-size:.875rem;
+  padding:.8rem 1.75rem;border-radius:4px;
+  display:inline-flex;align-items:center;gap:.5rem;transition:opacity .15s;
+}
+.btn-dl:hover{opacity:.88}
+.btn-gh{
+  border:1px solid var(--border);font-size:.82rem;font-weight:500;
+  padding:.8rem 1.25rem;border-radius:4px;
+  display:inline-flex;align-items:center;gap:.375rem;
+  transition:border-color .15s;
+}
+.btn-gh:hover{border-color:var(--ink)}
+
+/* ── FOOTER ── */
+footer{
+  background:#080C15;color:rgba(255,255,255,.3);
+  padding:2.5rem 0;font-size:.8rem;
+}
+.ft-i{
+  max-width:var(--max);margin:0 auto;padding:0 1.75rem;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.25rem;
+}
+.f-brand{font-size:.875rem;font-weight:700;color:rgba(255,255,255,.65)}
+.f-brand span{color:var(--or)}
+.f-links{display:flex;gap:1.75rem;flex-wrap:wrap}
+.f-links a{color:rgba(255,255,255,.28);transition:color .15s}
+.f-links a:hover{color:rgba(255,255,255,.75)}
+.f-copy{color:rgba(255,255,255,.2);font-size:.72rem}
+
+/* ── RESPONSIVE ── */
+@media(max-width:880px){
+  .hero-i{grid-template-columns:1fr;gap:3rem}
+  .bw{transform:none;max-width:480px;margin:0 auto}
+  .ft-hd{grid-template-columns:1fr;gap:1.5rem}
+  .ft-row{grid-template-columns:1fr;gap:.5rem;padding:1.2rem 0}
+  .sc-g,.os-g{grid-template-columns:1fr;gap:3rem}
+}
+@media(max-width:600px){
+  .nav-links{display:none}
+  .dl-i{flex-direction:column;align-items:flex-start}
+  .ft-i{flex-direction:column;align-items:flex-start}
+}
+@media(prefers-reduced-motion:reduce){.bw{transform:none;transition:none}}
+</style>
+
+<!-- OR NAVBAR — matches openrockets.com exactly -->
+<header class="or-header">
+  <nav class="or-nav">
+    <a href="https://openrockets.com" class="or-logo" id="or-logo-link">
+      <img src="https://openrockets.com/v/openrockets.png" alt="OpenRockets" id="or-logo-img"
+           onerror="document.getElementById('or-logo-img').style.display='none';document.getElementById('or-logo-text').style.display='block'">
+      <span class="or-logo-fb" id="or-logo-text">Open<br>Rockets<sup style="font-size:.55em;font-weight:700">®</sup></span>
+    </a>
+    <ul class="or-nav-links">
+      <li><a href="https://zeroprofit.org/">Register your NonProfit</a></li>
+      <li><a href="https://ads.openrockets.com/">Advertise for free</a></li>
+      <li><a href="https://press.openrockets.com/">Upload Artifacts</a></li>
+      <li><a href="https://about.openrockets.com/">Here to help!</a></li>
+      <li><a href="https://discord.gg/djXh8udpbn">Discord</a></li>
+    </ul>
+    <ul class="or-nav-ctas">
+      <li><a href="https://openrockets.com/join.html" class="apply">Apply</a></li>
+      <li><a href="https://discord.gg/djXh8udpbn">Discord</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-i">
+    <div>
+      <h1><span class="ik">InterKid</span> — the browser kids actually want to use.</h1>
+      <p class="hero-sub">An open-source browser built for children and educational systems. <strong>Safe by default, ad-free, classroom-ready.</strong> Powered by Hack Club's Vertex engine.</p>
+      <div class="hero-acts">
+        <a href="#download" class="btn-p">↓ Download Free</a>
+        <a href="https://github.com/hackclubium/vertex" class="btn-t">GitHub ↗</a>
+      </div>
+    </div>
+
+    <!-- Browser mockup -->
+    <div class="bw" aria-hidden="true">
+      <div class="bm">
+        <div class="bc2">
+          <div class="btr">
+            <span class="dot dr"></span>
+            <span class="dot dy"></span>
+            <span class="dot dg"></span>
+          </div>
+          <div class="bta">
+            <div class="tab a">
+              <svg class="tfav" viewBox="0 0 12 12"><rect width="12" height="12" rx="2" fill="#FF5500"/><text x="6" y="9.5" font-size="7.5" text-anchor="middle" fill="white" font-family="sans-serif" font-weight="bold">K</text></svg>
+              Khan Academy
+            </div>
+            <div class="tab">
+              <svg class="tfav" viewBox="0 0 12 12"><rect width="12" height="12" rx="2" fill="#FF8600"/><text x="6" y="9.5" font-size="7.5" text-anchor="middle" fill="white" font-family="sans-serif" font-weight="bold">S</text></svg>
+              Scratch
+            </div>
+          </div>
+        </div>
+        <div class="btb">
+          <div class="tbb">←</div>
+          <div class="tbb">→</div>
+          <div class="tbb">↻</div>
+          <div class="addr">
+            <span class="al">🔒</span>
+            <span class="at">khanacademy.org/math/grade-5</span>
+            <span class="as">Safe</span>
+          </div>
+        </div>
+        <div class="bvp">
+          <div class="mph">
+            <span class="mpl">Khan Academy</span>
+            <div class="mpps"><div class="mpp"></div><div class="mpp" style="width:22px"></div></div>
+          </div>
+          <div class="mphe">
+            <div class="mpls">
+              <div class="mphh" style="width:78%"></div>
+              <div class="mphh" style="width:55%;background:rgba(255,255,255,.38)"></div>
+              <div class="mppp" style="width:70%;margin-top:6px"></div>
+              <div class="mppp" style="width:48%"></div>
+            </div>
+            <div class="mpim"></div>
+          </div>
+          <div class="mpca">
+            <div class="mpcd"><div class="mpci" style="background:var(--or)"></div><div class="mpcl"></div><div class="mpcl" style="width:60%"></div></div>
+            <div class="mpcd"><div class="mpci" style="background:var(--cy)"></div><div class="mpcl"></div><div class="mpcl" style="width:55%"></div></div>
+            <div class="mpcd"><div class="mpci" style="background:var(--li)"></div><div class="mpcl"></div><div class="mpcl" style="width:65%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="sec-ft" id="features">
+  <div class="wrap">
+    <div class="ft-hd">
+      <h2>Built for real classrooms.</h2>
+      <p>Safe and ad-free out of the box, with the controls schools need — without the vendor lock-in they're tired of paying for.</p>
+    </div>
+    <div class="ft-list">
+      <div class="ft-row">
+        <div class="ft-name">Safe by default</div>
+        <div class="ft-desc">Content filtering blocks inappropriate sites, adult content, and dangerous downloads on install. No configuration, no ongoing fees, no per-seat charges.</div>
+      </div>
+      <div class="ft-row">
+        <div class="ft-name">Zero ads, zero tracking</div>
+        <div class="ft-desc">No advertising networks. No behavioral profiling of minors. No targeting, ever. Children see content — not manipulation designed to hook their attention.</div>
+      </div>
+      <div class="ft-row">
+        <div class="ft-name">Classroom mode</div>
+        <div class="ft-desc">Teachers lock all student devices to a single tab, push URLs to every student, or whitelist a set of approved sites for the lesson — in one click from the admin panel.</div>
+      </div>
+      <div class="ft-row">
+        <div class="ft-name">MDM-ready deployment</div>
+        <div class="ft-desc">Push to hundreds of Chromebooks, Windows, or Linux machines via Jamf, Mosyle, Intune, or manual imaging. Pre-built policy templates for common configurations are included.</div>
+      </div>
+      <div class="ft-row">
+        <div class="ft-name">Screen time controls</div>
+        <div class="ft-desc">Set daily usage caps, break reminders, and schedule off-hours. Works entirely locally — no cloud account or external service required.</div>
+      </div>
+      <div class="ft-row">
+        <div class="ft-name">COPPA &amp; FERPA ready</div>
+        <div class="ft-desc">No student accounts means no PII collection. District admins manage all settings locally. Legal compliance built in from the ground up, not bolted on later.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATEMENT -->
+<section class="sec-st">
+  <div class="wrap">
+    <p class="st-txt">
+      <strong>No accounts. No ads. No data collected.</strong>
+      A browser that exists for one reason —
+      getting out of the way so kids can learn.
+      <em>Open source, MIT licensed,</em>
+      free forever.
+    </p>
+    <div class="st-sub">
+      <span>Built on hackclubium/vertex</span>
+      <span>MIT License</span>
+      <span>Windows · macOS · Linux</span>
+      <span>An OpenRockets project</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOR SCHOOLS -->
+<section class="sec-sc" id="schools">
+  <div class="wrap">
+    <div class="sc-g">
+      <div class="sc-txt">
+        <h2>IT-friendly from day one.</h2>
+        <p>No per-seat licensing. No cloud dependencies. No vendor negotiation. A browser your IT department can deploy, audit, and trust.</p>
+        <ul class="sc-list">
+          <li>
+            <div class="sc-dot"></div>
+            <div class="sc-t">
+              <strong>Bulk deployment in minutes</strong>
+              <span>Drop the installer into your MDM or imaging pipeline. Group Policy templates for Windows domains included.</span>
+            </div>
+          </li>
+          <li>
+            <div class="sc-dot"></div>
+            <div class="sc-t">
+              <strong>Local admin dashboard</strong>
+              <span>Manage filter lists, whitelists, classroom sessions, and screen time policies from a single local interface — no cloud account needed.</span>
+            </div>
+          </li>
+          <li>
+            <div class="sc-dot"></div>
+            <div class="sc-t">
+              <strong>Works offline &amp; on-prem</strong>
+              <span>Filtering and admin controls require no internet dependency. Runs entirely on your own network.</span>
+            </div>
+          </li>
+          <li>
+            <div class="sc-dot"></div>
+            <div class="sc-t">
+              <strong>Community supported</strong>
+              <span>Maintained by Hack Club contributors and the OpenRockets community. File issues, submit PRs, or fork freely.</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="sc-facts">
+        <div class="sc-fact">
+          <div class="fn fn-or">$0</div>
+          <div class="fl">
+            <strong>Cost per seat</strong>
+            Free to download, deploy, and distribute. No licensing tiers, no renewal calls.
+          </div>
+        </div>
+        <div class="sc-fact">
+          <div class="fn fn-li">All</div>
+          <div class="fl">
+            <strong>Ad networks blocked</strong>
+            Every known ad and tracking network, blocked by default — no extension required.
+          </div>
+        </div>
+        <div class="sc-fact">
+          <div class="fn fn-cy">Zero</div>
+          <div class="fl">
+            <strong>Student data collected</strong>
+            No accounts, no telemetry, no usage logs sent outside your network.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OPEN SOURCE -->
+<section class="sec-os" id="oss">
+  <div class="wrap">
+    <div class="os-g">
+      <div class="os-txt">
+        <h2>Built on Hack Club's Vertex engine.</h2>
+        <p>InterKid is a child-safety layer on top of <strong>hackclubium/vertex</strong> — a Chromium fork built by students for students. The full stack is open, auditable, and MIT-licensed. Fork it, inspect it, or contribute.</p>
+        <div class="os-links">
+          <a href="https://github.com/hackclubium/vertex" class="os-lnk">
+            hackclubium/vertex
+            <span>Upstream engine ↗</span>
+          </a>
+          <a href="https://github.com/openrockets/interkid" class="os-lnk">
+            openrockets/interkid
+            <span>This project ↗</span>
+          </a>
+          <a href="#" class="os-lnk">
+            MIT License
+            <span>No restrictions ↗</span>
+          </a>
+          <a href="#" class="os-lnk">
+            File an issue or suggest a feature
+            <span>GitHub Issues ↗</span>
+          </a>
+        </div>
+      </div>
+      <div class="os-code">
+        <div class="cd-hd">
+          <span class="cd-d" style="background:#FF5F57"></span>
+          <span class="cd-d" style="background:#FFBD2E"></span>
+          <span class="cd-d" style="background:#28CA41"></span>
+          <span>interkid.config.json</span>
+        </div>
+        <div class="cd-b">
+<span class="c-op">{</span><br>
+&nbsp;&nbsp;<span class="c-k">"browser"</span><span class="c-op">:</span> <span class="c-s">"InterKid"</span><span class="c-op">,</span><br>
+&nbsp;&nbsp;<span class="c-k">"engine"</span><span class="c-op">:</span> <span class="c-s">"hackclubium/vertex"</span><span class="c-op">,</span><br>
+&nbsp;&nbsp;<span class="c-k">"license"</span><span class="c-op">:</span> <span class="c-s">"MIT"</span><span class="c-op">,</span><br>
+&nbsp;&nbsp;<span class="c-cm">// safety — all on out of the box</span><br>
+&nbsp;&nbsp;<span class="c-k">"safeSearch"</span><span class="c-op">:</span> <span class="c-v">true</span><span class="c-op">,</span><br>
+&nbsp;&nbsp;<span class="c-k">"adBlocking"</span><span class="c-op">:</span> <span class="c-v">true</span><span class="c-op">,</span><br>
+&nbsp;&nbsp;<span class="c-k">"tracking"</span><span class="c-op">:</span> <span class="c-v">false</span><span class="c-op">,</span><br>
+&nbsp;&nbsp;<span class="c-k">"classroomMode"</span><span class="c-op">:</span> <span class="c-v">true</span><span class="c-op">,</span><br>
+&nbsp;&nbsp;<span class="c-k">"dataCollected"</span><span class="c-op">:</span> <span class="c-v">null</span><span class="c-op">,</span><br>
+&nbsp;&nbsp;<span class="c-k">"platforms"</span><span class="c-op">:</span> <span class="c-op">[</span><span class="c-s">"windows"</span><span class="c-op">,</span> <span class="c-s">"macos"</span><span class="c-op">,</span> <span class="c-s">"linux"</span><span class="c-op">],</span><br>
+&nbsp;&nbsp;<span class="c-k">"mdmTemplates"</span><span class="c-op">:</span> <span class="c-op">[</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-s">"jamf"</span><span class="c-op">,</span> <span class="c-s">"intune"</span><span class="c-op">,</span> <span class="c-s">"mosyle"</span><br>
+&nbsp;&nbsp;<span class="c-op">]</span><br>
+<span class="c-op">}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOWNLOAD -->
+<section class="sec-dl" id="download">
+  <div class="wrap">
+    <div class="dl-i">
+      <div class="dl-copy">
+        <h2>Ready to set up InterKid?</h2>
+        <p>Free to download, free to deploy — no subscriptions, no vendor calls.</p>
+      </div>
+      <div class="dl-acts">
+        <a href="#" class="btn-dl">↓ Download Free</a>
+        <a href="https://github.com/hackclubium/vertex" class="btn-gh">View on GitHub ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-i">
+    <div class="f-brand"><span>InterKid</span> — a project by <a href="https://openrockets.com" style="color:rgba(255,255,255,.45)">OpenRockets</a></div>
+    <div class="f-links">
+      <a href="#features">Features</a>
+      <a href="#schools">For Schools</a>
+      <a href="#oss">Open Source</a>
+      <a href="https://github.com/hackclubium/vertex">GitHub</a>
+      <a href="#">MIT License</a>
+    </div>
+    <div class="f-copy">© 2025 OpenRockets. Built on hackclubium/vertex.</div>
+  </div>
+</footer>
