@@ -1,637 +1,1087 @@
-<title>InterKid — The Browser Built for Learning</title>
+<!DOCTYPE html>
+
+<html lang="en-US">
+<head>
+<meta charset="utf-8"/>
+<title>OpenRockets | There's no better time to do better things.</title>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<meta content="OpenRockets Inc. is an infrastructure service provider for nonprofits worldwide, run by exceptional minors and teenagers." name="description"/>
+<link href="https://openrockets.com/i/assets/static/openthread_logo_bash-trans-removebg-preview (1).png" rel="icon" type="image/png"/>
+<link href="https://openrockets.com/" rel="canonical"/>
+<!-- Core Layout and Interactive Styles -->
+<link href="https://b.stripecdn.com/mkt-ssr-statics/assets/_next/static/css/01e4fd07fe2a2b12.css" rel="stylesheet"/>
+<link href="https://b.stripecdn.com/mkt-ssr-statics/assets/_next/static/css/112bd7743768f461.css" rel="stylesheet"/>
+<link href="https://b.stripecdn.com/mkt-ssr-statics/assets/_next/static/css/43d635cdf484757e.css" rel="stylesheet"/>
+<link href="https://b.stripecdn.com/mkt-ssr-statics/assets/_next/static/css/05b42ab6014b2d13.css" rel="stylesheet"/>
+<link href="https://b.stripecdn.com/mkt-ssr-statics/assets/_next/static/css/e07e144a3b1db9ca.css" rel="stylesheet"/>
+<link href="https://b.stripecdn.com/mkt-ssr-statics/assets/_next/static/css/3046c2816c2ffd6e.css" rel="stylesheet"/>
+<link href="https://b.stripecdn.com/mkt-ssr-statics/assets/_next/static/css/b793c34868bb4156.css" rel="stylesheet"/>
+<link href="https://b.stripecdn.com/mkt-ssr-statics/assets/_next/static/css/d829866f0dc0cad9.css" rel="stylesheet"/>
+<link href="https://b.stripecdn.com/mkt-ssr-statics/assets/_next/static/css/7fe9607f2fcd2964.css" rel="stylesheet"/>
+<link href="https://b.stripecdn.com/mkt-ssr-statics/assets/_next/static/css/5e8a245fcb880dab.css" rel="stylesheet"/>
+<link href="https://openrockets.com/styles/overrides.css" rel="stylesheet"/>
+<!-- The exact image that will appear when shared -->
+<meta content="https://yourwebsite.com" property="og:image"/>
+<!-- Recommended matching tags for context -->
+<meta content="Register your NonProfit with ZeroProfit™ by OpenRockets Inc. for free." property="og:title"/>
+<meta content="OpenRockets Inc. is an infrastructure service provider for nonprofits worldwide run by exceptional minors and teenagers." property="og:description"/>
+<meta content="https://openrockets.com/studios/assets/images/trash.png.jpg" property="og:url"/>
+<meta content="website" property="og:type"/>
+<!-- X (formerly Twitter) specific card style -->
+<meta content="https://openrockets.com/studios/assets/images/trash.png.jpg" name="twitter:card"/>
 <style>
-:root {
-  --ink:    #0D1421;
-  --paper:  #F6F3EF;
-  --sur:    #FFFFFF;
-  --or:     #FF5500;
-  --cy:     #00AAFF;
-  --li:     #5DD62C;
-  --muted:  #7A8DA8;
-  --border: #DDD8D1;
-  --hero:   #0D1421;
-  --f:      system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-  --mono:   'JetBrains Mono','Fira Code',ui-monospace,monospace;
-  --max:    1060px;
-}
-@media(prefers-color-scheme:dark){
-  :root{--ink:#EDE9E3;--paper:#0D1421;--sur:#111927;--border:#1C2538}
-}
-:root[data-theme="light"]{--ink:#0D1421;--paper:#F6F3EF;--sur:#FFFFFF;--border:#DDD8D1}
-:root[data-theme="dark"] {--ink:#EDE9E3;--paper:#0D1421;--sur:#111927;--border:#1C2538}
-
-*{box-sizing:border-box;margin:0;padding:0}
-html{font-size:16px;scroll-behavior:smooth}
-body{font-family:var(--f);background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-a{color:inherit;text-decoration:none}
-.wrap{max-width:var(--max);margin:0 auto;padding:0 1.75rem}
-
-/* ── OR NAVBAR (matches openrockets.com) ── */
-/*
-  openrockets.com uses filter:invert(1) on the banner to flip white→black.
-  Here we set the dark background directly — same visual result, cleaner.
-  Logo image (/v/openrockets.png) is white-on-transparent, perfect for dark bg.
-*/
-.or-header{
-  position:sticky;top:0;z-index:1000;
-  background:#0a0a0a;
-  font-family:'sohne-var','SF Pro Display',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-}
-.or-nav{
-  max-width:1200px;margin:0 auto;padding:0 1.5rem;
-  height:76px;
-  display:flex;align-items:center;justify-content:space-between;gap:1.5rem;
-}
-.or-logo{
-  flex-shrink:0;display:flex;align-items:center;
-  text-decoration:none;
-}
-.or-logo img{
-  height:50px;width:auto;display:block;
-}
-/* text fallback when image can't load (artifact preview) */
-.or-logo-fb{
-  display:none;
-  font-size:1.15rem;font-weight:900;letter-spacing:-.04em;
-  color:#fff;line-height:1.1;
-}
-.or-logo img[src=""], .or-logo img:not([src]) { display:none; }
-.or-logo img.broken + .or-logo-fb { display:block; }
-
-.or-nav-links{
-  display:flex;align-items:center;gap:0;list-style:none;flex:1;justify-content:flex-start;
-  padding-left:1.5rem;
-}
-.or-nav-links a{
-  display:inline-flex;align-items:center;
-  padding:.5rem .8rem;
-  font-size:.875rem;font-weight:450;
-  color:rgba(255,255,255,.6);
-  transition:color .15s;white-space:nowrap;
-}
-.or-nav-links a:hover{color:#fff}
-.or-nav-ctas{
-  display:flex;align-items:center;gap:.625rem;list-style:none;flex-shrink:0;
-}
-.or-nav-ctas a{
-  display:inline-flex;align-items:center;
-  padding:.45rem 1rem;border-radius:4px;
-  font-size:.875rem;font-weight:500;
-  color:rgba(255,255,255,.7);
-  border:1px solid rgba(255,255,255,.18);
-  transition:border-color .15s,color .15s;
-}
-.or-nav-ctas a:hover{border-color:rgba(255,255,255,.5);color:#fff}
-.or-nav-ctas a.apply{
-  background:#fff;color:#0a0a0a;border-color:transparent;font-weight:600;
-}
-.or-nav-ctas a.apply:hover{background:rgba(255,255,255,.88)}
-@media(max-width:900px){.or-nav-links{display:none}}
-@media(max-width:500px){.or-nav-ctas li:last-child{display:none}}
-
-/* ── HERO ── */
-.hero{
-  background:var(--hero);padding:5.5rem 0 4.5rem;
-  overflow:hidden;position:relative;
-}
-.hero::before{
-  content:'';position:absolute;inset:0;
-  background-image:radial-gradient(rgba(255,255,255,.055) 1px,transparent 1px);
-  background-size:28px 28px;pointer-events:none;
-}
-.hero-i{
-  position:relative;z-index:1;
-  max-width:var(--max);margin:0 auto;padding:0 1.75rem;
-  display:grid;grid-template-columns:1fr 1.05fr;gap:4rem;align-items:center;
-}
-.hero h1{
-  font-size:clamp(2.2rem,3.8vw,3.5rem);
-  font-weight:800;line-height:1.06;letter-spacing:-.04em;
-  color:#fff;text-wrap:balance;margin-bottom:1.25rem;
-}
-.hero h1 .ik{color:var(--or)}
-.hero-sub{
-  font-size:.975rem;color:rgba(255,255,255,.48);
-  max-width:42ch;line-height:1.75;margin-bottom:2rem;
-}
-.hero-sub strong{color:rgba(255,255,255,.78);font-weight:600}
-.hero-acts{display:flex;flex-wrap:wrap;gap:.875rem;align-items:center}
-.btn-p{
-  background:var(--or);color:#fff;font-weight:700;font-size:.875rem;
-  padding:.8rem 1.75rem;border-radius:4px;
-  display:inline-flex;align-items:center;gap:.5rem;
-  transition:opacity .15s,transform .15s;
-}
-.btn-p:hover{opacity:.88;transform:translateY(-1px)}
-.btn-t{
-  color:rgba(255,255,255,.4);font-size:.82rem;
-  display:inline-flex;align-items:center;gap:.375rem;
-  transition:color .15s;
-}
-.btn-t:hover{color:rgba(255,255,255,.75)}
-
-/* ── BROWSER MOCKUP ── */
-.bw{
-  transform:perspective(1100px) rotateY(-5deg) rotateX(2.5deg);
-  transition:transform .5s ease;will-change:transform;
-}
-.bw:hover{transform:perspective(1100px) rotateY(-1.5deg) rotateX(.5deg)}
-.bm{border-radius:10px;overflow:hidden;background:#1B2436;
-  box-shadow:0 0 0 1px rgba(255,255,255,.07),0 40px 80px rgba(0,0,0,.55),0 0 80px rgba(255,85,0,.06)}
-.bc2{background:#232D3F;padding:.5rem .75rem 0}
-.btr{display:flex;gap:6px;margin-bottom:.5rem}
-.dot{width:11px;height:11px;border-radius:50%}
-.dr{background:#FF5F57}.dy{background:#FFBD2E}.dg{background:#28CA41}
-.bta{display:flex;gap:2px;align-items:flex-end}
-.tab{
-  padding:.32rem .875rem;border-radius:6px 6px 0 0;
-  font-size:.67rem;font-weight:500;color:rgba(255,255,255,.33);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;
-  display:flex;align-items:center;gap:.375rem;
-}
-.tab.a{background:#1B2436;color:rgba(255,255,255,.88)}
-.tfav{width:12px;height:12px;border-radius:2px;flex-shrink:0}
-.btb{background:#1B2436;padding:.5rem .75rem;display:flex;align-items:center;gap:.5rem}
-.tbb{
-  width:22px;height:22px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  color:rgba(255,255,255,.22);font-size:.7rem;
-}
-.addr{
-  flex:1;background:#111A28;border-radius:5px;
-  padding:.32rem .75rem;display:flex;align-items:center;gap:.5rem;min-width:0;
-}
-.al{color:var(--li);font-size:.68rem;flex-shrink:0}
-.at{font-family:var(--mono);font-size:.68rem;color:rgba(255,255,255,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.as{
-  margin-left:auto;flex-shrink:0;
-  background:rgba(93,214,44,.14);color:var(--li);
-  font-size:.56rem;font-weight:700;letter-spacing:.06em;
-  padding:2px 6px;border-radius:3px;text-transform:uppercase;
-}
-.bvp{background:#F6F3EF;padding:.875rem}
-.mph{background:var(--or);border-radius:4px;padding:.5rem .875rem;margin-bottom:.625rem;display:flex;align-items:center;justify-content:space-between}
-.mpl{font-size:.7rem;font-weight:800;color:#fff;letter-spacing:-.02em}
-.mpps{display:flex;gap:.375rem}
-.mpp{width:28px;height:6px;border-radius:3px;background:rgba(255,255,255,.3)}
-.mphe{background:#1B2436;border-radius:4px;padding:.75rem;margin-bottom:.625rem;display:flex;gap:.625rem;align-items:center}
-.mpls{flex:1}
-.mphh{height:7px;border-radius:3px;background:rgba(255,255,255,.7);margin-bottom:5px}
-.mppp{height:4px;border-radius:2px;background:rgba(255,255,255,.28);margin-bottom:4px}
-.mpim{width:55px;height:44px;border-radius:4px;background:linear-gradient(135deg,var(--or),var(--cy));opacity:.7;flex-shrink:0}
-.mpca{display:grid;grid-template-columns:repeat(3,1fr);gap:.375rem}
-.mpcd{background:#fff;border:1px solid #DDD8D1;border-radius:4px;padding:.4rem}
-.mpci{width:15px;height:15px;border-radius:3px;margin-bottom:4px}
-.mpcl{height:3px;border-radius:2px;background:#DDD8D1;margin-bottom:3px}
-
-/* ── FEATURES ── */
-.sec-ft{padding:5.5rem 0;border-top:1px solid var(--border)}
-.ft-hd{
-  display:grid;grid-template-columns:1fr 2fr;gap:4rem;
-  align-items:end;margin-bottom:3.5rem;
-}
-.ft-hd h2{
-  font-size:clamp(1.6rem,2.5vw,2.2rem);
-  font-weight:800;letter-spacing:-.035em;line-height:1.1;text-wrap:balance;
-}
-.ft-hd p{font-size:.9rem;color:var(--muted);line-height:1.75;max-width:50ch}
-.ft-list{border-top:1px solid var(--border)}
-.ft-row{
-  display:grid;grid-template-columns:220px 1fr;gap:3rem;
-  padding:1.375rem 0;border-bottom:1px solid var(--border);align-items:start;
-}
-.ft-name{font-size:.9rem;font-weight:700;letter-spacing:-.01em;padding-top:.1em}
-.ft-desc{font-size:.85rem;color:var(--muted);line-height:1.7}
-
-/* ── STATEMENT ── */
-.sec-st{
-  padding:5.5rem 0;background:var(--ink);
-  border-top:1px solid rgba(255,255,255,.06);
-}
-.st-txt{
-  font-size:clamp(1.4rem,2.6vw,2.1rem);
-  font-weight:500;color:rgba(255,255,255,.5);
-  line-height:1.55;letter-spacing:-.02em;max-width:22em;
-}
-.st-txt strong{color:#fff;font-weight:700}
-.st-txt em{font-style:normal;color:var(--or)}
-.st-sub{
-  margin-top:2.5rem;padding-top:2rem;
-  border-top:1px solid rgba(255,255,255,.08);
-  font-size:.78rem;color:rgba(255,255,255,.28);letter-spacing:.01em;
-  display:flex;gap:2.5rem;flex-wrap:wrap;
+    @media (max-width: 768px) {
+        .hds-navigation-menu__content {
+            display: none !important;
+            position: absolute;
+            top: 76px;
+            left: 0;
+            width: 100%;
+            background: white;
+            flex-direction: column;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .hds-navigation-menu__content.mobile-open {
+            display: flex !important;
+        }
+        #mobile-hamburger-btn {
+            display: block !important;
+        }
+        
+    }
+    </style></head>
+<body style="padding-top: 0rem;">
+<style>
+        .committee-table {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
 }
 
-/* ── SCHOOLS ── */
-.sec-sc{padding:5.5rem 0;border-top:1px solid var(--border)}
-.sc-g{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start}
-.sc-txt h2{
-  font-size:clamp(1.6rem,2.5vw,2.2rem);
-  font-weight:800;letter-spacing:-.035em;line-height:1.1;
-  text-wrap:balance;margin-bottom:1.25rem;
+.committee-year-block {
+    display: flex;
+    gap: 36px;
+    width: 60%;
+    align-items: flex-start;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
 }
-.sc-txt p{font-size:.9rem;color:var(--muted);line-height:1.75}
-.sc-list{list-style:none;margin-top:2.25rem}
-.sc-list li{
-  display:grid;grid-template-columns:14px 1fr;gap:.875rem;
-  padding:.875rem 0;border-bottom:1px solid var(--border);
-  font-size:.85rem;align-items:start;
-}
-.sc-list li:first-child{border-top:1px solid var(--border)}
-.sc-dot{
-  width:14px;height:14px;border-radius:50%;margin-top:.25em;flex-shrink:0;
-  border:1.5px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-}
-.sc-dot::after{content:'';width:5px;height:5px;border-radius:50%;background:var(--or)}
-.sc-t strong{font-weight:600;display:block;margin-bottom:.2rem;font-size:.875rem}
-.sc-t span{color:var(--muted);font-size:.8rem}
 
-/* large number facts */
-.sc-facts{display:flex;flex-direction:column}
-.sc-fact{
-  padding:1.875rem 0;border-bottom:1px solid var(--border);
-  display:grid;grid-template-columns:auto 1fr;gap:1.5rem;align-items:center;
+.committee-year-block:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
 }
-.sc-fact:first-child{border-top:1px solid var(--border)}
-.fn{font-size:3.5rem;font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums;line-height:1}
-.fn-or{color:var(--or)}.fn-li{color:var(--li)}.fn-cy{color:var(--cy)}
-.fl{font-size:.82rem;line-height:1.6;color:var(--muted)}
-.fl strong{display:block;font-weight:600;color:var(--ink);font-size:.875rem;margin-bottom:.15rem}
 
-/* ── OSS ── */
-.sec-os{padding:5.5rem 0;background:var(--sur);border-top:1px solid var(--border)}
-.os-g{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
-.os-txt h2{
-  font-size:clamp(1.6rem,2.5vw,2.2rem);
-  font-weight:800;letter-spacing:-.035em;line-height:1.1;
-  text-wrap:balance;margin-bottom:1.25rem;
+.cy-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    min-width: 44px;
+    padding-top: 2px;
+    letter-spacing: 0.5px;
 }
-.os-txt p{font-size:.9rem;color:var(--muted);line-height:1.75}
-.os-links{margin-top:2rem;border-top:1px solid var(--border)}
-.os-lnk{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.825rem 0;border-bottom:1px solid var(--border);
-  font-size:.85rem;font-weight:500;transition:color .15s;
-}
-.os-lnk:hover{color:var(--or)}
-.os-lnk span{font-size:.75rem;color:var(--muted)}
-.os-code{background:#0A0E1A;border-radius:8px;overflow:hidden}
-.cd-hd{
-  padding:.65rem 1rem;background:rgba(255,255,255,.03);
-  border-bottom:1px solid rgba(255,255,255,.07);
-  display:flex;align-items:center;gap:.5rem;
-}
-.cd-d{width:9px;height:9px;border-radius:50%}
-.cd-hd span{font-size:.68rem;color:rgba(255,255,255,.25);font-family:var(--mono);margin-left:.25rem}
-.cd-b{padding:1.25rem;font-family:var(--mono);font-size:.73rem;line-height:1.9;tab-size:2}
-.c-cm{color:rgba(255,255,255,.2)}.c-k{color:var(--cy)}.c-v{color:var(--li)}
-.c-s{color:#FFD070}.c-op{color:rgba(255,255,255,.35)}
 
-/* ── CTA ── */
-.sec-dl{padding:4rem 0;border-top:1px solid var(--border)}
-.dl-i{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:2rem}
-.dl-copy h2{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.375rem}
-.dl-copy p{font-size:.875rem;color:var(--muted)}
-.dl-acts{display:flex;gap:.875rem;flex-wrap:wrap;align-items:center}
-.btn-dl{
-  background:var(--or);color:#fff;font-weight:700;font-size:.875rem;
-  padding:.8rem 1.75rem;border-radius:4px;
-  display:inline-flex;align-items:center;gap:.5rem;transition:opacity .15s;
+.cy-members {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
 }
-.btn-dl:hover{opacity:.88}
-.btn-gh{
-  border:1px solid var(--border);font-size:.82rem;font-weight:500;
-  padding:.8rem 1.25rem;border-radius:4px;
-  display:inline-flex;align-items:center;gap:.375rem;
-  transition:border-color .15s;
-}
-.btn-gh:hover{border-color:var(--ink)}
 
-/* ── FOOTER ── */
-footer{
-  background:#080C15;color:rgba(255,255,255,.3);
-  padding:2.5rem 0;font-size:.8rem;
+.cy-member {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 14px;
 }
-.ft-i{
-  max-width:var(--max);margin:0 auto;padding:0 1.75rem;
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.25rem;
-}
-.f-brand{font-size:.875rem;font-weight:700;color:rgba(255,255,255,.65)}
-.f-brand span{color:var(--or)}
-.f-links{display:flex;gap:1.75rem;flex-wrap:wrap}
-.f-links a{color:rgba(255,255,255,.28);transition:color .15s}
-.f-links a:hover{color:rgba(255,255,255,.75)}
-.f-copy{color:rgba(255,255,255,.2);font-size:.72rem}
 
-/* ── RESPONSIVE ── */
-@media(max-width:880px){
-  .hero-i{grid-template-columns:1fr;gap:3rem}
-  .bw{transform:none;max-width:480px;margin:0 auto}
-  .ft-hd{grid-template-columns:1fr;gap:1.5rem}
-  .ft-row{grid-template-columns:1fr;gap:.5rem;padding:1.2rem 0}
-  .sc-g,.os-g{grid-template-columns:1fr;gap:3rem}
-}
-@media(max-width:600px){
-  .nav-links{display:none}
-  .dl-i{flex-direction:column;align-items:flex-start}
-  .ft-i{flex-direction:column;align-items:flex-start}
-}
-@media(prefers-reduced-motion:reduce){.bw{transform:none;transition:none}}
-</style>
+.cy-name  { color: var(--text); font-weight: 500; }
+.cy-role  { color: var(--muted); font-size: 12px; }
 
-<!-- OR NAVBAR — matches openrockets.com exactly -->
-<header class="or-header">
-  <nav class="or-nav">
-    <a href="https://openrockets.com" class="or-logo" id="or-logo-link">
-      <img src="https://openrockets.com/v/openrockets.png" alt="OpenRockets" id="or-logo-img"
-           onerror="document.getElementById('or-logo-img').style.display='none';document.getElementById('or-logo-text').style.display='block'">
-      <span class="or-logo-fb" id="or-logo-text">Open<br>Rockets<sup style="font-size:.55em;font-weight:700">®</sup></span>
-    </a>
-    <ul class="or-nav-links">
-      <li><a href="https://zeroprofit.org/">Register your NonProfit</a></li>
-      <li><a href="https://ads.openrockets.com/">Advertise for free</a></li>
-      <li><a href="https://press.openrockets.com/">Upload Artifacts</a></li>
-      <li><a href="https://about.openrockets.com/">Here to help!</a></li>
-      <li><a href="https://discord.gg/djXh8udpbn">Discord</a></li>
-    </ul>
-    <ul class="or-nav-ctas">
-      <li><a href="https://openrockets.com/join.html" class="apply">Apply</a></li>
-      <li><a href="https://discord.gg/djXh8udpbn">Discord</a></li>
-    </ul>
-  </nav>
+/* ── People Marquee ── */
+.people-marquee {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: var(--gray-100);
+}
+
+.people-row {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 12px 0;
+    background: var(--white);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.people-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-left 28s linear infinite;
+}
+
+.people-row.row-right .people-track {
+    animation-name: marquee-right;
+    animation-duration: 32s;
+}
+
+.people-row.slow .people-track {
+    animation-duration: 36s;
+}
+
+.people-set {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 10px;
+}
+
+.person-card {
+    display: inline-flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--white);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -0.1px;
+    color: var(--text);
+    text-align: left;
+    min-width: 160px;
+}
+
+.person-avatar {
+    --pixel: 8px;
+    --glass-blur: 14px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #0b0b0b;
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.18);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    image-rendering: pixelated;
+}
+
+.person-avatar::before,
+.person-avatar::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+}
+
+.person-avatar::before {
+    background-image: var(--pattern-primary);
+    background-size: var(--pattern-size);
+    background-repeat: repeat;
+    background-position: 0 0, 0 0, 0 0, 0 0;
+    filter: blur(var(--glass-blur)) saturate(1.25) contrast(1.05);
+    opacity: 0.98;
+    transform: scale(1.32);
+    animation: avatarGlow 20s linear infinite;
+}
+
+.person-avatar::after {
+    background:
+        radial-gradient(120px 70px at 30% 20%, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.06) 55%, rgba(255, 255, 255, 0) 70%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06));
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+        inset 0 -8px 18px rgba(0, 0, 0, 0.22);
+}
+
+.person-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+    gap: 2px;
+}
+
+/* Auto-add a small View Profile label to person cards */
+.person-card .person-text::after {
+    content: '';
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--muted);
+}
+.person-card:hover .person-text::after { text-decoration: underline; }
+
+.person-view {
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--muted);
+}
+.person-card:hover .person-view { text-decoration: underline; }
+
+.person-name {
+    color: var(--text);
+    font-size: 14px;
+}
+
+.person-meta {
+    color: var(--text);
+    font-size: 11px;
+    font-family: var(--font);
+    letter-spacing: 0.1px;
+    text-transform: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.region-icon {
+    font-size: 12px;
+    line-height: 1;
+    color: var(--text);
+}
+
+.name-font-a { font-family: var(--name-font-a); }
+.name-font-b { font-family: var(--name-font-b); }
+.name-font-c { font-family: var(--name-font-c); }
+
+.pattern-a {
+    --pattern-primary:
+        linear-gradient(90deg, var(--p1) 50%, transparent 0),
+        linear-gradient(var(--p2) 50%, transparent 0),
+        linear-gradient(90deg, transparent 50%, var(--p3) 0),
+        linear-gradient(transparent 50%, var(--p4) 0);
+    --pattern-secondary:
+        linear-gradient(90deg, var(--p3) 50%, transparent 0),
+        linear-gradient(var(--p4) 50%, transparent 0),
+        linear-gradient(90deg, transparent 50%, var(--p1) 0),
+        linear-gradient(transparent 50%, var(--p2) 0);
+    --pattern-size:
+        calc(var(--pixel) * 2) var(--pixel),
+        var(--pixel) calc(var(--pixel) * 2),
+        calc(var(--pixel) * 3) calc(var(--pixel) * 3),
+        calc(var(--pixel) * 2) calc(var(--pixel) * 2);
+}
+
+.pattern-b {
+    --pattern-primary:
+        repeating-linear-gradient(0deg, var(--p1) 0 var(--pixel), transparent var(--pixel) calc(var(--pixel) * 2)),
+        repeating-linear-gradient(90deg, var(--p2) 0 var(--pixel), transparent var(--pixel) calc(var(--pixel) * 2)),
+        repeating-linear-gradient(0deg, transparent 0 calc(var(--pixel) * 3), var(--p3) calc(var(--pixel) * 3) calc(var(--pixel) * 4));
+    --pattern-secondary:
+        repeating-linear-gradient(0deg, var(--p3) 0 var(--pixel), transparent var(--pixel) calc(var(--pixel) * 2)),
+        repeating-linear-gradient(90deg, var(--p4) 0 var(--pixel), transparent var(--pixel) calc(var(--pixel) * 2)),
+        repeating-linear-gradient(90deg, transparent 0 calc(var(--pixel) * 3), var(--p1) calc(var(--pixel) * 3) calc(var(--pixel) * 4));
+    --pattern-size:
+        calc(var(--pixel) * 4) calc(var(--pixel) * 4),
+        calc(var(--pixel) * 4) calc(var(--pixel) * 4),
+        calc(var(--pixel) * 6) calc(var(--pixel) * 6);
+}
+
+.pattern-c {
+    --pattern-primary:
+        linear-gradient(var(--p1) 0 0),
+        linear-gradient(90deg, var(--p2) 50%, transparent 0),
+        linear-gradient(transparent 50%, var(--p3) 0);
+    --pattern-secondary:
+        linear-gradient(var(--p3) 0 0),
+        linear-gradient(90deg, var(--p4) 50%, transparent 0),
+        linear-gradient(transparent 50%, var(--p1) 0);
+    --pattern-size:
+        calc(var(--pixel) * 3) calc(var(--pixel) * 3),
+        calc(var(--pixel) * 2) var(--pixel),
+        var(--pixel) calc(var(--pixel) * 2);
+}
+
+.pattern-d {
+    --pattern-primary:
+        conic-gradient(from 90deg, var(--p1) 0 25%, var(--p2) 0 50%, var(--p3) 0 75%, var(--p4) 0 100%),
+        conic-gradient(from 45deg, var(--p3) 0 25%, var(--p1) 0 50%, var(--p4) 0 75%, var(--p2) 0 100%);
+    --pattern-secondary:
+        conic-gradient(from 0deg, var(--p2) 0 25%, var(--p4) 0 50%, var(--p1) 0 75%, var(--p3) 0 100%),
+        conic-gradient(from 135deg, var(--p4) 0 25%, var(--p2) 0 50%, var(--p3) 0 75%, var(--p1) 0 100%);
+    --pattern-size:
+        calc(var(--pixel) * 2) calc(var(--pixel) * 2),
+        calc(var(--pixel) * 3) calc(var(--pixel) * 3);
+}
+
+.pattern-e {
+    --pattern-primary:
+        repeating-linear-gradient(90deg, var(--p1) 0 calc(var(--pixel) * 2), transparent calc(var(--pixel) * 2) calc(var(--pixel) * 3)),
+        repeating-linear-gradient(0deg, var(--p3) 0 calc(var(--pixel) * 2), transparent calc(var(--pixel) * 2) calc(var(--pixel) * 3)),
+        linear-gradient(90deg, transparent 50%, var(--p2) 0);
+    --pattern-secondary:
+        repeating-linear-gradient(90deg, var(--p4) 0 calc(var(--pixel) * 2), transparent calc(var(--pixel) * 2) calc(var(--pixel) * 3)),
+        repeating-linear-gradient(0deg, var(--p1) 0 calc(var(--pixel) * 2), transparent calc(var(--pixel) * 2) calc(var(--pixel) * 3)),
+        linear-gradient(90deg, transparent 50%, var(--p3) 0);
+    --pattern-size:
+        calc(var(--pixel) * 6) calc(var(--pixel) * 6),
+        calc(var(--pixel) * 6) calc(var(--pixel) * 6),
+        calc(var(--pixel) * 2) calc(var(--pixel) * 2);
+}
+
+.pattern-f {
+    --pattern-primary:
+        linear-gradient(90deg, var(--p2) 25%, transparent 0),
+        linear-gradient(90deg, transparent 50%, var(--p3) 0),
+        linear-gradient(var(--p1) 0 0);
+    --pattern-secondary:
+        linear-gradient(90deg, var(--p4) 25%, transparent 0),
+        linear-gradient(90deg, transparent 50%, var(--p1) 0),
+        linear-gradient(var(--p3) 0 0);
+    --pattern-size:
+        calc(var(--pixel) * 2) var(--pixel),
+        calc(var(--pixel) * 3) calc(var(--pixel) * 2),
+        calc(var(--pixel) * 4) calc(var(--pixel) * 4);
+}
+
+.pattern-g {
+    --pattern-primary:
+        repeating-linear-gradient(45deg, var(--p1) 0 var(--pixel), transparent var(--pixel) calc(var(--pixel) * 2)),
+        repeating-linear-gradient(-45deg, var(--p2) 0 var(--pixel), transparent var(--pixel) calc(var(--pixel) * 2)),
+        linear-gradient(var(--p3) 0 0);
+    --pattern-secondary:
+        repeating-linear-gradient(45deg, var(--p4) 0 var(--pixel), transparent var(--pixel) calc(var(--pixel) * 2)),
+        repeating-linear-gradient(-45deg, var(--p1) 0 var(--pixel), transparent var(--pixel) calc(var(--pixel) * 2)),
+        linear-gradient(var(--p2) 0 0);
+    --pattern-size:
+        calc(var(--pixel) * 4) calc(var(--pixel) * 4),
+        calc(var(--pixel) * 4) calc(var(--pixel) * 4),
+        calc(var(--pixel) * 3) calc(var(--pixel) * 3);
+}
+
+.pattern-h {
+    --pattern-primary:
+        linear-gradient(90deg, var(--p1) 0 25%, transparent 0 50%, var(--p2) 0 75%, transparent 0),
+        linear-gradient(var(--p3) 0 25%, transparent 0 50%, var(--p4) 0 75%, transparent 0);
+    --pattern-secondary:
+        linear-gradient(90deg, var(--p4) 0 25%, transparent 0 50%, var(--p1) 0 75%, transparent 0),
+        linear-gradient(var(--p2) 0 25%, transparent 0 50%, var(--p3) 0 75%, transparent 0);
+    --pattern-size:
+        calc(var(--pixel) * 4) calc(var(--pixel) * 2),
+        calc(var(--pixel) * 2) calc(var(--pixel) * 4);
+}
+
+.avatar-orange { --p1: #f97316; --p2: #fb7185; --p3: #0ea5e9; --p4: #facc15; }
+.avatar-coral  { --p1: #fb7185; --p2: #f43f5e; --p3: #8b5cf6; --p4: #f59e0b; }
+.avatar-lime   { --p1: #a3e635; --p2: #22c55e; --p3: #38bdf8; --p4: #facc15; }
+.avatar-blue   { --p1: #3b82f6; --p2: #38bdf8; --p3: #f97316; --p4: #ec4899; }
+.avatar-violet { --p1: #8b5cf6; --p2: #d946ef; --p3: #06b6d4; --p4: #facc15; }
+.avatar-teal   { --p1: #14b8a6; --p2: #22d3ee; --p3: #f43f5e; --p4: #f97316; }
+.avatar-rose   { --p1: #f43f5e; --p2: #e11d48; --p3: #6366f1; --p4: #22c55e; }
+.avatar-sky    { --p1: #38bdf8; --p2: #0ea5e9; --p3: #f59e0b; --p4: #d946ef; }
+.avatar-amber  { --p1: #f59e0b; --p2: #fbbf24; --p3: #ef4444; --p4: #22d3ee; }
+.avatar-mint   { --p1: #10b981; --p2: #34d399; --p3: #6366f1; --p4: #f97316; }
+.avatar-indigo { --p1: #6366f1; --p2: #818cf8; --p3: #f43f5e; --p4: #facc15; }
+.avatar-gold   { --p1: #fbbf24; --p2: #facc15; --p3: #8b5cf6; --p4: #06b6d4; }
+.avatar-slate  { --p1: #94a3b8; --p2: #64748b; --p3: #f97316; --p4: #22c55e; }
+.avatar-cyan   { --p1: #06b6d4; --p2: #22d3ee; --p3: #ec4899; --p4: #facc15; }
+
+@keyframes marquee-left {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+
+@keyframes marquee-right {
+    from { transform: translateX(-50%); }
+    to   { transform: translateX(0); }
+}
+
+@keyframes avatarGlow {
+    0%   { background-position: 0 0, 0 0, 0 0, 0 0; }
+    50%  { background-position: 8px -6px, -10px 4px, 6px -4px, -8px 10px; }
+    100% { background-position: 0 0, 0 0, 0 0, 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .people-track {
+        animation: none;
+        transform: translateX(0);
+    }
+}
+
+        :root{
+            --hds-color-button-primary-bg:rgb(0, 235, 152);
+        }
+    </style>
+<div id="__next">
+<div>
+<div class="mobile-safari-solid-bars"></div>
+<!-- ========================================== -->
+<!--            HEADER / NAVIGATION             -->
+<!-- ========================================== -->
+<header class="hds-color-mode navigation section section--white hds-mode--light" id="main-header" style="position: sticky; top: 0; left: 0; width: 100%; filter: invert(1); background-color: white; z-index: 10000; transition: transform 0.3s ease;">
+<div class="section-container navigation__layout">
+<nav class="hds-navigation-menu navigation-menu navigation-menu--homepage" id="navigation-menu">
+<!-- OpenRockets Brand Logo -->
+<img alt="OpenRockets Logo" src="https://openrockets.com/v/openrockets.png" style="filter: invert(1); width: 130px; background-color: 0; "/>
+<!-- Menu Links -->
+<div class="hds-navigation-menu__content navigation-menu-content" data-status="unmounted">
+<ul class="hds-navigation-menu__list navigation-menu-list hds-navigation-menu__list--horizontal">
+<a class="hds-navigation-menu__item navigation-item" href="https://zeroprofit.org" style="text-decoration: none;">
+<button class="hds-button hds-navigation-menu__trigger hds-button--transparent" type="button">
+<svg class="bi bi-patch-check-fill" fill="currentColor" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M10.067.87a2.89 2.89 0 0 0-4.134 0l-.622.638-.89-.011a2.89 2.89 0 0 0-2.924 2.924l.01.89-.636.622a2.89 2.89 0 0 0 0 4.134l.637.622-.011.89a2.89 2.89 0 0 0 2.924 2.924l.89-.01.622.636a2.89 2.89 0 0 0 4.134 0l.622-.637.89.011a2.89 2.89 0 0 0 2.924-2.924l-.01-.89.636-.622a2.89 2.89 0 0 0 0-4.134l-.637-.622.011-.89a2.89 2.89 0 0 0-2.924-2.924l-.89.01zm.287 5.984-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708.708"></path>
+</svg>
+                    Register your NonProfit</button>
+</a>
+<a class="hds-navigation-menu__item navigation-item" href="https://ads.openrockets.com" style="text-decoration: none;">
+<button class="hds-button hds-navigation-menu__trigger hds-button--transparent" type="button">
+<svg class="bi bi-people-fill" fill="currentColor" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"></path>
+</svg>
+                    Advertise for free</button>
+</a>
+<a class="hds-navigation-menu__item navigation-item" href="https://press.openrockets.com" style="text-decoration: none;">
+<button class="hds-button hds-navigation-menu__trigger hds-button--transparent" type="button">
+<img alt="" src="https://openrockets.com/i/assets/static/openthread_logo_bash-trans-removebg-preview (1).png" style="width: 20px; filter: invert(1) hue-rotate(45deg);"/>
+                    Upload Artifacts</button>
+</a>
+<a class="hds-navigation-menu__item navigation-item" href="https://about.openrockets.com/" style="text-decoration: none;">
+<button class="hds-button hds-navigation-menu__trigger hds-button--transparent" type="button"><svg class="bi bi-chat-fill" fill="currentColor" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6-.097 1.016-.417 2.13-.771 2.966-.079.186.074.394.273.362 2.256-.37 3.597-.938 4.18-1.234A9 9 0 0 0 8 15"></path>
+</svg> Here to help!</button>
+</a>
+<a class="hds-navigation-menu__item navigation-item" href="https://discord.gg/djXh8udpbn" style="text-decoration: none;">
+<button class="hds-button hds-navigation-menu__trigger hds-button--transparent" type="button"><svg class="bi bi-discord" fill="currentColor" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"></path>
+</svg>   Discord</button>
+</a>
+</ul>
+</div>
+<!-- Header Action Buttons -->
+<button id="mobile-hamburger-btn" style="background: none; border: none; font-size: 28px; cursor: pointer; color: black; margin-right: 15px; display: none;">?</button><ul class="navigation-buttons">
+<li class="hds-navigation-menu__item navigation-item">
+<a class="hds-button navigation-cta-button navigation-item__sign-in hds-button--secondary-on-quiet" href="https://openrockets.com/join.html">
+<span class="navigation-button-measure">Apply</span>
+</a>
+</li>
+<li class="hds-navigation-menu__item navigation-item">
+<a class="hds-button navigation-cta-button navigation-item__contact-sales hds-button--primary" href="https://discord.gg/djXh8udpbn">
+                  Discord
+                  <svg class="hds-icon hds-icon-hover-arrow" fill="none" height="10" stroke="currentColor" stroke-width="2" width="10">
+<path d="M0.5 5.5h7"></path>
+<path d="M1.5 1.5l4 4-4 4"></path>
+</svg>
+</a>
+</li>
+</ul>
+</nav>
+</div>
 </header>
+<!-- ========================================== -->
+<!--                HERO SECTION                -->
+<!-- ========================================== -->
+<main id="main-content"></main>
+<!-- ========================================== -->
+<style>*,:before,:after,::backdrop {
+    --tw-border-spacing-x: 0;
+    --tw-border-spacing-y: 0;
+    --tw-translate-x: 0;
+    --tw-translate-y: 0;
+    --tw-rotate: 0;
+    --tw-skew-x: 0;
+    --tw-skew-y: 0;
+    --tw-scale-x: 1;
+    --tw-scale-y: 1;
+    --tw-pan-x: ;
+    --tw-pan-y: ;
+    --tw-pinch-zoom: ;
+    --tw-scroll-snap-strictness: proximity;
+    --tw-gradient-from-position: ;
+    --tw-gradient-via-position: ;
+    --tw-gradient-to-position: ;
+    --tw-ordinal: ;
+    --tw-slashed-zero: ;
+    --tw-numeric-figure: ;
+    --tw-numeric-spacing: ;
+    --tw-numeric-fraction: ;
+    --tw-ring-inset: ;
+    --tw-ring-offset-width: 0px;
+    --tw-ring-offset-color: #fff;
+    --tw-ring-color: #3b82f680;
+    --tw-ring-offset-shadow: 0 0 #0000;
+    --tw-ring-shadow: 0 0 #0000;
+    --tw-shadow: 0 0 #0000;
+    --tw-shadow-colored: 0 0 #0000;
+    --tw-blur: ;
+    --tw-brightness: ;
+    --tw-contrast: ;
+    --tw-grayscale: ;
+    --tw-hue-rotate: ;
+    --tw-invert: ;
+    --tw-saturate: ;
+    --tw-sepia: ;
+    --tw-drop-shadow: ;
+    --tw-backdrop-blur: ;
+    --tw-backdrop-brightness: ;
+    --tw-backdrop-contrast: ;
+    --tw-backdrop-grayscale: ;
+    --tw-backdrop-hue-rotate: ;
+    --tw-backdrop-invert: ;
+    --tw-backdrop-opacity: ;
+    --tw-backdrop-saturate: ;
+    --tw-backdrop-sepia: ;
+    --tw-contain-size: ;
+    --tw-contain-layout: ;
+    --tw-contain-paint: ;
+    --tw-contain-style:
+}
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-i">
-    <div>
-      <h1><span class="ik">InterKid</span> — the browser kids actually want to use.</h1>
-      <p class="hero-sub">An open-source browser built for children and educational systems. <strong>Safe by default, ad-free, classroom-ready.</strong> Powered by Hack Club's Vertex engine.</p>
-      <div class="hero-acts">
-        <a href="#download" class="btn-p">↓ Download Free</a>
-        <a href="https://github.com/hackclubium/vertex" class="btn-t">GitHub ↗</a>
-      </div>
-    </div>
+.footer-logo {
+    max-width: 320px;
+    height: 8rem
+}
 
-    <!-- Browser mockup -->
-    <div class="bw" aria-hidden="true">
-      <div class="bm">
-        <div class="bc2">
-          <div class="btr">
-            <span class="dot dr"></span>
-            <span class="dot dy"></span>
-            <span class="dot dg"></span>
-          </div>
-          <div class="bta">
-            <div class="tab a">
-              <svg class="tfav" viewBox="0 0 12 12"><rect width="12" height="12" rx="2" fill="#FF5500"/><text x="6" y="9.5" font-size="7.5" text-anchor="middle" fill="white" font-family="sans-serif" font-weight="bold">K</text></svg>
-              Khan Academy
-            </div>
-            <div class="tab">
-              <svg class="tfav" viewBox="0 0 12 12"><rect width="12" height="12" rx="2" fill="#FF8600"/><text x="6" y="9.5" font-size="7.5" text-anchor="middle" fill="white" font-family="sans-serif" font-weight="bold">S</text></svg>
-              Scratch
-            </div>
-          </div>
-        </div>
-        <div class="btb">
-          <div class="tbb">←</div>
-          <div class="tbb">→</div>
-          <div class="tbb">↻</div>
-          <div class="addr">
-            <span class="al">🔒</span>
-            <span class="at">khanacademy.org/math/grade-5</span>
-            <span class="as">Safe</span>
-          </div>
-        </div>
-        <div class="bvp">
-          <div class="mph">
-            <span class="mpl">Khan Academy</span>
-            <div class="mpps"><div class="mpp"></div><div class="mpp" style="width:22px"></div></div>
-          </div>
-          <div class="mphe">
-            <div class="mpls">
-              <div class="mphh" style="width:78%"></div>
-              <div class="mphh" style="width:55%;background:rgba(255,255,255,.38)"></div>
-              <div class="mppp" style="width:70%;margin-top:6px"></div>
-              <div class="mppp" style="width:48%"></div>
-            </div>
-            <div class="mpim"></div>
-          </div>
-          <div class="mpca">
-            <div class="mpcd"><div class="mpci" style="background:var(--or)"></div><div class="mpcl"></div><div class="mpcl" style="width:60%"></div></div>
-            <div class="mpcd"><div class="mpci" style="background:var(--cy)"></div><div class="mpcl"></div><div class="mpcl" style="width:55%"></div></div>
-            <div class="mpcd"><div class="mpci" style="background:var(--li)"></div><div class="mpcl"></div><div class="mpcl" style="width:65%"></div></div>
-          </div>
-        </div>
-      </div>
-    </div>
+.player-loading-label {
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    font-family: Michroma,monospace;
+    font-size: 11px
+}
 
-  </div>
-</section>
+.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-900 {
+    color: #000
+}
 
-<!-- FEATURES -->
-<section class="sec-ft" id="features">
-  <div class="wrap">
-    <div class="ft-hd">
-      <h2>Built for real classrooms.</h2>
-      <p>Safe and ad-free out of the box, with the controls schools need — without the vendor lock-in they're tired of paying for.</p>
-    </div>
-    <div class="ft-list">
-      <div class="ft-row">
-        <div class="ft-name">Safe by default</div>
-        <div class="ft-desc">Content filtering blocks inappropriate sites, adult content, and dangerous downloads on install. No configuration, no ongoing fees, no per-seat charges.</div>
-      </div>
-      <div class="ft-row">
-        <div class="ft-name">Zero ads, zero tracking</div>
-        <div class="ft-desc">No advertising networks. No behavioral profiling of minors. No targeting, ever. Children see content — not manipulation designed to hook their attention.</div>
-      </div>
-      <div class="ft-row">
-        <div class="ft-name">Classroom mode</div>
-        <div class="ft-desc">Teachers lock all student devices to a single tab, push URLs to every student, or whitelist a set of approved sites for the lesson — in one click from the admin panel.</div>
-      </div>
-      <div class="ft-row">
-        <div class="ft-name">MDM-ready deployment</div>
-        <div class="ft-desc">Push to hundreds of Chromebooks, Windows, or Linux machines via Jamf, Mosyle, Intune, or manual imaging. Pre-built policy templates for common configurations are included.</div>
-      </div>
-      <div class="ft-row">
-        <div class="ft-name">Screen time controls</div>
-        <div class="ft-desc">Set daily usage caps, break reminders, and schedule off-hours. Works entirely locally — no cloud account or external service required.</div>
-      </div>
-      <div class="ft-row">
-        <div class="ft-name">COPPA &amp; FERPA ready</div>
-        <div class="ft-desc">No student accounts means no PII collection. District admins manage all settings locally. Legal compliance built in from the ground up, not bolted on later.</div>
-      </div>
-    </div>
-  </div>
-</section>
+.bg-gray-50,.bg-gray-100,.bg-gray-200 {
+    background-color: #fff
+}
 
-<!-- STATEMENT -->
-<section class="sec-st">
-  <div class="wrap">
-    <p class="st-txt">
-      <strong>No accounts. No ads. No data collected.</strong>
-      A browser that exists for one reason —
-      getting out of the way so kids can learn.
-      <em>Open source, MIT licensed,</em>
-      free forever.
-    </p>
-    <div class="st-sub">
-      <span>Built on hackclubium/vertex</span>
-      <span>MIT License</span>
-      <span>Windows · macOS · Linux</span>
-      <span>An OpenRockets project</span>
-    </div>
-  </div>
-</section>
+.border-gray-100,.border-gray-200,.border-gray-300 {
+    border-color: #000
+}
 
-<!-- FOR SCHOOLS -->
-<section class="sec-sc" id="schools">
-  <div class="wrap">
-    <div class="sc-g">
-      <div class="sc-txt">
-        <h2>IT-friendly from day one.</h2>
-        <p>No per-seat licensing. No cloud dependencies. No vendor negotiation. A browser your IT department can deploy, audit, and trust.</p>
-        <ul class="sc-list">
-          <li>
-            <div class="sc-dot"></div>
-            <div class="sc-t">
-              <strong>Bulk deployment in minutes</strong>
-              <span>Drop the installer into your MDM or imaging pipeline. Group Policy templates for Windows domains included.</span>
-            </div>
-          </li>
-          <li>
-            <div class="sc-dot"></div>
-            <div class="sc-t">
-              <strong>Local admin dashboard</strong>
-              <span>Manage filter lists, whitelists, classroom sessions, and screen time policies from a single local interface — no cloud account needed.</span>
-            </div>
-          </li>
-          <li>
-            <div class="sc-dot"></div>
-            <div class="sc-t">
-              <strong>Works offline &amp; on-prem</strong>
-              <span>Filtering and admin controls require no internet dependency. Runs entirely on your own network.</span>
-            </div>
-          </li>
-          <li>
-            <div class="sc-dot"></div>
-            <div class="sc-t">
-              <strong>Community supported</strong>
-              <span>Maintained by Hack Club contributors and the OpenRockets community. File issues, submit PRs, or fork freely.</span>
-            </div>
-          </li>
-        </ul>
-      </div>
-      <div class="sc-facts">
-        <div class="sc-fact">
-          <div class="fn fn-or">$0</div>
-          <div class="fl">
-            <strong>Cost per seat</strong>
-            Free to download, deploy, and distribute. No licensing tiers, no renewal calls.
-          </div>
-        </div>
-        <div class="sc-fact">
-          <div class="fn fn-li">All</div>
-          <div class="fl">
-            <strong>Ad networks blocked</strong>
-            Every known ad and tracking network, blocked by default — no extension required.
-          </div>
-        </div>
-        <div class="sc-fact">
-          <div class="fn fn-cy">Zero</div>
-          <div class="fl">
-            <strong>Student data collected</strong>
-            No accounts, no telemetry, no usage logs sent outside your network.
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+button.rounded-md,button.rounded-lg,button.rounded-full,a.rounded-md,a.rounded-lg,a.rounded-full {
+    border-radius: 0
+}
 
-<!-- OPEN SOURCE -->
-<section class="sec-os" id="oss">
-  <div class="wrap">
-    <div class="os-g">
-      <div class="os-txt">
-        <h2>Built on Hack Club's Vertex engine.</h2>
-        <p>InterKid is a child-safety layer on top of <strong>hackclubium/vertex</strong> — a Chromium fork built by students for students. The full stack is open, auditable, and MIT-licensed. Fork it, inspect it, or contribute.</p>
-        <div class="os-links">
-          <a href="https://github.com/hackclubium/vertex" class="os-lnk">
-            hackclubium/vertex
-            <span>Upstream engine ↗</span>
-          </a>
-          <a href="https://github.com/openrockets/interkid" class="os-lnk">
-            openrockets/interkid
-            <span>This project ↗</span>
-          </a>
-          <a href="#" class="os-lnk">
-            MIT License
-            <span>No restrictions ↗</span>
-          </a>
-          <a href="#" class="os-lnk">
-            File an issue or suggest a feature
-            <span>GitHub Issues ↗</span>
-          </a>
-        </div>
-      </div>
-      <div class="os-code">
-        <div class="cd-hd">
-          <span class="cd-d" style="background:#FF5F57"></span>
-          <span class="cd-d" style="background:#FFBD2E"></span>
-          <span class="cd-d" style="background:#28CA41"></span>
-          <span>interkid.config.json</span>
-        </div>
-        <div class="cd-b">
-<span class="c-op">{</span><br>
-&nbsp;&nbsp;<span class="c-k">"browser"</span><span class="c-op">:</span> <span class="c-s">"InterKid"</span><span class="c-op">,</span><br>
-&nbsp;&nbsp;<span class="c-k">"engine"</span><span class="c-op">:</span> <span class="c-s">"hackclubium/vertex"</span><span class="c-op">,</span><br>
-&nbsp;&nbsp;<span class="c-k">"license"</span><span class="c-op">:</span> <span class="c-s">"MIT"</span><span class="c-op">,</span><br>
-&nbsp;&nbsp;<span class="c-cm">// safety — all on out of the box</span><br>
-&nbsp;&nbsp;<span class="c-k">"safeSearch"</span><span class="c-op">:</span> <span class="c-v">true</span><span class="c-op">,</span><br>
-&nbsp;&nbsp;<span class="c-k">"adBlocking"</span><span class="c-op">:</span> <span class="c-v">true</span><span class="c-op">,</span><br>
-&nbsp;&nbsp;<span class="c-k">"tracking"</span><span class="c-op">:</span> <span class="c-v">false</span><span class="c-op">,</span><br>
-&nbsp;&nbsp;<span class="c-k">"classroomMode"</span><span class="c-op">:</span> <span class="c-v">true</span><span class="c-op">,</span><br>
-&nbsp;&nbsp;<span class="c-k">"dataCollected"</span><span class="c-op">:</span> <span class="c-v">null</span><span class="c-op">,</span><br>
-&nbsp;&nbsp;<span class="c-k">"platforms"</span><span class="c-op">:</span> <span class="c-op">[</span><span class="c-s">"windows"</span><span class="c-op">,</span> <span class="c-s">"macos"</span><span class="c-op">,</span> <span class="c-s">"linux"</span><span class="c-op">],</span><br>
-&nbsp;&nbsp;<span class="c-k">"mdmTemplates"</span><span class="c-op">:</span> <span class="c-op">[</span><br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-s">"jamf"</span><span class="c-op">,</span> <span class="c-s">"intune"</span><span class="c-op">,</span> <span class="c-s">"mosyle"</span><br>
-&nbsp;&nbsp;<span class="c-op">]</span><br>
-<span class="c-op">}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+:root {
+    scrollbar-color: #3b82f6 #3b82f614;
+    scrollbar-width: thin
+}
 
-<!-- DOWNLOAD -->
-<section class="sec-dl" id="download">
-  <div class="wrap">
-    <div class="dl-i">
-      <div class="dl-copy">
-        <h2>Ready to set up InterKid?</h2>
-        <p>Free to download, free to deploy — no subscriptions, no vendor calls.</p>
-      </div>
-      <div class="dl-acts">
-        <a href="#" class="btn-dl">↓ Download Free</a>
-        <a href="https://github.com/hackclubium/vertex" class="btn-gh">View on GitHub ↗</a>
-      </div>
-    </div>
-  </div>
-</section>
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px
+}
 
-<!-- FOOTER -->
-<footer>
-  <div class="ft-i">
-    <div class="f-brand"><span>InterKid</span> — a project by <a href="https://openrockets.com" style="color:rgba(255,255,255,.45)">OpenRockets</a></div>
-    <div class="f-links">
-      <a href="#features">Features</a>
-      <a href="#schools">For Schools</a>
-      <a href="#oss">Open Source</a>
-      <a href="https://github.com/hackclubium/vertex">GitHub</a>
-      <a href="#">MIT License</a>
-    </div>
-    <div class="f-copy">© 2025 OpenRockets. Built on hackclubium/vertex.</div>
-  </div>
+::-webkit-scrollbar-track {
+    background: #0f172a0a
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(#3b82f6 0%,#2563eb 100%);
+    border: 2px solid #fffc;
+    border-radius: 999px
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(#2563eb 0%,#1d4ed8 100%)
+}
+
+.py-10 {
+    background-color: #ffffffc7
+}
+
+@keyframes blink-colors {
+    0%,to {
+        color: #fff;
+        background-color: #000;
+        border-color: #000
+    }
+
+    50% {
+        color: #000;
+        background-color: #fff;
+        border-color: #000
+    }
+}
+
+.animate-blink-btn {
+    animation: 1.2s step-end infinite blink-colors
+}
+
+.last\:border-0:last-child {
+    border-width: 0
+}
+
+.hover\:bg-black:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgb(0 0 0/var(--tw-bg-opacity,1))
+}
+
+.hover\:bg-gray-50:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgb(249 250 251/var(--tw-bg-opacity,1))
+}
+
+.hover\:bg-gray-800:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgb(31 41 55/var(--tw-bg-opacity,1))
+}
+
+.hover\:bg-white:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgb(255 255 255/var(--tw-bg-opacity,1))
+}
+
+.hover\:bg-white\/10:hover {
+    background-color: #ffffff1a
+}
+
+.hover\:fill-amber-200:hover {
+    fill: #fde68a
+}
+
+.hover\:text-gray-900:hover {
+    --tw-text-opacity: 1;
+    color: rgb(17 24 39/var(--tw-text-opacity,1))
+}
+
+.hover\:text-red-700:hover {
+    --tw-text-opacity: 1;
+    color: rgb(185 28 28/var(--tw-text-opacity,1))
+}
+
+.hover\:underline:hover {
+    text-decoration-line: underline
+}
+
+.hover\:opacity-80:hover {
+    opacity: .8
+}
+
+.focus\:outline-none:focus {
+    outline-offset: 2px;
+    outline: 2px solid #0000
+}
+
+.focus\:ring-0:focus {
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow,0 0 #0000)
+}
+
+.focus\:ring-2:focus {
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow,0 0 #0000)
+}
+
+.focus\:ring-black:focus {
+    --tw-ring-opacity: 1;
+    --tw-ring-color: rgb(0 0 0/var(--tw-ring-opacity,1))
+}
+
+.focus\:ring-blue-500:focus {
+    --tw-ring-opacity: 1;
+    --tw-ring-color: rgb(59 130 246/var(--tw-ring-opacity,1))
+}
+
+.disabled\:cursor-not-allowed:disabled {
+    cursor: not-allowed
+}
+
+.disabled\:opacity-50:disabled {
+    opacity: .5
+}
+
+.prose-headings\:text-black :where(h1,h2,h3,h4,h5,h6,th):not(:where([class~=not-prose],[class~=not-prose] *)),.prose-p\:text-black :where(p):not(:where([class~=not-prose],[class~=not-prose] *)),.prose-a\:text-black :where(a):not(:where([class~=not-prose],[class~=not-prose] *)),.prose-strong\:text-black :where(strong):not(:where([class~=not-prose],[class~=not-prose] *)),.prose-li\:text-black :where(li):not(:where([class~=not-prose],[class~=not-prose] *)) {
+    --tw-text-opacity: 1;
+    color: rgb(0 0 0/var(--tw-text-opacity,1))
+}
+
+@media (width>=640px) {
+    .sm\: col-span-2 {
+        grid-column:span 2/span 2
+    }
+
+    .sm\:inline {
+        display: inline
+    }
+
+    .sm\:hidden {
+        display: none
+    }
+
+    .sm\:grid-cols-2 {
+        grid-template-columns: repeat(2,minmax(0,1fr))
+    }
+
+    .sm\:grid-cols-3 {
+        grid-template-columns: repeat(3,minmax(0,1fr))
+    }
+
+    .sm\:flex-row {
+        flex-direction: row
+    }
+
+    .sm\:gap-0 {
+        gap: 0
+    }
+
+    .sm\:gap-3 {
+        gap: .75rem
+    }
+
+    .sm\:gap-4 {
+        gap: 1rem
+    }
+
+    .sm\:p-8 {
+        padding: 2rem
+    }
+
+    .sm\:px-4 {
+        padding-left: 1rem;
+        padding-right: 1rem
+    }
+
+    .sm\:px-6 {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem
+    }
+
+    .sm\:py-0 {
+        padding-top: 0;
+        padding-bottom: 0
+    }
+
+    .sm\:pl-4 {
+        padding-left: 1rem
+    }
+
+    .sm\:text-3xl {
+        font-size: 1.875rem;
+        line-height: 2.25rem
+    }
+
+    .sm\:text-4xl {
+        font-size: 2.25rem;
+        line-height: 2.5rem
+    }
+
+    .sm\:text-5xl {
+        font-size: 3rem;
+        line-height: 1
+    }
+
+    .sm\:text-base {
+        font-size: 1rem;
+        line-height: 1.5rem
+    }
+
+    .sm\:text-lg {
+        font-size: 1.125rem;
+        line-height:1.35rem
+    }
+}
+
+@media (width>=768px) {
+    .md\: col-span-2 {
+        grid-column:span 2/span 2
+    }
+
+    .md\:flex {
+        display: flex
+    }
+
+    .md\:grid-cols-2 {
+        grid-template-columns: repeat(2,minmax(0,1fr))
+    }
+
+    .md\:grid-cols-4 {
+        grid-template-columns: repeat(4,minmax(0,1fr))
+    }
+
+    .md\:flex-row {
+        flex-direction: row
+    }
+
+    .md\:items-start {
+        align-items: flex-start
+    }
+
+    .md\:items-center {
+        align-items: center
+    }
+
+    .md\:justify-between {
+        justify-content: space-between
+    }
+}
+
+@media (width>=1024px) {
+    .lg\: col-span-5 {
+        grid-column:span 5/span 5
+    }
+
+    .lg\:col-span-7 {
+        grid-column: span 7/span 7
+    }
+
+    .lg\:w-72 {
+        width: 18rem
+    }
+
+    .lg\:w-full {
+        width: 100%
+    }
+
+    .lg\:grid-cols-12 {
+        grid-template-columns: repeat(12,minmax(0,1fr))
+    }
+
+    .lg\:grid-cols-3 {
+        grid-template-columns: repeat(3,minmax(0,1fr))
+    }
+
+    .lg\:grid-cols-\[320px\,1fr\,280px\] {
+        grid-template-columns: 320px 1fr 280px
+    }
+
+    .lg\:flex-row {
+        flex-direction: row
+    }
+
+    .lg\:flex-col {
+        flex-direction: column
+    }
+
+    .lg\:px-8 {
+        padding-left: 2rem;
+        padding-right: 2rem
+    }
+}
+
+@media (width>=1280px) {
+    .xl\: col-span-4 {
+        grid-column:span 4/span 4
+    }
+
+    .xl\:col-span-8 {
+        grid-column: span 8/span 8
+    }
+}
+</style>
+<!--                   FOOTER                   -->
+</div>
+<!-- ═══════════════════════════════════════════ -->
+<!-- FOOTER                                     -->
+<!-- ═══════════════════════════════════════════ -->
+<footer class="or-footer" style="background-color: white;">
+<div class="or-container" style="background: white;">
+<div class="or-footer-top" style="justify-content: center !important; align-items: center !important;">
+<img alt="" max-width="70%" src="https://openrockets.com/v/7d272ef1-dd42-478a-807e-35463dbb5634.png"/>
+<div class="or-footer-links">
+<a class="or-footer-link" href="https://zeroprofit.org">
+<span style="font-size: 200%; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;font-weight: 700; color: black !important; ">We Stand For </span>
+<img alt="" src="https://zeroprofit.org/assets/images/brand-logo1.png" style="width: 200px;"/>
+</a>
+</div>
+</div>
+</div>
 </footer>
+<style>
+    .home-footer { margin-top: 3rem; }
+    .home-shell { width: 100%; margin-inline: auto; padding-inline: 16px; }
+    .footer-content { font-size: .875rem; }
+  </style>
+<footer class="home-footer" data-testid="home-footer" style="border-top: 1px solid #ffffff; padding-top: 40px; padding-bottom: 40px; padding-left:2rem ; padding-right: 2rem; background-color: #000000; color: #ffffff;">
+<div class="home-shell footer-content" style="display: flex; flex-direction: column; gap: 30px;">
+<div style="display: flex; flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
+<img alt="OpenRockets Mode Logo" src="https://openrockets.com/i/assets/static/brand/DARKMODEFAVICON.png" style="width: 7rem; max-width: 100%;"/>
+<hr style="width: 100%; border: none; border-top: 1px solid rgba(255,255,255,0.2); margin-top: 20px;"/>
+</div>
+<div class="footer-top-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px;">
+<div class="footer-col" style="text-align: left; display: flex; flex-direction: column; align-items: flex-start;">
+<img alt="OpenRockets Logo" src="https://openrockets.com/i/assets/static/brand/271742354.png" style="margin-bottom: 15px; display: block; filter: invert(1) brightness(100);" width="220"/>
+<p style="color: #ffffff; font-size: 14px; line-height: 1.6; text-align: left;">An infrastructure service provider for nonprofits run by exceptional minors and teenagers worldwide.</p>
+<p style="color: #ffffff; font-size: 14px; line-height: 1.6; margin-top: 10px; text-align: left;">Revitalize youth volunteering. Make a difference. Join the network of elites.</p>
+</div>
+<div class="footer-col" style="text-align: left; display: flex; flex-direction: column; align-items: flex-start;">
+<h4 style="font-size: 14px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; color: #ffffff;">Legal &amp; Press</h4>
+<div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
+<a href="https://about.openrockets.com/legal/terms" style="color: #ffffff; text-decoration: none; font-size: 14px; text-align: left;">Terms of Service</a>
+<a href="https://about.openrockets.com/legal/privacy-policy" style="color: #ffffff; text-decoration: none; font-size: 14px; text-align: left;">Privacy Policy</a>
+<a href="https://about.openrockets.com/legal/parental-consent-form" style="color: #ffffff; text-decoration: none; font-size: 14px; text-align: left;">Parental Consent</a>
+<a href="https://about.openrockets.com" style="color: #ffffff; text-decoration: none; font-size: 14px; background: none; border: none; cursor: pointer; padding: 0; text-align: left;">About OpenRockets Press</a>
+</div>
+</div>
+<div class="footer-col" style="text-align: left; display: flex; flex-direction: column; align-items: flex-start;">
+<h4 style="font-size: 14px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; color: #ffffff;">Social</h4>
+<div style="display: flex; flex-direction: column; gap: 12px; align-items: flex-start;">
+<a href="https://discord.gg/djXh8udpbn" style="color: #ffffff; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; text-align: left;">
+<svg fill="currentColor" height="18" viewbox="0 0 24 24" width="18"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"></path></svg>
+              Discord
+            </a>
+<a href="https://linkedin.com/company/openrocketsinc" style="color: #ffffff; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; text-align: left;">
+<svg fill="currentColor" height="18" viewbox="0 0 24 24" width="18"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.924 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path></svg>
+              LinkedIn
+            </a>
+<a href="https://x.com/openrockets" style="color: #ffffff; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; text-align: left;">
+<svg fill="currentColor" height="18" viewbox="0 0 24 24" width="18"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+              Twitter / X
+            </a>
+<a href="https://blog.openrockets.com" style="color: #ffffff; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; text-align: left;">
+<svg fill="currentColor" height="18" viewbox="0 0 24 24" width="18"><path d="M3 3h18v18H3V3zm15 15V6H6v12h12zm-2-9H8v2h8V9zm0 4H8v2h8v-2z"></path></svg>
+              OpenRockets Blog
+            </a>
+<a href="https://www.crunchbase.com/organization/openrockets" style="color: #ffffff; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; text-align: left;">
+<svg fill="currentColor" height="18" viewbox="0 0 24 24" width="18"><path d="M21.6 0H2.4A2.4 2.4 0 000 2.4v19.2A2.4 2.4 0 002.4 24h19.2a2.4 2.4 0 002.4-2.4V2.4A2.4 2.4 0 0021.6 0zM17.65 16.53c-1.25 1.4-3.08 2.22-5.4 2.22-3.8 0-6.85-2.86-6.85-6.8 0-3.9 3.1-6.72 6.88-6.72 2.37 0 4.14.88 5.4 2.25l-2.12 2.2c-.85-.85-1.85-1.28-3.26-1.28-2.02 0-3.6 1.58-3.6 3.55s1.58 3.55 3.6 3.55c1.45 0 2.4-.48 3.24-1.32l2.1 2.35zm1.5-6.85v4.5h-1.5v-4.5h1.5z"></path></svg>
+              Crunchbase
+            </a>
+</div>
+</div>
+<div class="footer-col" style="text-align: left; display: flex; flex-direction: column; align-items: flex-start;">
+<h4 style="font-size: 14px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; color: #ffffff;">Ping us anytime</h4>
+<div style="display: flex; flex-direction: column; gap: 15px; align-items: flex-start; text-align: left;">
+<div>
+<strong style="font-size: 12px; color: #ffffff; display: block; margin-bottom: 4px; text-transform: uppercase;">Contact (24/7)</strong>
+<a href="mailto:team@openrockets.com" style="color: #ffffff; text-decoration: none; font-size: 14px;">team@openrockets.com</a><br/>
+<a href="tel:+16037772159" style="color: #ffffff; text-decoration: none; font-size: 14px;">+1 (603) 777-2159 (U.S and Canada)</a>
+</div>
+<div>
+<strong style="font-size: 12px; color: #ffffff; display: block; margin-bottom: 4px; text-transform: uppercase;">Mail us, visit us!</strong>
+<span style="color: #ffffff; font-size: 14px; line-height: 1.5; display: block;">266 Elmwood Ave, Ste 420, Buffalo, New York 14222, United States of America<br/>Melville Lane Area, FairFax, VA, United States 22033</span>
+</div>
+</div>
+</div>
+</div>
+<div class="footer-bottom-row" style="border-top: 1px solid #ffffff; padding-top: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 15px;">
+<span style="color: #ffffff; font-size: 13px; text-align: left;">OpenRockets is a 100% teen-run United States C-Corporation.<br/>© &amp; (TM) 2022-2026 OpenRockets Incorporated. All Rights Reserved.</span>
+<a href="#" id="open_preferences_center" style="color: #ffffff; font-size: 13px; text-decoration: none;">Update cookies preferences</a>
+</div>
+</div>
+</footer>
+<!-- Status Bar -->
+<div class="or-status-bar">
+<div class="or-status-inner">
+<span class="or-status-indicator" style="color: white;">
+        OpenRockets® Beaver🦫™ Non-Commercial, No-Derivatives, Read-Only License Version 0.0.1.
+      </span>
+</div>
+</div>
+<iframe frameborder="0" height="300px" src="https://openrockets-datacentres-a-series.openstatus.dev/" style="overflow-y: hidden !important;" width="100%"></iframe>
+<script>document.addEventListener('DOMContentLoaded', () => {
+  const banner = document.querySelector('.home-banner');
+  if (!banner) return;
+
+  const track = banner.querySelector('.home-banner-track');
+  const slides = Array.from(banner.querySelectorAll('.home-banner-slide'));
+  const toggle = banner.querySelector('.home-banner-toggle');
+
+  if (!track || slides.length === 0) return;
+
+  let index = Math.max(0, slides.findIndex(s => s.classList.contains('is-active')));
+  let paused = false;
+  let timer = null;
+  const intervalMs = 5000;
+
+  function render() {
+    track.style.transform = `translateX(-${index * 100}%)`;
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('is-active', i === index);
+      slide.setAttribute('aria-hidden', i === index ? 'false' : 'true');
+    });
+
+    if (toggle) {
+      toggle.textContent = paused ? 'Play' : 'Pause';
+      toggle.setAttribute('aria-pressed', paused ? 'true' : 'false');
+    }
+  }
+
+  function nextSlide() {
+    index = (index + 1) % slides.length;
+    render();
+  }
+
+  function start() {
+    stop();
+    timer = setInterval(() => {
+      if (!paused) nextSlide();
+    }, intervalMs);
+  }
+
+  function stop() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+    }
+  }
+
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      paused = !paused;
+      render();
+    });
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      paused = true;
+      render();
+    }
+  });
+
+  render();
+  start();
+});
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const header = document.getElementById('main-header');
+    if (!header) return;
+    
+    let lastScrollY = window.scrollY;
+    const scrollThreshold = 50; // trigger a bit earlier
+
+    window.addEventListener('scroll', () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > scrollThreshold) {
+        if (currentScrollY > lastScrollY) {
+          // Scrolling down
+          header.style.transform = 'translateY(-100%)';
+        } else {
+          // Scrolling up
+          header.style.transform = 'translateY(0)';
+        }
+      } else {
+        // Near the top of the page
+        header.style.transform = 'translateY(0)';
+      }
+
+      lastScrollY = currentScrollY;
+    });
+  });
+</script>
+</div><script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var btn = document.getElementById('mobile-hamburger-btn');
+        var menu = document.querySelector('.hds-navigation-menu__content');
+        if(btn && menu) {
+            btn.addEventListener('click', function() {
+                menu.classList.toggle('mobile-open');
+            });
+        }
+    });
+    </script></body>
+<!-- Cookie Consent by TermsFeed https://www.TermsFeed.com -->
+<script charset="UTF-8" src="https://www.termsfeed.com/public/cookie-consent/4.2.0/cookie-consent.js" type="text/javascript"></script>
+<script charset="UTF-8" type="text/javascript">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({"notice_banner_type":"simple","consent_type":"implied","palette":"dark","language":"en","page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],"notice_banner_reject_button_hide":false,"preferences_center_close_button_hide":false,"page_refresh_confirmation_buttons":false,"website_privacy_policy_url":"https://privacy.openrockets.com"});
+});
+</script>
+<noscript>Free cookie consent management tool by <a href="https://www.termsfeed.com/">TermsFeed</a></noscript>
+<!-- End Cookie Consent by TermsFeed https://www.TermsFeed.com -->
+<!-- Below is the link that users can use to open Preferences Center to change their preferences. Do not modify the ID parameter. Place it where appropriate, style it as needed. -->
+<a href="#" id="open_preferences_center">Update cookies preferences</a>
+</html>
