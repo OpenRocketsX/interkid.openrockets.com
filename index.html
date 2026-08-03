@@ -19,7 +19,7 @@
 <link href="https://b.stripecdn.com/mkt-ssr-statics/assets/_next/static/css/d829866f0dc0cad9.css" rel="stylesheet"/>
 <link href="https://b.stripecdn.com/mkt-ssr-statics/assets/_next/static/css/7fe9607f2fcd2964.css" rel="stylesheet"/>
 <link href="https://b.stripecdn.com/mkt-ssr-statics/assets/_next/static/css/5e8a245fcb880dab.css" rel="stylesheet"/>
-<link href="https://openrockets.com/styles/overrides.css" rel="stylesheet"/>
+<link href="overrides.css" rel="stylesheet"/>
 <!-- The exact image that will appear when shared -->
 <meta content="https://yourwebsite.com" property="og:image"/>
 <!-- Recommended matching tags for context -->
@@ -474,10 +474,30 @@
 </nav>
 </div>
 </header>
+<div class="interkit-ribbon" id="interkit-ribbon" aria-label="InterKit product bar">
+<div class="section-container interkit-ribbon__inner">
+<a class="interkit-ribbon__brand" href="#interkit-search" aria-label="InterKit home">
+<img alt="interkid" src="assets/interkit-logo.svg"/>
+</a>
+</div>
+</div>
 <!-- ========================================== -->
 <!--                HERO SECTION                -->
 <!-- ========================================== -->
-<main id="main-content"></main>
+<main id="main-content">
+<section class="interkit-search-hero" id="interkit-search" aria-labelledby="interkit-search-title">
+<div class="interkit-search-hero__inner">
+<img class="interkit-search-hero__logo" alt="interkid" src="assets/interkit-logo.svg"/>
+<h1 class="interkit-search-hero__title" id="interkit-search-title">Search InterKit</h1>
+<form class="interkit-search" action="https://www.google.com/search" method="get" role="search">
+<input type="hidden" name="sitesearch" value="interkid.openrockets.com"/>
+<label class="sr-only" for="interkit-search-input">Search InterKit</label>
+<input id="interkit-search-input" name="q" type="search" autocomplete="off" placeholder="Search InterKit"/>
+<button type="submit">Search</button>
+</form>
+</div>
+</section>
+</main>
 <!-- ========================================== -->
 <style>*,:before,:after,::backdrop {
     --tw-border-spacing-x: 0;
@@ -1040,6 +1060,12 @@ button.rounded-md,button.rounded-lg,button.rounded-full,a.rounded-md,a.rounded-l
     if (!header) return;
     
     let lastScrollY = window.scrollY;
+    const setHeaderHeight = () => {
+      document.documentElement.style.setProperty('--main-header-height', `${header.offsetHeight}px`);
+    };
+    setHeaderHeight();
+    window.addEventListener('resize', setHeaderHeight);
+
     const scrollThreshold = 50; // trigger a bit earlier
 
     window.addEventListener('scroll', () => {
@@ -1049,13 +1075,16 @@ button.rounded-md,button.rounded-lg,button.rounded-full,a.rounded-md,a.rounded-l
         if (currentScrollY > lastScrollY) {
           // Scrolling down
           header.style.transform = 'translateY(-100%)';
+          document.body.classList.add('main-header-hidden');
         } else {
           // Scrolling up
           header.style.transform = 'translateY(0)';
+          document.body.classList.remove('main-header-hidden');
         }
       } else {
         // Near the top of the page
         header.style.transform = 'translateY(0)';
+        document.body.classList.remove('main-header-hidden');
       }
 
       lastScrollY = currentScrollY;
