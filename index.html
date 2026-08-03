@@ -30,7 +30,15 @@
 <!-- X (formerly Twitter) specific card style -->
 <meta content="https://openrockets.com/studios/assets/images/trash.png.jpg" name="twitter:card"/>
 <style>
-    @media (max-width: 768px) {
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
+    
+    @font-face {
+        font-family: 'Google Sans Flex';
+        src: url('https://fonts.gstatic.com/s/googlesans/v29/4UaGrENHsxJlGDuGo1OIlL3Owp5eKQtG.woff2') format('woff2');
+        font-display: block;
+    }
+
+    @media (max-width: 1024px) {
         .hds-navigation-menu__content {
             display: none !important;
             position: absolute;
@@ -41,14 +49,17 @@
             flex-direction: column;
             padding: 1rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 9999;
         }
         .hds-navigation-menu__content.mobile-open {
             display: flex !important;
         }
         #mobile-hamburger-btn {
-            display: block !important;
+            display: flex !important;
         }
-        
+        .navigation-buttons {
+            display: none !important;
+        }
     }
     </style></head>
 <body style="padding-top: 0rem;">
@@ -416,8 +427,8 @@
 <!--            HEADER / NAVIGATION             -->
 <!-- ========================================== -->
 <header class="hds-color-mode navigation section section--white hds-mode--light" id="main-header" style="position: sticky; top: 0; left: 0; width: 100%; filter: invert(1); background-color: white; z-index: 10000; transition: transform 0.3s ease;">
-<div class="section-container navigation__layout">
-<nav class="hds-navigation-menu navigation-menu navigation-menu--homepage" id="navigation-menu">
+<div class="section-container navigation__layout" style="display: flex; width: 100%; max-width: 100%; padding: 0 20px;">
+<nav class="hds-navigation-menu navigation-menu navigation-menu--homepage" id="navigation-menu" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
 <!-- OpenRockets Brand Logo -->
 <img alt="OpenRockets Logo" src="https://openrockets.com/v/openrockets.png" style="filter: invert(1); width: 130px; background-color: 0; "/>
 <!-- Menu Links -->
@@ -455,7 +466,11 @@
 </ul>
 </div>
 <!-- Header Action Buttons -->
-<button id="mobile-hamburger-btn" style="background: none; border: none; font-size: 28px; cursor: pointer; color: black; margin-right: 15px; display: none;">?</button><ul class="navigation-buttons">
+<div style="display: flex; align-items: center; gap: 15px;">
+<button id="mobile-hamburger-btn" style="background: none; border: none; cursor: pointer; color: black; display: none; padding: 5px; align-items: center; justify-content: center;">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+</button>
+<ul class="navigation-buttons" style="display: flex; margin: 0; padding: 0;">
 <li class="hds-navigation-menu__item navigation-item">
 <a class="hds-button navigation-cta-button navigation-item__sign-in hds-button--secondary-on-quiet" href="https://openrockets.com/join.html">
 <span class="navigation-button-measure">Apply</span>
@@ -471,13 +486,14 @@
 </a>
 </li>
 </ul>
+</div>
 </nav>
 </div>
 </header>
-<div class="interkit-ribbon" id="interkit-ribbon" aria-label="Interkid product bar" style="display: flex; align-items: center; padding: 10px 20px; border-bottom: 1px solid #eee;">
-<div class="section-container interkit-ribbon__inner">
-<a class="interkit-ribbon__brand" href="#interkit-search" aria-label="Interkid home" style="text-decoration: none;">
-<span class="interkid-logo-text" style="font-size: 1.5rem; font-weight: 600; color: #1f1f1f;">Interkid</span>
+<div class="interkit-ribbon" id="interkit-ribbon" aria-label="Interkid product bar" style="display: flex; align-items: center; padding: 8px 20px; border-bottom: 1px solid #e0e0e0; background: #fff; height: 50px; overflow: hidden; box-sizing: border-box;">
+<div style="display: flex; align-items: center; margin: 0; padding: 0;">
+<a class="interkit-ribbon__brand" href="#interkit-search" aria-label="Interkid home" style="text-decoration: none; display: flex; align-items: center;">
+<span class="interkid-logo-text" style="font-size: 1.3rem; font-weight: 500; color: #5f6368; letter-spacing: -0.5px;">Interkid</span>
 </a>
 </div>
 </div>
@@ -485,19 +501,23 @@
 <!--                HERO SECTION                -->
 <!-- ========================================== -->
 <main id="main-content">
-<section class="interkit-search-hero" id="interkit-search" aria-labelledby="interkit-search-title" style="position: relative; width: 100%; min-height: 80vh; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-top: 0; padding: 0;">
-    <!-- blurred background image -->
-    <div style="position: absolute; inset: -30%; background-image: url('assets/background.jpg'); background-size: cover; background-position: center; filter: blur(60px); opacity: 0.9; z-index: -1;"></div>
+<section class="interkit-search-hero" id="interkit-search" aria-labelledby="interkit-search-title" style="position: relative; width: 100%; min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; margin-top: 0; padding: 0; background: linear-gradient(135deg, #fdfdfd 0%, #f0f4f8 100%);">
+    <!-- blurred background image with fallback -->
+    <div style="position: absolute; inset: -30%; background-image: url('/assets/background.jpg'), url('assets/background.jpg'); background-size: cover; background-position: center; filter: blur(60px); opacity: 0.9; z-index: -1;"></div>
     <!-- optional overlay for light color -->
-    <div style="position: absolute; inset: 0; background-color: rgba(255,255,255,0.3); z-index: -1;"></div>
+    <div style="position: absolute; inset: 0; background-color: rgba(255,255,255,0.5); z-index: -1;"></div>
     
-    <div class="interkit-search-hero__inner" style="position: relative; z-index: 1; text-align: center; width: 100%; max-width: 800px; padding: 0 20px;">
-        <div class="interkid-logo-text" style="font-size: 5rem; font-weight: 600; color: #1f1f1f; margin-bottom: 2.5rem; letter-spacing: -1px;">Interkid</div>
-        <form class="interkit-search" action="https://www.google.com/search" method="get" role="search" style="display: flex; gap: 8px; width: 100%; background: #ffffff; padding: 8px 12px; border-radius: 40px; box-shadow: 0 8px 30px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.05);">
+    <div class="interkit-search-hero__inner" style="position: relative; z-index: 1; text-align: center; width: 100%; max-width: 700px; padding: 0 20px; transform: translateY(-5vh);">
+        <div class="interkid-logo-text" style="font-size: 5.5rem; font-weight: 500; color: #202124; margin-bottom: 2rem; letter-spacing: -2px;">Interkid</div>
+        <form class="interkit-search" action="https://www.google.com/search" method="get" role="search" style="position: relative; display: flex; align-items: center; width: 100%;">
             <input type="hidden" name="sitesearch" value="interkid.openrockets.com"/>
             <label class="sr-only" for="interkit-search-input">Search Interkid</label>
-            <input id="interkit-search-input" name="q" type="search" autocomplete="off" placeholder="Search anything on Interkid..." style="flex: 1; border: none; outline: none; padding: 12px 16px; font-size: 1.1rem; border-radius: 30px; font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif; background: transparent;" />
-            <button type="submit" style="background: #1a73e8; color: white; border: none; padding: 12px 30px; font-size: 1.1rem; font-weight: 500; border-radius: 30px; cursor: pointer; font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif; transition: background 0.2s;">Search</button>
+            
+            <svg style="position: absolute; left: 20px; color: #9aa0a6; width: 22px; height: 22px; pointer-events: none;" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"></path>
+            </svg>
+            
+            <input id="interkit-search-input" name="q" type="search" autocomplete="off" placeholder="Search anything on Interkid..." style="width: 100%; padding: 16px 20px 16px 54px; font-size: 1.15rem; border-radius: 40px; border: 1px solid #dfe1e5; box-shadow: 0 2px 8px rgba(32,33,36,0.08); outline: none; font-family: 'Space Grotesk', system-ui, sans-serif; background: #ffffff; color: #202124; transition: box-shadow 0.2s, border 0.2s;" onfocus="this.style.boxShadow='0 4px 12px rgba(32,33,36,0.15)'; this.style.border='1px solid #cce1ff';" onblur="this.style.boxShadow='0 2px 8px rgba(32,33,36,0.08)'; this.style.border='1px solid #dfe1e5';" />
         </form>
     </div>
 </section>
@@ -507,7 +527,15 @@
     if (document.fonts) {
         document.fonts.load('1em "Google Sans Flex"').then(function() {
             document.documentElement.classList.add('font-loaded');
+        }).catch(function() {
+            // Fallback if it fails to load
+            document.documentElement.classList.add('font-loaded');
         });
+        
+        // Safety timeout just in case
+        setTimeout(function() {
+            document.documentElement.classList.add('font-loaded');
+        }, 1500);
     } else {
         document.documentElement.classList.add('font-loaded');
     }
@@ -515,13 +543,8 @@
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap');
     
-    @font-face {
-        font-family: 'Google Sans Flex';
-        src: url('https://fonts.gstatic.com/s/googlesansflex/v8/2Xpn2Z26mzq1_Jq7Q-uW_PjT78zI22_3.woff2') format('woff2');
-        font-display: block;
-    }
     .interkid-logo-text {
-        font-family: 'Google Sans Flex', 'Google Sans', sans-serif;
+        font-family: 'Google Sans Flex', 'Outfit', 'Google Sans', 'Product Sans', 'Inter', system-ui, sans-serif !important;
         user-select: none;
         -webkit-user-select: none;
         -webkit-user-drag: none;
