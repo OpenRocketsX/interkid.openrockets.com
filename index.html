@@ -39,6 +39,7 @@
     }
 
     @media (max-width: 1024px) {
+        body { overflow-x: hidden; }
         .hds-navigation-menu__content {
             display: none !important;
             position: absolute;
@@ -53,6 +54,21 @@
         }
         .hds-navigation-menu__content.mobile-open {
             display: flex !important;
+        }
+        .hds-navigation-menu__list {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            width: 100%;
+        }
+        .hds-navigation-menu__list a {
+            width: 100%;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .hds-navigation-menu__list button {
+            width: 100%;
+            text-align: left;
+            justify-content: flex-start;
         }
         #mobile-hamburger-btn {
             display: flex !important;
@@ -467,7 +483,7 @@
 </div>
 <!-- Header Action Buttons -->
 <div style="display: flex; align-items: center; gap: 15px;">
-<button id="mobile-hamburger-btn" style="background: none; border: none; cursor: pointer; color: black; display: none; padding: 5px; align-items: center; justify-content: center;">
+<button id="mobile-hamburger-btn" onclick="document.querySelector('.hds-navigation-menu__content').classList.toggle('mobile-open')" style="background: none; border: none; cursor: pointer; color: black; display: none; padding: 5px; align-items: center; justify-content: center;">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
 </button>
 <ul class="navigation-buttons" style="display: flex; margin: 0; padding: 0;">
@@ -490,8 +506,8 @@
 </nav>
 </div>
 </header>
-<div class="interkit-ribbon" id="interkit-ribbon" aria-label="interkid product bar" style="display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #e0e0e0; background: #ffffff; min-height: 52px; overflow: hidden; box-sizing: border-box;">
-<div class="section-container navigation__layout" style="display: flex; align-items: center;  justify-content: center; width: 100%; height: 100%;">
+<div class="interkit-ribbon" id="interkit-ribbon" aria-label="interkid product bar" style="display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #e0e0e0; background: #ffffff; min-height: 52px; overflow: hidden; box-sizing: border-box; width: 100%;">
+<div class="section-container navigation__layout" style="display: flex; align-items: center; justify-content: flex-start; width: 100%; height: 100%; padding: 0 20px;">
 <a class="interkit-ribbon__brand" href="#interkit-search" aria-label="interkid home" style="text-decoration: none; display: flex; align-items: center; ">
 <span class="interkid-logo-text" style="font-size: 1.45rem; font-weight: 600; color: #0071FF !important; letter-spacing: -0.5px; font-family: 'Google Sans Flex', 'Outfit', sans-serif !important;">interkid<span style="color: black; font-size: 40%  ;">.org</span></span>
 </a>
