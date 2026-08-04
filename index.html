@@ -428,7 +428,7 @@
 <!-- ========================================== -->
 <header class="hds-color-mode navigation section section--white hds-mode--light" id="main-header" style="position: sticky; top: 0; left: 0; width: 100%; filter: invert(1); background-color: white; z-index: 10000; transition: transform 0.3s ease;">
 <div class="section-container navigation__layout" style="display: flex; width: 100%; max-width: 100%; padding: 0 20px;">
-<nav class="hds-navigation-menu navigation-menu navigation-menu--homepage" id="navigation-menu" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+<nav class="hds-navigation-menu navigation-menu navigation-menu--homepage" id="navigation-menu" style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: nowrap;">
 <!-- OpenRockets Brand Logo -->
 <img alt="OpenRockets Logo" src="https://openrockets.com/v/openrockets.png" style="filter: invert(1); width: 130px; background-color: 0; "/>
 <!-- Menu Links -->
@@ -490,10 +490,10 @@
 </nav>
 </div>
 </header>
-<div class="interkit-ribbon" id="interkit-ribbon" aria-label="Interkid product bar" style="display: flex; align-items: center; padding: 8px 20px; border-bottom: 1px solid #e0e0e0; background: #fff; height: 50px; overflow: hidden; box-sizing: border-box;">
-<div style="display: flex; align-items: center; margin: 0; padding: 0;">
-<a class="interkit-ribbon__brand" href="#interkit-search" aria-label="Interkid home" style="text-decoration: none; display: flex; align-items: center;">
-<span class="interkid-logo-text" style="font-size: 1.3rem; font-weight: 500; color: #5f6368; letter-spacing: -0.5px;">Interkid</span>
+<div class="interkit-ribbon" id="interkit-ribbon" aria-label="Interkid product bar" style="display: flex; align-items: center; border-bottom: 1px solid #e0e0e0; background: #fff; height: 50px; overflow: hidden; box-sizing: border-box;">
+<div class="section-container" style="display: flex; align-items: center; width: 100%;">
+<a class="interkit-ribbon__brand" href="#interkit-search" aria-label="Interkid home" style="text-decoration: none; display: flex; align-items: center; padding-left: 0;">
+<span class="interkid-logo-text" style="font-size: 1.6rem; font-weight: 500; color: #0071ff; letter-spacing: -0.5px;">Interkid</span>
 </a>
 </div>
 </div>
@@ -501,9 +501,9 @@
 <!--                HERO SECTION                -->
 <!-- ========================================== -->
 <main id="main-content">
-<section class="interkit-search-hero" id="interkit-search" aria-labelledby="interkit-search-title" style="position: relative; width: 100%; min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; margin-top: 0; padding: 0; background: linear-gradient(135deg, #fdfdfd 0%, #f0f4f8 100%);">
-    <!-- blurred background image with fallback -->
-    <div style="position: absolute; inset: -30%; background-image: url('/assets/background.jpg'), url('assets/background.jpg'); background-size: cover; background-position: center; filter: blur(60px); opacity: 0.9; z-index: -1;"></div>
+<section class="interkit-search-hero" id="interkit-search" aria-labelledby="interkit-search-title" style="position: relative; width: 100%; min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; margin-top: 0; padding: 0; background: #000;">
+    <!-- YouTube Background Video -->
+    <iframe src="https://www.youtube.com/embed/IUN664s7N-c?autoplay=1&mute=1&controls=0&disablekb=1&modestbranding=1&showinfo=0&loop=1&playlist=IUN664s7N-c" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" style="position: absolute; top: 50%; left: 50%; width: 100vw; height: 100vh; min-width: 177.77vh; min-height: 56.25vw; transform: translate(-50%, -50%); z-index: -2; pointer-events: none;" aria-hidden="true" allowfullscreen></iframe>
     <!-- optional overlay for light color -->
     <div style="position: absolute; inset: 0; background-color: rgba(255,255,255,0.5); z-index: -1;"></div>
     
@@ -521,9 +521,60 @@
         </form>
     </div>
 </section>
+
+<!-- Twitter Post Wall Section -->
+<section style="padding: 60px 20px; background: #fdfdfd;">
+    <h2 style="text-align: center; font-family: 'Space Grotesk', sans-serif; font-size: 2.5rem; color: #333; margin-bottom: 40px;">Community Voices</h2>
+    <div class="twitter-wall">
+        <!-- We dynamically populate this via JS to create the massive block wall -->
+    </div>
+</section>
+
+<!-- Mock Left/Right Sections -->
+<section class="section-container" style="padding: 80px 20px;">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 40px; margin-bottom: 80px;">
+        <div style="flex: 1; min-width: 300px;">
+            <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 2rem; color: #111;">Safety First, Always</h3>
+            <p style="font-family: system-ui, sans-serif; font-size: 1.1rem; color: #555; line-height: 1.6;">Our platform prioritizes the safety and security of all users, filtering out harmful content and ensuring a positive, constructive environment for everyone.</p>
+        </div>
+        <div style="flex: 1; min-width: 300px; height: 300px; background: #eef2f6; border-radius: 20px;"></div>
+    </div>
+    
+    <div style="display: flex; flex-wrap: wrap-reverse; align-items: center; justify-content: center; gap: 40px;">
+        <div style="flex: 1; min-width: 300px; height: 300px; background: #eef2f6; border-radius: 20px;"></div>
+        <div style="flex: 1; min-width: 300px;">
+            <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 2rem; color: #111;">Curated Content Delivery</h3>
+            <p style="font-family: system-ui, sans-serif; font-size: 1.1rem; color: #555; line-height: 1.6;">Interkid uses advanced algorithms to curate educational and inspiring content, specifically tailored to avoid traumatic or absurd posts that often plague social media.</p>
+        </div>
+    </div>
+</section>
+
 </main>
 <!-- ========================================== -->
 <script>
+    // Generate the massive Twitter wall dynamically
+    document.addEventListener("DOMContentLoaded", function() {
+        const wall = document.querySelector('.twitter-wall');
+        if (wall) {
+            let html = '';
+            for(let i=0; i<30; i++) {
+                const delay = (Math.random() * 5).toFixed(2);
+                const duration = (Math.random() * 4 + 4).toFixed(2);
+                html += `<div class="mock-tweet" style="animation: fadeInOut ${duration}s ${delay}s infinite alternate;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <div style="width: 40px; height: 40px; background: #ddd; border-radius: 50%;"></div>
+                        <div>
+                            <div style="font-weight: bold; font-family: sans-serif;">Merriam-Webster</div>
+                            <div style="color: #666; font-size: 0.9em;">@MerriamWebster</div>
+                        </div>
+                    </div>
+                    <p style="font-family: sans-serif; font-size: 15px; margin: 0; line-height: 1.4;">A mock placeholder for the tweet content showcasing our dynamic brick-wall interface.</p>
+                </div>`;
+            }
+            wall.innerHTML = html;
+        }
+    });
+
     if (document.fonts) {
         document.fonts.load('1em "Google Sans Flex"').then(function() {
             document.documentElement.classList.add('font-loaded');
@@ -554,6 +605,27 @@
     }
     .font-loaded .interkid-logo-text {
         opacity: 1;
+    }
+    
+    .twitter-wall {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        grid-auto-flow: dense;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    .mock-tweet {
+        background: #fff;
+        border: 1px solid #e1e8ed;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        opacity: 0.8;
+    }
+    @keyframes fadeInOut {
+        0% { opacity: 0.2; transform: scale(0.98); }
+        100% { opacity: 1; transform: scale(1); }
     }
 </style>
 <!-- ========================================== -->
