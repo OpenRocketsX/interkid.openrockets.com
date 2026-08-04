@@ -428,7 +428,7 @@
 <!-- ========================================== -->
 <header class="hds-color-mode navigation section section--white hds-mode--light" id="main-header" style="position: sticky; top: 0; left: 0; width: 100%; filter: invert(1); background-color: white; z-index: 10000; transition: transform 0.3s ease;">
 <div class="section-container navigation__layout" style="display: flex; width: 100%; max-width: 100%; padding: 0 20px;">
-<nav class="hds-navigation-menu navigation-menu navigation-menu--homepage" id="navigation-menu" style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: nowrap;">
+<nav class="hds-navigation-menu navigation-menu navigation-menu--homepage" id="navigation-menu" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
 <!-- OpenRockets Brand Logo -->
 <img alt="OpenRockets Logo" src="https://openrockets.com/v/openrockets.png" style="filter: invert(1); width: 130px; background-color: 0; "/>
 <!-- Menu Links -->
@@ -490,10 +490,10 @@
 </nav>
 </div>
 </header>
-<div class="interkit-ribbon" id="interkit-ribbon" aria-label="Interkid product bar" style="display: flex; align-items: center; border-bottom: 1px solid #e0e0e0; background: #fff; height: 50px; overflow: hidden; box-sizing: border-box;">
-<div class="section-container" style="display: flex; align-items: center; width: 100%;">
-<a class="interkit-ribbon__brand" href="#interkit-search" aria-label="Interkid home" style="text-decoration: none; display: flex; align-items: center; padding-left: 0;">
-<span class="interkid-logo-text" style="font-size: 1.6rem; font-weight: 500; color: #0071ff; letter-spacing: -0.5px;">Interkid</span>
+<div class="interkit-ribbon" id="interkit-ribbon" aria-label="Interkid product bar" style="display: flex; align-items: center; border-bottom: 1px solid #e0e0e0; background: #ffffff; min-height: 52px; overflow: hidden; box-sizing: border-box;">
+<div class="section-container navigation__layout" style="display: flex; align-items: center; width: 100%; height: 100%;">
+<a class="interkit-ribbon__brand" href="#interkit-search" aria-label="Interkid home" style="text-decoration: none; display: flex; align-items: center;">
+<span class="interkid-logo-text" style="font-size: 1.45rem; font-weight: 600; color: #0071FF !important; letter-spacing: -0.5px; font-family: 'Google Sans Flex', 'Outfit', sans-serif !important;">Interkid</span>
 </a>
 </div>
 </div>
@@ -501,80 +501,182 @@
 <!--                HERO SECTION                -->
 <!-- ========================================== -->
 <main id="main-content">
-<section class="interkit-search-hero" id="interkit-search" aria-labelledby="interkit-search-title" style="position: relative; width: 100%; min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; margin-top: 0; padding: 0; background: #000;">
-    <!-- YouTube Background Video -->
-    <iframe src="https://www.youtube.com/embed/IUN664s7N-c?autoplay=1&mute=1&controls=0&disablekb=1&modestbranding=1&showinfo=0&loop=1&playlist=IUN664s7N-c" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" style="position: absolute; top: 50%; left: 50%; width: 100vw; height: 100vh; min-width: 177.77vh; min-height: 56.25vw; transform: translate(-50%, -50%); z-index: -2; pointer-events: none;" aria-hidden="true" allowfullscreen></iframe>
-    <!-- optional overlay for light color -->
-    <div style="position: absolute; inset: 0; background-color: rgba(255,255,255,0.5); z-index: -1;"></div>
+<section class="interkit-search-hero" id="interkit-search" aria-labelledby="interkit-search-title" style="position: relative; width: 100%; min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; margin-top: 0; padding: 0; background: #0a0a0a;">
+    <!-- YouTube Video Background -->
+    <div style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 0;">
+        <iframe 
+            src="https://www.youtube.com/embed/IUN664s7N-c?autoplay=1&mute=1&controls=0&loop=1&playlist=IUN664s7N-c&playsinline=1&enablejsapi=1" 
+            title="Hero Video Background" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            style="position: absolute; top: 50%; left: 50%; width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh; transform: translate(-50%, -50%); pointer-events: none; border: none; opacity: 0.45; filter: brightness(0.9) contrast(1.1);"
+        ></iframe>
+    </div>
+    <!-- Soft overlay backdrop -->
+    <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.75) 100%); backdrop-filter: blur(8px); z-index: 1;"></div>
     
-    <div class="interkit-search-hero__inner" style="position: relative; z-index: 1; text-align: center; width: 100%; max-width: 700px; padding: 0 20px; transform: translateY(-5vh);">
-        <div class="interkid-logo-text" style="font-size: 5.5rem; font-weight: 500; color: #202124; margin-bottom: 2rem; letter-spacing: -2px;">Interkid</div>
+    <!-- Hero Search & Branding -->
+    <div class="interkit-search-hero__inner" style="position: relative; z-index: 2; text-align: center; width: 100%; max-width: 720px; padding: 0 20px; transform: translateY(-3vh);">
+        <div class="interkid-logo-text" style="font-size: 5.5rem; font-weight: 500; color: #111111; margin-bottom: 2rem; letter-spacing: -2px; font-family: 'Google Sans Flex', 'Outfit', sans-serif !important;">Interkid</div>
         <form class="interkit-search" action="https://www.google.com/search" method="get" role="search" style="position: relative; display: flex; align-items: center; width: 100%;">
             <input type="hidden" name="sitesearch" value="interkid.openrockets.com"/>
             <label class="sr-only" for="interkit-search-input">Search Interkid</label>
             
-            <svg style="position: absolute; left: 20px; color: #9aa0a6; width: 22px; height: 22px; pointer-events: none;" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <svg style="position: absolute; left: 20px; color: #0071FF; width: 22px; height: 22px; pointer-events: none;" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"></path>
             </svg>
             
-            <input id="interkit-search-input" name="q" type="search" autocomplete="off" placeholder="Search anything on Interkid..." style="width: 100%; padding: 16px 20px 16px 54px; font-size: 1.15rem; border-radius: 40px; border: 1px solid #dfe1e5; box-shadow: 0 2px 8px rgba(32,33,36,0.08); outline: none; font-family: 'Space Grotesk', system-ui, sans-serif; background: #ffffff; color: #202124; transition: box-shadow 0.2s, border 0.2s;" onfocus="this.style.boxShadow='0 4px 12px rgba(32,33,36,0.15)'; this.style.border='1px solid #cce1ff';" onblur="this.style.boxShadow='0 2px 8px rgba(32,33,36,0.08)'; this.style.border='1px solid #dfe1e5';" />
+            <input id="interkit-search-input" name="q" type="search" autocomplete="off" placeholder="Search anything on Interkid..." style="width: 100%; padding: 18px 24px 18px 56px; font-size: 1.15rem; border-radius: 40px; border: 1px solid rgba(0,0,0,0.12); box-shadow: 0 4px 20px rgba(0,0,0,0.08); outline: none; font-family: 'Space Grotesk', system-ui, sans-serif; background: rgba(255,255,255,0.95); color: #111111; transition: all 0.25s ease;" onfocus="this.style.boxShadow='0 6px 24px rgba(0, 113, 255, 0.25)'; this.style.borderColor='#0071FF';" onblur="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'; this.style.borderColor='rgba(0,0,0,0.12)';" />
         </form>
     </div>
 </section>
 
-<!-- Twitter Post Wall Section -->
-<section style="padding: 60px 20px; background: #fdfdfd;">
-    <h2 style="text-align: center; font-family: 'Space Grotesk', sans-serif; font-size: 2.5rem; color: #333; margin-bottom: 40px;">Community Voices</h2>
-    <div class="twitter-wall">
-        <!-- We dynamically populate this via JS to create the massive block wall -->
-    </div>
-</section>
-
-<!-- Mock Left/Right Sections -->
-<section class="section-container" style="padding: 80px 20px;">
-    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 40px; margin-bottom: 80px;">
-        <div style="flex: 1; min-width: 300px;">
-            <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 2rem; color: #111;">Safety First, Always</h3>
-            <p style="font-family: system-ui, sans-serif; font-size: 1.1rem; color: #555; line-height: 1.6;">Our platform prioritizes the safety and security of all users, filtering out harmful content and ensuring a positive, constructive environment for everyone.</p>
-        </div>
-        <div style="flex: 1; min-width: 300px; height: 300px; background: #eef2f6; border-radius: 20px;"></div>
-    </div>
-    
-    <div style="display: flex; flex-wrap: wrap-reverse; align-items: center; justify-content: center; gap: 40px;">
-        <div style="flex: 1; min-width: 300px; height: 300px; background: #eef2f6; border-radius: 20px;"></div>
-        <div style="flex: 1; min-width: 300px;">
-            <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 2rem; color: #111;">Curated Content Delivery</h3>
-            <p style="font-family: system-ui, sans-serif; font-size: 1.1rem; color: #555; line-height: 1.6;">Interkid uses advanced algorithms to curate educational and inspiring content, specifically tailored to avoid traumatic or absurd posts that often plague social media.</p>
-        </div>
-    </div>
-</section>
-
-</main>
 <!-- ========================================== -->
-<script>
-    // Generate the massive Twitter wall dynamically
-    document.addEventListener("DOMContentLoaded", function() {
-        const wall = document.querySelector('.twitter-wall');
-        if (wall) {
-            let html = '';
-            for(let i=0; i<30; i++) {
-                const delay = (Math.random() * 5).toFixed(2);
-                const duration = (Math.random() * 4 + 4).toFixed(2);
-                html += `<div class="mock-tweet" style="animation: fadeInOut ${duration}s ${delay}s infinite alternate;">
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                        <div style="width: 40px; height: 40px; background: #ddd; border-radius: 50%;"></div>
+<!--       POST-HERO MASONRY WALL & VOICES      -->
+<!-- ========================================== -->
+<section class="or-section" style="background: #f8fafc; padding: 70px 0; border-top: 1px solid #e2e8f0;">
+    <div class="or-container" style="max-width: 1140px; margin: 0 auto; padding: 0 24px;">
+        <div class="or-section-header" style="text-align: center; margin-bottom: 40px;">
+            <span style="background: #0071FF; color: white; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Community Wire</span>
+            <h2 style="font-size: 32px; font-weight: 700; color: #111111; margin: 14px 0 8px 0; font-family: 'Space Grotesk', sans-serif;">Voices Across the Network</h2>
+            <p style="font-size: 16px; color: #64748b; max-width: 640px; margin: 0 auto;">Live updates, youth perspectives, and stories from across Interkid and OpenRockets.</p>
+        </div>
+
+        <!-- Brick Masonry Wall Grid -->
+        <div id="masonry-wall" style="column-count: 3; column-gap: 20px;">
+            
+            <!-- X/Twitter Post Card 1 -->
+            <div class="masonry-brick" style="display: inline-block; width: 100%; margin-bottom: 20px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.5s ease; break-inside: avoid;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: #0071FF; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">MW</div>
                         <div>
-                            <div style="font-weight: bold; font-family: sans-serif;">Merriam-Webster</div>
-                            <div style="color: #666; font-size: 0.9em;">@MerriamWebster</div>
+                            <div style="font-weight: 600; font-size: 14px; color: #1e293b;">Merriam-Webster</div>
+                            <div style="font-size: 12px; color: #94a3b8;">@MerriamWebster</div>
                         </div>
                     </div>
-                    <p style="font-family: sans-serif; font-size: 15px; margin: 0; line-height: 1.4;">A mock placeholder for the tweet content showcasing our dynamic brick-wall interface.</p>
-                </div>`;
-            }
-            wall.innerHTML = html;
-        }
-    });
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color: #0f1419;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </div>
+                <p style="font-size: 14px; color: #334155; line-height: 1.5; margin-bottom: 14px;">Word of the Day: resilience. The capacity to withstand or recover quickly from difficult conditions. Shared with young builders worldwide. #OpenRockets #Interkid</p>
+                <div style="font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 10px;">Verified Post • <a href="https://x.com/MerriamWebster/status/2084348410409205986" target="_blank" style="color: #0071FF; text-decoration: none;">View on X</a></div>
+            </div>
 
+            <!-- X Post Card 2 -->
+            <div class="masonry-brick" style="display: inline-block; width: 100%; margin-bottom: 20px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.5s ease; break-inside: avoid;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: #10b981; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">ZP</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px; color: #1e293b;">ZeroProfit Initiative</div>
+                            <div style="font-size: 12px; color: #94a3b8;">@ZeroProfitOrg</div>
+                        </div>
+                    </div>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color: #0f1419;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </div>
+                <p style="font-size: 14px; color: #334155; line-height: 1.5; margin-bottom: 14px;">"Building zero-cost digital tools for youth-led non-profits. Technology belongs to everyone who wants to change the world."</p>
+                <div style="font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 10px;">Community Highlight • <a href="https://zeroprofit.org" target="_blank" style="color: #0071FF; text-decoration: none;">Learn More</a></div>
+            </div>
+
+            <!-- X Post Card 3 -->
+            <div class="masonry-brick" style="display: inline-block; width: 100%; margin-bottom: 20px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.5s ease; break-inside: avoid;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: #6366f1; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">OR</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px; color: #1e293b;">OpenRockets Network</div>
+                            <div style="font-size: 12px; color: #94a3b8;">@OpenRockets</div>
+                        </div>
+                    </div>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color: #0f1419;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </div>
+                <p style="font-size: 14px; color: #334155; line-height: 1.5; margin-bottom: 14px;">There's no better time to do better things. Empowering exceptional minors and teenagers across the globe.</p>
+                <div style="font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 10px;">Official Broadcast</div>
+            </div>
+
+            <!-- X Post Card 4 -->
+            <div class="masonry-brick" style="display: inline-block; width: 100%; margin-bottom: 20px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.5s ease; break-inside: avoid;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: #ec4899; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">IK</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px; color: #1e293b;">Interkid Studios</div>
+                            <div style="font-size: 12px; color: #94a3b8;">@InterkidApp</div>
+                        </div>
+                    </div>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color: #0f1419;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </div>
+                <p style="font-size: 14px; color: #334155; line-height: 1.5; margin-bottom: 14px;">Every young mind holds an entire universe of potential. Interkid is built to give those ideas wings.</p>
+                <div style="font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 10px;">Product Update</div>
+            </div>
+
+            <!-- X Post Card 5 -->
+            <div class="masonry-brick" style="display: inline-block; width: 100%; margin-bottom: 20px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.5s ease; break-inside: avoid;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: #f59e0b; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">YT</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px; color: #1e293b;">Youth Tech Alliance</div>
+                            <div style="font-size: 12px; color: #94a3b8;">@YouthTechGlobal</div>
+                        </div>
+                    </div>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color: #0f1419;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </div>
+                <p style="font-size: 14px; color: #334155; line-height: 1.5; margin-bottom: 14px;">Connecting high-school creators, open-source contributors, and non-profit leaders across 40+ countries.</p>
+                <div style="font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 10px;">Global Network</div>
+            </div>
+
+            <!-- X Post Card 6 -->
+            <div class="masonry-brick" style="display: inline-block; width: 100%; margin-bottom: 20px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.5s ease; break-inside: avoid;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: #8b5cf6; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">DC</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px; color: #1e293b;">Discord Community</div>
+                            <div style="font-size: 12px; color: #94a3b8;">@OpenRocketsDC</div>
+                        </div>
+                    </div>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color: #0f1419;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </div>
+                <p style="font-size: 14px; color: #334155; line-height: 1.5; margin-bottom: 14px;">Join our Discord server to collaborate, share projects, and connect directly with fellow teen innovators.</p>
+                <div style="font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 10px;">Join Discord • <a href="https://discord.gg/djXh8udpbn" target="_blank" style="color: #0071FF; text-decoration: none;">discord.gg</a></div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Dynamic Random Dimming / Fade Controller Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const bricks = document.querySelectorAll('.masonry-brick');
+    if (!bricks.length) return;
+
+    setInterval(() => {
+        const randomIndex = Math.floor(Math.random() * bricks.length);
+        const targetBrick = bricks[randomIndex];
+
+        targetBrick.style.opacity = '0.35';
+        targetBrick.style.transform = 'scale(0.97)';
+        targetBrick.style.filter = 'brightness(0.7)';
+
+        setTimeout(() => {
+            targetBrick.style.opacity = '1';
+            targetBrick.style.transform = 'scale(1)';
+            targetBrick.style.filter = 'brightness(1)';
+        }, 1800);
+    }, 2800);
+});
+</script>
+</main>
+<!-- ========================================== -->
+<style>
+    @media (max-width: 800px) {
+        #masonry-wall {
+            column-count: 1 !important;
+        }
+    }
+</style>
+<script>
     if (document.fonts) {
         document.fonts.load('1em "Google Sans Flex"').then(function() {
             document.documentElement.classList.add('font-loaded');
@@ -605,27 +707,6 @@
     }
     .font-loaded .interkid-logo-text {
         opacity: 1;
-    }
-    
-    .twitter-wall {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 20px;
-        grid-auto-flow: dense;
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-    .mock-tweet {
-        background: #fff;
-        border: 1px solid #e1e8ed;
-        border-radius: 12px;
-        padding: 16px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        opacity: 0.8;
-    }
-    @keyframes fadeInOut {
-        0% { opacity: 0.2; transform: scale(0.98); }
-        100% { opacity: 1; transform: scale(1); }
     }
 </style>
 <!-- ========================================== -->
