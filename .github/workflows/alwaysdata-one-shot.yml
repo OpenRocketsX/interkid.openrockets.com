@@ -20,8 +20,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy
-        env:
-          DEPLOY_COMMENT: ${{ github.event.comment.body }}
         run: bash deploy/alwaysdata/one-shot.sh
 
       - name: Redact deployment trigger
