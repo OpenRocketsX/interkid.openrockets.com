@@ -1,0 +1,35 @@
+name: One-shot alwaysdata deploy
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  ALWAYSDATA_ACCOUNT: interkidtest
+
+jobs:
+  deploy:
+    if: ${{ github.event.issue.pull_request == null && startsWith(github.event.comment.body, 'alwaysdata-deploy:') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy
+        env:
+          DEPLOY_COMMENT: ${{ github.event.comment.body }}
+        run: bash deploy/alwaysdata/one-shot.sh
+
+      - name: Redact deployment trigger
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+        run: |
+          gh api --method PATCH \
+            "repos/${GITHUB_REPOSITORY}/issues/comments/${COMMENT_ID}" \
+            -f body='alwaysdata deployment credential removed'
