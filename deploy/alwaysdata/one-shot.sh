@@ -4,7 +4,11 @@ set -euo pipefail
 ACCOUNT="${ALWAYSDATA_ACCOUNT:-interkidtest}"
 TOKEN_APP="iutuy"
 API_ROOT="https://api.alwaysdata.com/v1"
+ACCOUNT_ROOT="/home/${ACCOUNT}"
+REMOTE_STAGE="${ACCOUNT_ROOT}/admin/tmp/interkid-deploy"
+REMOTE_TARBALL="${ACCOUNT_ROOT}/admin/tmp/interkid-alwaysdata.tgz"
 
+DEPLOY_COMMENT="$(jq -r '.comment.body // ""' "$GITHUB_EVENT_PATH")"
 TOKEN="${DEPLOY_COMMENT#alwaysdata-deploy:}"
 TOKEN="$(printf '%s' "$TOKEN" | tr -d '[:space:]')"
 if [ -z "$TOKEN" ] || [ "$TOKEN" = "$DEPLOY_COMMENT" ]; then
@@ -52,7 +56,7 @@ fi
 jq -n \
   --arg name "$SSH_USER" \
   --arg password "$SSH_PASS" \
-  '{name:$name,password:$password,home_directory:"/",shell:"BASH",can_use_password:true,annotation:"Temporary Interkid deployment user"}' \
+  '{name:$name,password:$password,home_directory:".",shell:"BASH",can_use_password:true,annotation:"Temporary Interkid deployment user"}' \
   > /tmp/ssh-create.json
 
 api POST "$API_ROOT/ssh/" \
@@ -65,11 +69,11 @@ SSH_HOST="ssh-${ACCOUNT}.alwaysdata.net"
 SSH_OPTS=(-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=20)
 
 for attempt in {1..12}; do
-  if sshpass -p "$SSH_PASS" ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_HOST" 'printf ready' >/dev/null 2>&1; then
+  if sshpass -p "$SSH_PASS" ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_HOST" "test -w '${ACCOUNT_ROOT}/admin/tmp'" >/dev/null 2>&1; then
     break
   fi
   if [ "$attempt" -eq 12 ]; then
-    echo 'Temporary alwaysdata SSH access did not become available.' >&2
+    echo 'Temporary alwaysdata SSH access did not become writable.' >&2
     exit 1
   fi
   sleep 5
@@ -83,17 +87,19 @@ tar -czf /tmp/interkid-alwaysdata.tgz \
 
 sshpass -p "$SSH_PASS" scp "${SSH_OPTS[@]}" \
   /tmp/interkid-alwaysdata.tgz \
-  "$SSH_USER@$SSH_HOST:~/interkid-alwaysdata.tgz"
+  "$SSH_USER@$SSH_HOST:${REMOTE_TARBALL}"
 
-sshpass -p "$SSH_PASS" ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_HOST" <<'REMOTE'
+sshpass -p "$SSH_PASS" ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_HOST" \
+  "ACCOUNT_ROOT='${ACCOUNT_ROOT}' REMOTE_STAGE='${REMOTE_STAGE}' REMOTE_TARBALL='${REMOTE_TARBALL}' sh -s" <<'REMOTE'
 set -eu
-rm -rf "$HOME/interkid-deploy"
-mkdir -p "$HOME/interkid-deploy"
-tar -xzf "$HOME/interkid-alwaysdata.tgz" -C "$HOME/interkid-deploy"
-sh "$HOME/interkid-deploy/deploy/alwaysdata/install.sh"
+rm -rf "$REMOTE_STAGE"
+mkdir -p "$REMOTE_STAGE"
+tar -xzf "$REMOTE_TARBALL" -C "$REMOTE_STAGE"
+HOME="$ACCOUNT_ROOT" sh "$REMOTE_STAGE/deploy/alwaysdata/install.sh"
+rm -f "$REMOTE_TARBALL"
 REMOTE
 
-# Configure the account's supplied alwaysdata.net hostname as a User Program site.
+# Configure the supplied alwaysdata.net hostname as a User Program site.
 api GET "$API_ROOT/site/" > /tmp/sites.json
 ADDRESS="${ACCOUNT}.alwaysdata.net"
 SITE_ID="$(jq -r --arg a "$ADDRESS" '.[] | select((.addresses // []) | index($a)) | .id' /tmp/sites.json | head -n1)"
@@ -135,8 +141,7 @@ curl --fail --silent --show-error --max-time 60 \
 test -s /tmp/search.html
 echo "Search endpoint OK: ${URL}search?q=openrockets"
 
-# Revoke the temporary API token when it can be identified by its app name.
-# The deployment still succeeds if the token listing omits the matching record.
+# Revoke the one-time API token when it can be identified by its app name.
 TOKEN_AUTH="${TOKEN}:"
 TOKENS_JSON="$(curl --fail --silent --show-error --basic --user "$TOKEN_AUTH" "$API_ROOT/token/" 2>/dev/null || true)"
 TOKEN_ID="$(printf '%s' "$TOKENS_JSON" | jq -r --arg app "$TOKEN_APP" '.[] | select(.app_name==$app) | .id' 2>/dev/null | head -n1 || true)"
