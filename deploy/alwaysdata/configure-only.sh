@@ -20,7 +20,7 @@ AUTH="${TOKEN} account=${ACCOUNT}:"
 curl --fail --silent --show-error --basic --user "$AUTH" \
   "$API_ROOT/site/" > /tmp/sites.json
 
-SITE_ID="$(jq -r --arg a "$ADDRESS" '.[] | select((.addresses // []) | index($a)) | .id' /tmp/sites.json | head -n1)"
+SITE_ID="$(jq -r --arg a "$ADDRESS" '.[] | select(((.addresses // []) | map(rtrimstr("/"))) | index($a)) | .id' /tmp/sites.json | head -n1)"
 if [ -z "$SITE_ID" ]; then
   echo "No existing site found for $ADDRESS" >&2
   jq -c '.[] | {id,type,addresses,working_directory,command}' /tmp/sites.json
@@ -53,9 +53,15 @@ fi
 echo "Site configuration accepted (HTTP $STATUS)."
 cat /tmp/site-response.json | jq -c '{id,type,addresses,working_directory,command,environment,ssl_force}' || true
 
-curl --fail --silent --show-error --basic --user "$AUTH" \
+RESTART_STATUS="$(curl --silent --show-error --basic --user "$AUTH" \
   -H 'alwaysdata-synchronous: yes' \
-  -X POST "$API_ROOT/site/$SITE_ID/restart/" >/dev/null
+  -X POST -o /tmp/restart-response.txt -w '%{http_code}' \
+  "$API_ROOT/site/$SITE_ID/restart/")"
+if [[ "$RESTART_STATUS" != 2* ]]; then
+  echo "alwaysdata site restart failed with HTTP $RESTART_STATUS" >&2
+  cat /tmp/restart-response.txt >&2 || true
+  exit 1
+fi
 
 echo 'Site restart requested.'
 
@@ -79,7 +85,6 @@ curl --fail --silent --show-error --max-time 60 \
 test -s /tmp/search.html
 echo "Search endpoint OK: ${URL}search?q=openrockets"
 
-# Revoke the access token after a successful end-to-end deployment when discoverable.
 TOKENS_JSON="$(curl --fail --silent --show-error --basic --user "${TOKEN}:" "$API_ROOT/token/" 2>/dev/null || true)"
 TOKEN_ID="$(printf '%s' "$TOKENS_JSON" | jq -r '.[] | select(.app_name=="iutuy") | .id' 2>/dev/null | head -n1 || true)"
 if [ -n "$TOKEN_ID" ]; then
