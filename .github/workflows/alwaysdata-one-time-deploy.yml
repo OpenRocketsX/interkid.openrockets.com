@@ -26,25 +26,29 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -eu
           openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:3072 -out /tmp/alwaysdata-private.pem 2>/dev/null
           openssl pkey -in /tmp/alwaysdata-private.pem -pubout -out /tmp/alwaysdata-public.pem
           public_key="$(base64 -w0 /tmp/alwaysdata-public.pem)"
           gh api "repos/${GITHUB_REPOSITORY}/issues/${HANDOFF_ISSUE}/comments" \
-            -f body="ALWAYSDATA_PUBLIC_KEY_B64=${public_key}" >/dev/null
+            -f body="ALWAYSDATA_PUBLIC_KEY_RUN_${GITHUB_RUN_ID}_B64=${public_key}" >/dev/null
 
-      - name: Receive encrypted token
+      - name: Receive encrypted token for this run
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -eu
+          prefix="ALWAYSDATA_CIPHERTEXT_RUN_${GITHUB_RUN_ID}="
           body=""
           for attempt in $(seq 1 120); do
-            body="$(gh api "repos/${GITHUB_REPOSITORY}/issues/${HANDOFF_ISSUE}/comments" --paginate --jq '[.[] | select(.body | startswith("ALWAYSDATA_CIPHERTEXT="))][-1].body // ""')"
+            comments="$(gh api "repos/${GITHUB_REPOSITORY}/issues/${HANDOFF_ISSUE}/comments" --paginate)"
+            body="$(printf '%s' "$comments" | jq -r --arg prefix "$prefix" '[.[] | select(.body | startswith($prefix))][-1].body // ""')"
             [ -n "$body" ] && break
             sleep 5
           done
-          [ -n "$body" ] || { echo "Encrypted handoff was not received"; exit 1; }
-          printf '%s' "${body#ALWAYSDATA_CIPHERTEXT=}" | base64 -d > /tmp/alwaysdata-token.enc
+          [ -n "$body" ] || { echo "Encrypted handoff was not received for run ${GITHUB_RUN_ID}"; exit 1; }
+          ciphertext="${body#"$prefix"}"
+          printf '%s' "$ciphertext" | base64 -d > /tmp/alwaysdata-token.enc
           openssl pkeyutl -decrypt \
             -inkey /tmp/alwaysdata-private.pem \
             -in /tmp/alwaysdata-token.enc \
@@ -76,7 +80,7 @@ jobs:
           printf '%s' "$ssh_id" > /tmp/alwaysdata-ssh-id
           printf '%s' "$deploy_user" > /tmp/alwaysdata-ssh-user
 
-      - name: Ensure Interkid and SearXNG are installed
+      - name: Install Interkid and SearXNG
         run: |
           set -eu
           sudo apt-get update -qq
@@ -87,9 +91,9 @@ jobs:
           tar -czf /tmp/interkid-alwaysdata.tgz index.html searxng/settings.yml deploy/alwaysdata/install.sh deploy/alwaysdata/start.sh
           SSHPASS="$deploy_password" sshpass -e scp -o StrictHostKeyChecking=accept-new /tmp/interkid-alwaysdata.tgz "${deploy_user}@${host}:~/interkid-alwaysdata.tgz"
           SSHPASS="$deploy_password" sshpass -e ssh -o StrictHostKeyChecking=accept-new "${deploy_user}@${host}" \
-            'rm -rf "$HOME/interkid-deploy" && mkdir -p "$HOME/interkid-deploy" && tar -xzf "$HOME/interkid-alwaysdata.tgz" -C "$HOME/interkid-deploy" && if [ -x "$HOME/interkid-search/venv/bin/granian" ]; then cp "$HOME/interkid-deploy/index.html" "$HOME/interkid-search/searxng-src/searx/templates/simple/index.html"; cp "$HOME/interkid-deploy/searxng/settings.yml" "$HOME/interkid-search/config/settings.yml"; cp "$HOME/interkid-deploy/deploy/alwaysdata/start.sh" "$HOME/interkid-search/start.sh"; chmod 755 "$HOME/interkid-search/start.sh"; SECRET="$(cat "$HOME/interkid-search/secret")"; SETTINGS="$HOME/interkid-search/config/settings.yml" SEARX_SECRET="$SECRET" "$HOME/interkid-search/venv/bin/python" -c '"'"'import os; from pathlib import Path; p=Path(os.environ["SETTINGS"]); t=p.read_text(); p.write_text(t.replace("secret_key: \"ultrasecretkey\"", f"secret_key: \"{os.environ['"'"'SEARX_SECRET'"'"']}\""))'"'"'; else sh "$HOME/interkid-deploy/deploy/alwaysdata/install.sh"; fi'
+            'rm -rf "$HOME/interkid-deploy" && mkdir -p "$HOME/interkid-deploy" && tar -xzf "$HOME/interkid-alwaysdata.tgz" -C "$HOME/interkid-deploy" && sh "$HOME/interkid-deploy/deploy/alwaysdata/install.sh"'
 
-      - name: Configure alwaysdata site
+      - name: Configure alwaysdata user-program site
         run: |
           set -eu
           token="$(cat /tmp/alwaysdata-token)"
@@ -123,7 +127,6 @@ jobs:
           [ "$ok" = 1 ] || { echo "Homepage did not become ready"; exit 1; }
           curl -LfsS --max-time 60 "$base/search?q=openrockets" -o /tmp/interkid-search.html
           test -s /tmp/interkid-search.html
-          grep -qi 'openrockets' /tmp/interkid-search.html || true
           echo "INTERKID_LIVE_URL=$base"
 
       - name: Remove temporary deployment access
@@ -135,6 +138,6 @@ jobs:
           ssh_id="$(cat /tmp/alwaysdata-ssh-id)"
           curl -fsS -X DELETE --basic --user "$auth" "https://api.alwaysdata.com/v1/ssh/${ssh_id}/" >/dev/null || true
           tokens="$(curl -fsS --basic --user "$token:" https://api.alwaysdata.com/v1/token/ || true)"
-          token_id="$(printf '%s' "$tokens" | jq -r --arg app "$TOKEN_APP_NAME" '.[] | select(.app_name == $app) | .id' | head -n1)"
+          token_id="$(printf '%s' "$tokens" | jq -r --arg app "$TOKEN_APP_NAME" '.[] | select((.app_name // .application // .name // "") == $app) | .id' | head -n1)"
           if [ -n "$token_id" ]; then curl -fsS -X DELETE --basic --user "$token:" "https://api.alwaysdata.com/v1/token/${token_id}/" >/dev/null || true; fi
           rm -f /tmp/alwaysdata-token /tmp/alwaysdata-token.enc /tmp/alwaysdata-private.pem /tmp/alwaysdata-ssh-password
