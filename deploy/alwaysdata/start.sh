@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-ROOT="$HOME/interkid-search"
+ROOT="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 
 export SEARXNG_SETTINGS_PATH="$ROOT/config/settings.yml"
 export GRANIAN_INTERFACE="wsgi"
