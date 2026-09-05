@@ -5,8 +5,10 @@ ACCOUNT="${ALWAYSDATA_ACCOUNT:-interkidtest}"
 TOKEN_APP="iutuy"
 API_ROOT="https://api.alwaysdata.com/v1"
 ACCOUNT_ROOT="/home/${ACCOUNT}"
-REMOTE_STAGE="${ACCOUNT_ROOT}/admin/tmp/interkid-deploy"
-REMOTE_TARBALL="${ACCOUNT_ROOT}/admin/tmp/interkid-alwaysdata.tgz"
+REMOTE_STAGE="${ACCOUNT_ROOT}/admin/tmp/interkid-deploy-${GITHUB_RUN_ID}"
+REMOTE_TARBALL="${ACCOUNT_ROOT}/admin/tmp/interkid-alwaysdata-${GITHUB_RUN_ID}.tgz"
+DEPLOY_DIR_NAME="interkid-search-${GITHUB_RUN_ID}"
+DEPLOY_ROOT="${ACCOUNT_ROOT}/${DEPLOY_DIR_NAME}"
 
 DEPLOY_COMMENT="$(jq -r '.comment.body // ""' "$GITHUB_EVENT_PATH")"
 TOKEN="${DEPLOY_COMMENT#alwaysdata-deploy:}"
@@ -46,7 +48,6 @@ sudo apt-get install -y -qq sshpass jq >/dev/null
 api GET "$API_ROOT/site/" > /tmp/sites.json
 echo 'alwaysdata API access verified.'
 
-# Replace any stale temporary deploy user.
 api GET "$API_ROOT/ssh/" > /tmp/ssh-users.json
 OLD_ID="$(jq -r --arg n "$SSH_USER" '.[] | select(.name==$n) | .id' /tmp/ssh-users.json | head -n1)"
 if [ -n "$OLD_ID" ]; then
@@ -69,7 +70,7 @@ SSH_HOST="ssh-${ACCOUNT}.alwaysdata.net"
 SSH_OPTS=(-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=20)
 
 for attempt in {1..12}; do
-  if sshpass -p "$SSH_PASS" ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_HOST" "test -w '${ACCOUNT_ROOT}/admin/tmp'" >/dev/null 2>&1; then
+  if sshpass -p "$SSH_PASS" ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_HOST" "test -w '${ACCOUNT_ROOT}/admin/tmp' && test -w '${ACCOUNT_ROOT}'" >/dev/null 2>&1; then
     break
   fi
   if [ "$attempt" -eq 12 ]; then
@@ -90,16 +91,16 @@ sshpass -p "$SSH_PASS" scp "${SSH_OPTS[@]}" \
   "$SSH_USER@$SSH_HOST:${REMOTE_TARBALL}"
 
 sshpass -p "$SSH_PASS" ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_HOST" \
-  "ACCOUNT_ROOT='${ACCOUNT_ROOT}' REMOTE_STAGE='${REMOTE_STAGE}' REMOTE_TARBALL='${REMOTE_TARBALL}' sh -s" <<'REMOTE'
+  "ACCOUNT_ROOT='${ACCOUNT_ROOT}' REMOTE_STAGE='${REMOTE_STAGE}' REMOTE_TARBALL='${REMOTE_TARBALL}' DEPLOY_ROOT='${DEPLOY_ROOT}' sh -s" <<'REMOTE'
 set -eu
 rm -rf "$REMOTE_STAGE"
 mkdir -p "$REMOTE_STAGE"
 tar -xzf "$REMOTE_TARBALL" -C "$REMOTE_STAGE"
-HOME="$ACCOUNT_ROOT" sh "$REMOTE_STAGE/deploy/alwaysdata/install.sh"
+HOME="$ACCOUNT_ROOT" INTERKID_ROOT="$DEPLOY_ROOT" INTERKID_STAGE="$REMOTE_STAGE" \
+  sh "$REMOTE_STAGE/deploy/alwaysdata/install.sh"
 rm -f "$REMOTE_TARBALL"
 REMOTE
 
-# Configure the supplied alwaysdata.net hostname as a User Program site.
 api GET "$API_ROOT/site/" > /tmp/sites.json
 ADDRESS="${ACCOUNT}.alwaysdata.net"
 SITE_ID="$(jq -r --arg a "$ADDRESS" '.[] | select((.addresses // []) | index($a)) | .id' /tmp/sites.json | head -n1)"
@@ -107,7 +108,8 @@ SITE_ID="$(jq -r --arg a "$ADDRESS" '.[] | select((.addresses // []) | index($a)
 jq -n \
   --arg address "$ADDRESS" \
   --arg base_url "https://${ADDRESS}/" \
-  '{type:"user_program",addresses:[$address],command:"./start.sh",working_directory:"interkid-search",environment:("SEARXNG_BASE_URL="+$base_url),ssl_force:true,max_idle_time:0,annotation:"Interkid SearXNG"}' \
+  --arg workdir "$DEPLOY_DIR_NAME" \
+  '{type:"user_program",addresses:[$address],command:"./start.sh",working_directory:$workdir,environment:("SEARXNG_BASE_URL="+$base_url),ssl_force:true,max_idle_time:0,annotation:"Interkid SearXNG"}' \
   > /tmp/site.json
 
 if [ -n "$SITE_ID" ]; then
@@ -141,7 +143,6 @@ curl --fail --silent --show-error --max-time 60 \
 test -s /tmp/search.html
 echo "Search endpoint OK: ${URL}search?q=openrockets"
 
-# Revoke the one-time API token when it can be identified by its app name.
 TOKEN_AUTH="${TOKEN}:"
 TOKENS_JSON="$(curl --fail --silent --show-error --basic --user "$TOKEN_AUTH" "$API_ROOT/token/" 2>/dev/null || true)"
 TOKEN_ID="$(printf '%s' "$TOKENS_JSON" | jq -r --arg app "$TOKEN_APP" '.[] | select(.app_name==$app) | .id' 2>/dev/null | head -n1 || true)"
