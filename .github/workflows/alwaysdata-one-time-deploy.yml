@@ -8,7 +8,7 @@ on:
 
 permissions:
   contents: read
-  issues: read
+  issues: write
 
 jobs:
   deploy:
@@ -22,11 +22,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Generate ephemeral encryption key
+      - name: Generate and publish ephemeral encryption key
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:3072 -out /tmp/alwaysdata-private.pem 2>/dev/null
           openssl pkey -in /tmp/alwaysdata-private.pem -pubout -out /tmp/alwaysdata-public.pem
-          echo "ALWAYSDATA_PUBLIC_KEY_B64=$(base64 -w0 /tmp/alwaysdata-public.pem)"
+          public_key="$(base64 -w0 /tmp/alwaysdata-public.pem)"
+          gh api "repos/${GITHUB_REPOSITORY}/issues/${HANDOFF_ISSUE}/comments" \
+            -f body="ALWAYSDATA_PUBLIC_KEY_B64=${public_key}" >/dev/null
 
       - name: Receive encrypted token
         env:
@@ -52,7 +56,6 @@ jobs:
           echo "::add-mask::$token"
 
       - name: Configure temporary SSH user
-        id: ssh
         run: |
           set -eu
           token="$(cat /tmp/alwaysdata-token)"
@@ -60,19 +63,13 @@ jobs:
           deploy_user="${ALWAYSDATA_ACCOUNT}_deploy"
           deploy_password="$(openssl rand -hex 24)"
           echo "::add-mask::$deploy_password"
-
           ssh_list="$(curl -fsS --basic --user "$auth" https://api.alwaysdata.com/v1/ssh/)"
           ssh_id="$(printf '%s' "$ssh_list" | jq -r --arg n "$deploy_user" '.[] | select(.name == $n) | .id' | head -n1)"
-
           payload="$(jq -nc --arg name "$deploy_user" --arg password "$deploy_password" '{name:$name,password:$password,home_directory:"/",shell:"BASH",can_use_password:true,annotation:"Temporary Interkid deployment user"}')"
           if [ -n "$ssh_id" ]; then
-            curl -fsS -X PATCH --basic --user "$auth" \
-              -H 'Content-Type: application/json' -H 'alwaysdata-synchronous: yes' \
-              --data "$payload" "https://api.alwaysdata.com/v1/ssh/${ssh_id}/" >/tmp/ssh-result.json
+            curl -fsS -X PATCH --basic --user "$auth" -H 'Content-Type: application/json' -H 'alwaysdata-synchronous: yes' --data "$payload" "https://api.alwaysdata.com/v1/ssh/${ssh_id}/" >/tmp/ssh-result.json
           else
-            curl -fsS -X POST --basic --user "$auth" \
-              -H 'Content-Type: application/json' -H 'alwaysdata-synchronous: yes' \
-              --data "$payload" https://api.alwaysdata.com/v1/ssh/ >/tmp/ssh-result.json
+            curl -fsS -X POST --basic --user "$auth" -H 'Content-Type: application/json' -H 'alwaysdata-synchronous: yes' --data "$payload" https://api.alwaysdata.com/v1/ssh/ >/tmp/ssh-result.json
             ssh_id="$(jq -r '.id' /tmp/ssh-result.json)"
           fi
           printf '%s' "$deploy_password" > /tmp/alwaysdata-ssh-password
@@ -87,21 +84,9 @@ jobs:
           deploy_user="$(cat /tmp/alwaysdata-ssh-user)"
           deploy_password="$(cat /tmp/alwaysdata-ssh-password)"
           host="ssh-${ALWAYSDATA_ACCOUNT}.alwaysdata.net"
-
-          tar -czf /tmp/interkid-alwaysdata.tgz \
-            index.html \
-            searxng/settings.yml \
-            deploy/alwaysdata/install.sh \
-            deploy/alwaysdata/start.sh
-
-          SSHPASS="$deploy_password" sshpass -e scp \
-            -o StrictHostKeyChecking=accept-new \
-            /tmp/interkid-alwaysdata.tgz "${deploy_user}@${host}:~/interkid-alwaysdata.tgz"
-
-          SSHPASS="$deploy_password" sshpass -e ssh \
-            -o StrictHostKeyChecking=accept-new \
-            "${deploy_user}@${host}" \
-            'rm -rf "$HOME/interkid-deploy" && mkdir -p "$HOME/interkid-deploy" && tar -xzf "$HOME/interkid-alwaysdata.tgz" -C "$HOME/interkid-deploy" && sh "$HOME/interkid-deploy/deploy/alwaysdata/install.sh"'
+          tar -czf /tmp/interkid-alwaysdata.tgz index.html searxng/settings.yml deploy/alwaysdata/install.sh deploy/alwaysdata/start.sh
+          SSHPASS="$deploy_password" sshpass -e scp -o StrictHostKeyChecking=accept-new /tmp/interkid-alwaysdata.tgz "${deploy_user}@${host}:~/interkid-alwaysdata.tgz"
+          SSHPASS="$deploy_password" sshpass -e ssh -o StrictHostKeyChecking=accept-new "${deploy_user}@${host}" 'rm -rf "$HOME/interkid-deploy" && mkdir -p "$HOME/interkid-deploy" && tar -xzf "$HOME/interkid-alwaysdata.tgz" -C "$HOME/interkid-deploy" && sh "$HOME/interkid-deploy/deploy/alwaysdata/install.sh"'
 
       - name: Configure alwaysdata site
         run: |
@@ -111,19 +96,13 @@ jobs:
           address="${ALWAYSDATA_ACCOUNT}.alwaysdata.net"
           command="/home/${ALWAYSDATA_ACCOUNT}/interkid-search/start.sh"
           workdir="/home/${ALWAYSDATA_ACCOUNT}/interkid-search"
-
           sites="$(curl -fsS --basic --user "$auth" https://api.alwaysdata.com/v1/site/)"
           site_id="$(printf '%s' "$sites" | jq -r --arg a "$address" '.[] | select((.addresses // []) | index($a)) | .id' | head -n1)"
           payload="$(jq -nc --arg address "$address" --arg command "$command" --arg workdir "$workdir" '{name:"Interkid Search",addresses:[$address],type:"user_program",command:$command,working_directory:$workdir,ssl_force:true,annotation:"Interkid SearXNG"}')"
-
           if [ -n "$site_id" ]; then
-            curl -fsS -X PATCH --basic --user "$auth" \
-              -H 'Content-Type: application/json' -H 'alwaysdata-synchronous: yes' \
-              --data "$payload" "https://api.alwaysdata.com/v1/site/${site_id}/" >/tmp/site-result.json
+            curl -fsS -X PATCH --basic --user "$auth" -H 'Content-Type: application/json' -H 'alwaysdata-synchronous: yes' --data "$payload" "https://api.alwaysdata.com/v1/site/${site_id}/" >/tmp/site-result.json
           else
-            curl -fsS -X POST --basic --user "$auth" \
-              -H 'Content-Type: application/json' -H 'alwaysdata-synchronous: yes' \
-              --data "$payload" https://api.alwaysdata.com/v1/site/ >/tmp/site-result.json
+            curl -fsS -X POST --basic --user "$auth" -H 'Content-Type: application/json' -H 'alwaysdata-synchronous: yes' --data "$payload" https://api.alwaysdata.com/v1/site/ >/tmp/site-result.json
             site_id="$(jq -r '.id' /tmp/site-result.json)"
           fi
           printf '%s' "$site_id" > /tmp/alwaysdata-site-id
@@ -135,10 +114,7 @@ jobs:
           base="https://${ALWAYSDATA_ACCOUNT}.alwaysdata.net"
           ok=0
           for attempt in $(seq 1 60); do
-            if curl -LfsS --max-time 20 "$base/" -o /tmp/interkid-home.html && grep -qi 'interkid' /tmp/interkid-home.html; then
-              ok=1
-              break
-            fi
+            if curl -LfsS --max-time 20 "$base/" -o /tmp/interkid-home.html && grep -qi 'interkid' /tmp/interkid-home.html; then ok=1; break; fi
             sleep 5
           done
           [ "$ok" = 1 ] || { echo "Homepage did not become ready"; exit 1; }
@@ -154,10 +130,7 @@ jobs:
           auth="${token} account=${ALWAYSDATA_ACCOUNT}:"
           ssh_id="$(cat /tmp/alwaysdata-ssh-id)"
           curl -fsS -X DELETE --basic --user "$auth" "https://api.alwaysdata.com/v1/ssh/${ssh_id}/" >/dev/null || true
-
           tokens="$(curl -fsS --basic --user "$token:" https://api.alwaysdata.com/v1/token/ || true)"
           token_id="$(printf '%s' "$tokens" | jq -r --arg app "$TOKEN_APP_NAME" '.[] | select(.app_name == $app) | .id' | head -n1)"
-          if [ -n "$token_id" ]; then
-            curl -fsS -X DELETE --basic --user "$token:" "https://api.alwaysdata.com/v1/token/${token_id}/" >/dev/null || true
-          fi
+          if [ -n "$token_id" ]; then curl -fsS -X DELETE --basic --user "$token:" "https://api.alwaysdata.com/v1/token/${token_id}/" >/dev/null || true; fi
           rm -f /tmp/alwaysdata-token /tmp/alwaysdata-token.enc /tmp/alwaysdata-private.pem /tmp/alwaysdata-ssh-password
