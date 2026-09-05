@@ -13,7 +13,7 @@ permissions:
 jobs:
   fix:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     env:
       ALWAYSDATA_ACCOUNT: interkidtest
       HANDOFF_ISSUE: "3"
@@ -71,6 +71,7 @@ jobs:
           fi
           printf '%s' "$pass" >/tmp/ssh-pass
           printf '%s' "$id" >/tmp/ssh-id
+          sleep 20
 
       - name: Upload fixed start script and test locally
         run: |
@@ -79,9 +80,18 @@ jobs:
           pass="$(cat /tmp/ssh-pass)"
           host="ssh-${ALWAYSDATA_ACCOUNT}.alwaysdata.net"
           user="${ALWAYSDATA_ACCOUNT}_deploy"
-          SSHPASS="$pass" sshpass -e scp -o StrictHostKeyChecking=accept-new \
-            deploy/alwaysdata/start.sh "$user@$host:~/interkid-search/start.sh"
-          SSHPASS="$pass" sshpass -e ssh -o StrictHostKeyChecking=accept-new "$user@$host" 'bash -s' <<'REMOTE'
+          uploaded=0
+          for attempt in $(seq 1 8); do
+            if SSHPASS="$pass" sshpass -e scp -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 \
+              deploy/alwaysdata/start.sh "$user@$host:~/interkid-search/start.sh"; then
+              uploaded=1
+              break
+            fi
+            echo "SSH credentials not active yet; retry $attempt/8"
+            sleep 10
+          done
+          [ "$uploaded" = 1 ] || { echo "Could not upload runtime fix"; exit 1; }
+          SSHPASS="$pass" sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 "$user@$host" 'bash -s' <<'REMOTE'
             set -eu
             chmod 755 "$HOME/interkid-search/start.sh"
             cd "$HOME/interkid-search"
@@ -89,12 +99,15 @@ jobs:
             pid=$!
             trap 'kill "$pid" 2>/dev/null || true' EXIT
             ready=0
-            for attempt in $(seq 1 20); do
+            for attempt in $(seq 1 30); do
               if curl -fsS --max-time 5 http://127.0.0.1:8399/ -o /tmp/interkid-runtime-home.html; then ready=1; break; fi
               sleep 1
             done
-            if [ "$ready" != 1 ]; then cat /tmp/interkid-runtime-test.log; exit 1; fi
-            grep -qi 'interkid' /tmp/interkid-runtime-home.html
+            if [ "$ready" != 1 ]; then
+              cat /tmp/interkid-runtime-test.log
+              exit 1
+            fi
+            grep -qi 'interkid' /tmp/interkid-runtime-home.html || { echo 'Homepage response missing Interkid'; head -c 500 /tmp/interkid-runtime-home.html; exit 1; }
           REMOTE
 
       - name: Restart alwaysdata site
@@ -121,17 +134,23 @@ jobs:
           test -s /tmp/search.html
           echo "INTERKID_LIVE_URL=$base"
 
-      - name: Remove temporary SSH and revoke supplied API token
+      - name: Revoke supplied API token after successful verification
         if: success()
         run: |
           set -eu
           token="$(cat /tmp/token)"
-          auth="${token} account=${ALWAYSDATA_ACCOUNT}:"
-          ssh_id="$(cat /tmp/ssh-id)"
-          curl -fsS -X DELETE --basic --user "$auth" "https://api.alwaysdata.com/v1/ssh/${ssh_id}/" >/dev/null || true
           tokens="$(curl -fsS --basic --user "$token:" https://api.alwaysdata.com/v1/token/)"
           token_id="$(printf '%s' "$tokens" | jq -r --arg app "$TOKEN_APP_NAME" '.[] | select(.app_name == $app) | .id' | head -n1)"
           if [ -n "$token_id" ]; then
             curl -fsS -X DELETE --basic --user "$token:" "https://api.alwaysdata.com/v1/token/${token_id}/" >/dev/null || true
           fi
-          rm -f /tmp/token /tmp/token.enc /tmp/private.pem /tmp/ssh-pass
+
+      - name: Remove temporary SSH login and local credentials
+        if: always()
+        run: |
+          token="$(cat /tmp/token 2>/dev/null || true)"
+          ssh_id="$(cat /tmp/ssh-id 2>/dev/null || true)"
+          if [ -n "$token" ] && [ -n "$ssh_id" ]; then
+            curl -fsS -X DELETE --basic --user "${token} account=${ALWAYSDATA_ACCOUNT}:" "https://api.alwaysdata.com/v1/ssh/${ssh_id}/" >/dev/null || true
+          fi
+          rm -f /tmp/token /tmp/token.enc /tmp/private.pem /tmp/ssh-pass /tmp/ssh-id
