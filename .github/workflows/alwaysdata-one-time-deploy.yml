@@ -76,7 +76,7 @@ jobs:
           printf '%s' "$ssh_id" > /tmp/alwaysdata-ssh-id
           printf '%s' "$deploy_user" > /tmp/alwaysdata-ssh-user
 
-      - name: Install Interkid and SearXNG
+      - name: Ensure Interkid and SearXNG are installed
         run: |
           set -eu
           sudo apt-get update -qq
@@ -86,7 +86,8 @@ jobs:
           host="ssh-${ALWAYSDATA_ACCOUNT}.alwaysdata.net"
           tar -czf /tmp/interkid-alwaysdata.tgz index.html searxng/settings.yml deploy/alwaysdata/install.sh deploy/alwaysdata/start.sh
           SSHPASS="$deploy_password" sshpass -e scp -o StrictHostKeyChecking=accept-new /tmp/interkid-alwaysdata.tgz "${deploy_user}@${host}:~/interkid-alwaysdata.tgz"
-          SSHPASS="$deploy_password" sshpass -e ssh -o StrictHostKeyChecking=accept-new "${deploy_user}@${host}" 'rm -rf "$HOME/interkid-deploy" && mkdir -p "$HOME/interkid-deploy" && tar -xzf "$HOME/interkid-alwaysdata.tgz" -C "$HOME/interkid-deploy" && sh "$HOME/interkid-deploy/deploy/alwaysdata/install.sh"'
+          SSHPASS="$deploy_password" sshpass -e ssh -o StrictHostKeyChecking=accept-new "${deploy_user}@${host}" \
+            'rm -rf "$HOME/interkid-deploy" && mkdir -p "$HOME/interkid-deploy" && tar -xzf "$HOME/interkid-alwaysdata.tgz" -C "$HOME/interkid-deploy" && if [ -x "$HOME/interkid-search/venv/bin/granian" ]; then cp "$HOME/interkid-deploy/index.html" "$HOME/interkid-search/searxng-src/searx/templates/simple/index.html"; cp "$HOME/interkid-deploy/searxng/settings.yml" "$HOME/interkid-search/config/settings.yml"; cp "$HOME/interkid-deploy/deploy/alwaysdata/start.sh" "$HOME/interkid-search/start.sh"; chmod 755 "$HOME/interkid-search/start.sh"; SECRET="$(cat "$HOME/interkid-search/secret")"; SETTINGS="$HOME/interkid-search/config/settings.yml" SEARX_SECRET="$SECRET" "$HOME/interkid-search/venv/bin/python" -c '"'"'import os; from pathlib import Path; p=Path(os.environ["SETTINGS"]); t=p.read_text(); p.write_text(t.replace("secret_key: \"ultrasecretkey\"", f"secret_key: \"{os.environ['"'"'SEARX_SECRET'"'"']}\""))'"'"'; else sh "$HOME/interkid-deploy/deploy/alwaysdata/install.sh"; fi'
 
       - name: Configure alwaysdata site
         run: |
@@ -94,17 +95,19 @@ jobs:
           token="$(cat /tmp/alwaysdata-token)"
           auth="${token} account=${ALWAYSDATA_ACCOUNT}:"
           address="${ALWAYSDATA_ACCOUNT}.alwaysdata.net"
-          command="/home/${ALWAYSDATA_ACCOUNT}/interkid-search/start.sh"
-          workdir="/home/${ALWAYSDATA_ACCOUNT}/interkid-search"
           sites="$(curl -fsS --basic --user "$auth" https://api.alwaysdata.com/v1/site/)"
+          printf '%s' "$sites" | jq '[.[] | {id,type,addresses,annotation,working_directory,command}]'
           site_id="$(printf '%s' "$sites" | jq -r --arg a "$address" '.[] | select((.addresses // []) | index($a)) | .id' | head -n1)"
-          payload="$(jq -nc --arg address "$address" --arg command "$command" --arg workdir "$workdir" '{name:"Interkid Search",addresses:[$address],type:"user_program",command:$command,working_directory:$workdir,ssl_force:true,annotation:"Interkid SearXNG"}')"
+          payload="$(jq -nc --arg address "$address" '{type:"user_program",addresses:[$address],command:"./start.sh",working_directory:"interkid-search",ssl_force:true,annotation:"Interkid Search"}')"
+          response=/tmp/site-response.json
           if [ -n "$site_id" ]; then
-            curl -fsS -X PATCH --basic --user "$auth" -H 'Content-Type: application/json' -H 'alwaysdata-synchronous: yes' --data "$payload" "https://api.alwaysdata.com/v1/site/${site_id}/" >/tmp/site-result.json
+            code="$(curl -sS -o "$response" -w '%{http_code}' -X PATCH --basic --user "$auth" -H 'Content-Type: application/json' -H 'alwaysdata-synchronous: yes' --data "$payload" "https://api.alwaysdata.com/v1/site/${site_id}/")"
           else
-            curl -fsS -X POST --basic --user "$auth" -H 'Content-Type: application/json' -H 'alwaysdata-synchronous: yes' --data "$payload" https://api.alwaysdata.com/v1/site/ >/tmp/site-result.json
-            site_id="$(jq -r '.id' /tmp/site-result.json)"
+            code="$(curl -sS -o "$response" -w '%{http_code}' -X POST --basic --user "$auth" -H 'Content-Type: application/json' -H 'alwaysdata-synchronous: yes' --data "$payload" https://api.alwaysdata.com/v1/site/)"
+            if [ "$code" -ge 200 ] && [ "$code" -lt 300 ]; then site_id="$(jq -r '.id' "$response")"; fi
           fi
+          cat "$response"
+          if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then echo "alwaysdata site API returned HTTP $code"; exit 1; fi
           printf '%s' "$site_id" > /tmp/alwaysdata-site-id
           curl -fsS -X POST --basic --user "$auth" "https://api.alwaysdata.com/v1/site/${site_id}/restart/" >/dev/null || true
 
@@ -120,6 +123,7 @@ jobs:
           [ "$ok" = 1 ] || { echo "Homepage did not become ready"; exit 1; }
           curl -LfsS --max-time 60 "$base/search?q=openrockets" -o /tmp/interkid-search.html
           test -s /tmp/interkid-search.html
+          grep -qi 'openrockets' /tmp/interkid-search.html || true
           echo "INTERKID_LIVE_URL=$base"
 
       - name: Remove temporary deployment access
