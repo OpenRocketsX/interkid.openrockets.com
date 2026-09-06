@@ -7,12 +7,14 @@
   <meta name="description" content="Interkid — safe web search by OpenRockets.">
   <title>interkid</title>
 
-  <link rel="icon" href="https://openrockets.com/favicon.ico" sizes="any">
-  <link rel="shortcut icon" href="https://openrockets.com/favicon.ico">
-  <link rel="apple-touch-icon" href="https://openrockets.com/favicon.ico">
+  <link rel="icon" type="image/png" href="https://openrockets.com/i/assets/static/openthread_logo_bash-trans-removebg-preview%20(1).png">
+  <link rel="shortcut icon" type="image/png" href="https://openrockets.com/i/assets/static/openthread_logo_bash-trans-removebg-preview%20(1).png">
+  <link rel="apple-touch-icon" href="https://openrockets.com/i/assets/static/openthread_logo_bash-trans-removebg-preview%20(1).png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://www.youtube.com">
+  <link rel="preconnect" href="https://i.ytimg.com">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
@@ -40,6 +42,7 @@
     .hero {
       position: relative; width: 100%; min-height: 100svh; display: grid; place-items: center;
       overflow: hidden; isolation: isolate; background: #0a0a0a;
+      padding-bottom: calc(42px + env(safe-area-inset-bottom));
     }
 
     .video-shell, .video-shade, .video-fallback {
@@ -47,12 +50,12 @@
       -webkit-user-select: none; -webkit-user-drag: none;
     }
 
-    .video-shell { z-index: -3; overflow: hidden; background: #0a0a0a; }
+    .video-shell { z-index: -3; overflow: hidden; background: transparent; }
 
     .video-fallback {
       z-index: -4;
       background:
-        linear-gradient(180deg, rgba(5,5,5,0.18), rgba(5,5,5,0.5)),
+        linear-gradient(180deg, rgba(5,5,5,0.2), rgba(5,5,5,0.5)),
         url("https://i.ytimg.com/vi/IUN664s7N-c/maxresdefault.jpg") center center / cover no-repeat,
         #111;
       transform: scale(1.025);
@@ -72,18 +75,18 @@
     .video-shade {
       z-index: -2;
       background:
-        radial-gradient(circle at 50% 45%, rgba(255,255,255,0.05), rgba(0,0,0,0.18) 42%, rgba(0,0,0,0.46) 100%),
-        linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.08) 45%, rgba(0,0,0,0.38) 100%);
+        radial-gradient(circle at 50% 42%, rgba(255,255,255,0.05), rgba(0,0,0,0.18) 42%, rgba(0,0,0,0.47) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.08) 45%, rgba(0,0,0,0.4) 100%);
     }
 
     .hero-inner {
       width: min(740px, calc(100% - 32px));
-      transform: translateY(-2.4vh);
+      transform: translateY(-3vh);
       text-align: center;
     }
 
     .brand {
-      margin: 0 0 22px; color: #fff; font-family: "Google Sans Flex", "Outfit", sans-serif;
+      margin: 0 0 20px; color: #fff; font-family: "Google Sans Flex", "Outfit", sans-serif;
       font-size: clamp(3.6rem, 9vw, 5.5rem); font-weight: 500; line-height: 0.94;
       letter-spacing: -0.055em; text-shadow: 0 2px 26px rgba(0,0,0,0.22);
       user-select: none; -webkit-user-select: none; -webkit-user-drag: none; cursor: default;
@@ -92,8 +95,8 @@
     .search-form { position: relative; width: 100%; margin: 0 auto; }
 
     .search-surface {
-      position: relative; display: grid; grid-template-columns: 48px minmax(0, 1fr) auto;
-      align-items: center; min-height: 56px; padding: 4px 6px 4px 3px;
+      position: relative; display: grid; grid-template-columns: 46px minmax(0, 1fr) auto;
+      align-items: center; min-height: 52px; padding: 3px 5px 3px 2px;
       border: 1px solid rgba(0,0,0,0.16); border-radius: 999px;
       background: rgba(255,255,255,0.97);
       box-shadow: 0 12px 42px rgba(0,0,0,0.22), 0 2px 10px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(255,255,255,0.75);
@@ -106,12 +109,12 @@
       box-shadow: 0 15px 50px rgba(0,0,0,0.26), 0 0 0 3px rgba(255,255,255,0.22), inset 0 0 0 1px rgba(255,255,255,0.8);
     }
 
-    .search-icon { width: 21px; height: 21px; margin: auto; color: #151515; pointer-events: none; }
+    .search-icon { width: 20px; height: 20px; margin: auto; color: #151515; pointer-events: none; }
 
     #q {
-      width: 100%; min-width: 0; height: 46px; padding: 0 10px 0 0; border: 0; outline: 0;
+      width: 100%; min-width: 0; height: 42px; padding: 0 9px 0 0; border: 0; outline: 0;
       background: transparent; color: #111;
-      font: 500 1.04rem/1.2 "Google Sans Flex", "Outfit", system-ui, sans-serif;
+      font: 500 1.02rem/1.2 "Google Sans Flex", "Outfit", system-ui, sans-serif;
       letter-spacing: -0.012em; appearance: none; -webkit-appearance: none;
     }
 
@@ -121,7 +124,7 @@
     .actions { display: flex; align-items: center; gap: 3px; }
 
     .icon-button {
-      width: 42px; height: 42px; display: grid; place-items: center; padding: 0; border: 0;
+      width: 38px; height: 38px; display: grid; place-items: center; padding: 0; border: 0;
       border-radius: 50%; cursor: pointer;
       transition: transform 140ms ease, background 140ms ease, opacity 140ms ease;
     }
@@ -133,25 +136,21 @@
     .submit-button { background: #0b0b0b; color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.24); }
     .submit-button:hover, .submit-button:focus-visible { background: #232323; transform: scale(1.035); }
     .icon-button:active { transform: scale(0.95); }
-    .icon-button svg { width: 20px; height: 20px; }
+    .icon-button svg { width: 19px; height: 19px; }
 
     .copyright-ribbon {
       position: fixed;
-      left: max(16px, env(safe-area-inset-left));
-      bottom: max(14px, env(safe-area-inset-bottom));
-      z-index: 5;
-      max-width: calc(100vw - 32px);
-      padding: 7px 10px;
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 999px;
-      background: rgba(0,0,0,0.34);
-      color: rgba(255,255,255,0.76);
+      left: 0; right: 0; bottom: 0; z-index: 5;
+      width: 100%; min-height: calc(40px + env(safe-area-inset-bottom));
+      display: flex; align-items: flex-start; justify-content: flex-start;
+      padding: 11px max(18px, env(safe-area-inset-left)) calc(10px + env(safe-area-inset-bottom));
+      border-top: 1px solid rgba(255,255,255,0.13);
+      background: rgba(6,6,6,0.56);
+      color: rgba(255,255,255,0.78);
       font: 400 0.74rem/1.2 "Google Sans Flex", "Outfit", system-ui, sans-serif;
       letter-spacing: -0.01em;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      user-select: none;
-      -webkit-user-select: none;
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      user-select: none; -webkit-user-select: none;
     }
 
     .sr-only {
@@ -160,43 +159,52 @@
     }
 
     @media (max-width: 640px) {
+      .hero {
+        place-items: initial;
+        align-items: start;
+      }
+
       .hero-inner {
-        width: min(100% - 20px, 680px);
-        transform: translateY(-4vh);
+        width: calc(100% - 22px);
+        margin: clamp(118px, 25svh, 190px) auto 0;
+        transform: none;
       }
 
       .brand {
-        margin-bottom: 17px;
-        font-size: clamp(3.15rem, 17vw, 4.5rem);
+        margin-bottom: 16px;
+        font-size: clamp(3.1rem, 16vw, 4.35rem);
       }
 
       .search-surface {
-        min-height: 52px;
-        grid-template-columns: 42px minmax(0, 1fr) auto;
-        padding: 3px 5px 3px 2px;
+        min-height: 50px;
+        grid-template-columns: 40px minmax(0, 1fr) auto;
+        padding: 2px 5px 2px 2px;
       }
 
-      #q { height: 44px; font-size: 1rem; }
-      .icon-button { width: 38px; height: 38px; }
-      .search-icon { width: 20px; height: 20px; }
+      #q { height: 42px; font-size: 0.99rem; }
+      .icon-button { width: 37px; height: 37px; }
+      .search-icon { width: 19px; height: 19px; }
 
       .copyright-ribbon {
-        left: 50%;
-        bottom: max(10px, env(safe-area-inset-bottom));
-        transform: translateX(-50%);
-        width: max-content;
-        max-width: calc(100vw - 20px);
-        padding: 6px 9px;
+        justify-content: center;
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
         font-size: 0.67rem;
-        white-space: normal;
         text-align: center;
       }
     }
 
+    @media (max-width: 390px) {
+      .hero-inner { width: calc(100% - 18px); margin-top: clamp(106px, 23svh, 165px); }
+      .brand { font-size: clamp(2.9rem, 15.5vw, 3.8rem); margin-bottom: 14px; }
+      .search-surface { grid-template-columns: 38px minmax(0, 1fr) auto; }
+      #q { font-size: 0.96rem; }
+    }
+
     @media (max-height: 560px) and (orientation: landscape) {
-      .hero-inner { transform: translateY(-1vh); }
+      .hero { place-items: center; }
+      .hero-inner { margin: 0 auto; transform: translateY(-1vh); }
       .brand { margin-bottom: 12px; font-size: clamp(2.6rem, 11vh, 4rem); }
-      .copyright-ribbon { bottom: 8px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -207,17 +215,7 @@
 <body>
   <main class="hero" aria-labelledby="interkid-title">
     <div class="video-fallback" aria-hidden="true"></div>
-
-    <div class="video-shell" aria-hidden="true">
-      <iframe
-        id="hero-video"
-        title=""
-        tabindex="-1"
-        allow="autoplay; encrypted-media; picture-in-picture"
-        referrerpolicy="strict-origin-when-cross-origin">
-      </iframe>
-    </div>
-
+    <div class="video-shell" aria-hidden="true"><div id="hero-video"></div></div>
     <div class="video-shade" aria-hidden="true"></div>
 
     <section class="hero-inner">
@@ -225,7 +223,6 @@
 
       <form class="search-form" action="/search" method="get" role="search">
         <label class="sr-only" for="q">Search the internet</label>
-
         <div class="search-surface">
           <svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
             <path d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -233,20 +230,14 @@
 
           <input id="q" name="q" type="search" placeholder="Search the internet" autocomplete="off"
             autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="search">
-
           <input type="hidden" name="safesearch" value="2">
 
           <div class="actions">
             <button class="icon-button clear-button" id="clear-search" type="button" aria-label="Clear search">
-              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-                <path d="M7 7l10 10M17 7 7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M7 7l10 10M17 7 7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </button>
-
             <button class="icon-button submit-button" type="submit" aria-label="Search">
-              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-                <path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
           </div>
         </div>
@@ -254,16 +245,12 @@
     </section>
   </main>
 
-  <div class="copyright-ribbon" aria-label="Copyright">
-    © 2024–2026 OpenRockets Inc. All rights reserved.
-  </div>
+  <div class="copyright-ribbon" aria-label="Copyright">© 2024–2026 OpenRockets Inc. All rights reserved.</div>
 
   <script>
     (() => {
       const input = document.getElementById("q");
       const clearButton = document.getElementById("clear-search");
-      const video = document.getElementById("hero-video");
-
       const syncClearButton = () => clearButton.classList.toggle("visible", input.value.length > 0);
       input.addEventListener("input", syncClearButton);
       clearButton.addEventListener("click", () => {
@@ -279,26 +266,77 @@
 
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const saveData = navigator.connection && navigator.connection.saveData;
+      if (reducedMotion || saveData) return;
 
-      if (!reducedMotion && !saveData) {
-        const origin = encodeURIComponent(window.location.origin);
-        const src = "https://www.youtube.com/embed/IUN664s7N-c" +
-          "?autoplay=1&mute=1&controls=0&loop=1&playlist=IUN664s7N-c" +
-          "&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&origin=" + origin;
+      let player;
+      let trimTimer;
+      let apiTimeout;
 
-        video.src = src;
+      const keepLastTenSecondsOut = () => {
+        if (!player || typeof player.getDuration !== "function") return;
+        const duration = player.getDuration();
+        const current = player.getCurrentTime();
+        if (duration > 15 && current >= duration - 10) {
+          player.seekTo(0, true);
+          player.playVideo();
+        }
+      };
 
-        const revealVideo = () => video.classList.add("is-playing");
-        video.addEventListener("load", () => {
-          window.setTimeout(revealVideo, 900);
-        }, { once: true });
-
-        window.setTimeout(() => {
-          if (!video.classList.contains("is-playing")) {
-            video.removeAttribute("src");
+      window.onYouTubeIframeAPIReady = () => {
+        window.clearTimeout(apiTimeout);
+        player = new YT.Player("hero-video", {
+          videoId: "IUN664s7N-c",
+          playerVars: {
+            autoplay: 1,
+            controls: 0,
+            disablekb: 1,
+            fs: 0,
+            iv_load_policy: 3,
+            playsinline: 1,
+            rel: 0,
+            modestbranding: 1,
+            enablejsapi: 1,
+            origin: window.location.origin
+          },
+          events: {
+            onReady: (event) => {
+              event.target.mute();
+              event.target.playVideo();
+            },
+            onStateChange: (event) => {
+              if (event.data === YT.PlayerState.PLAYING) {
+                const frame = event.target.getIframe();
+                frame.setAttribute("title", "");
+                frame.setAttribute("tabindex", "-1");
+                frame.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+                frame.classList.add("is-playing");
+                window.clearInterval(trimTimer);
+                trimTimer = window.setInterval(keepLastTenSecondsOut, 500);
+              } else if (event.data === YT.PlayerState.ENDED) {
+                event.target.seekTo(0, true);
+                event.target.playVideo();
+              }
+            },
+            onError: () => {
+              window.clearInterval(trimTimer);
+              const frame = document.querySelector(".video-shell iframe");
+              if (frame) frame.classList.remove("is-playing");
+            }
           }
-        }, 9000);
-      }
+        });
+      };
+
+      const api = document.createElement("script");
+      api.src = "https://www.youtube.com/iframe_api";
+      api.async = true;
+      document.head.appendChild(api);
+
+      apiTimeout = window.setTimeout(() => {
+        if (!player) {
+          const frame = document.querySelector(".video-shell iframe");
+          if (frame) frame.remove();
+        }
+      }, 10000);
     })();
   </script>
 </body>
