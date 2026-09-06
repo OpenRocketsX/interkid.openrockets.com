@@ -1,3 +1,47 @@
+<style id="interkid-footer-flow-fix">
+  /* Keep the footer after the complete results document, including any stock
+     SearXNG floats/positioning that would otherwise escape main's height. */
+  body.results_endpoint {
+    min-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  body.results_endpoint #main_results {
+    flex: 1 0 auto !important;
+    display: flow-root !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    position: relative !important;
+  }
+
+  body.results_endpoint #main_results::after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+
+  body.results_endpoint #results,
+  body.results_endpoint #urls,
+  body.results_endpoint #pagination {
+    position: static !important;
+    float: none !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  body.results_endpoint .or-results-footer {
+    flex: 0 0 auto !important;
+    position: relative !important;
+    inset: auto !important;
+    clear: both !important;
+    z-index: 0 !important;
+  }
+</style>
+
 <style id="interkid-results-layout-fix">
   /* SearXNG's stock results header is a two-column grid. Our custom wrapper must
      own the whole row, otherwise it gets squeezed into the native 3rem logo cell. */
