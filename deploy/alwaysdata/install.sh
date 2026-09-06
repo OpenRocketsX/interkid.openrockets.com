@@ -24,6 +24,8 @@ cp "$STAGE/searxng/templates/simple/base.html" "$SRC/searx/templates/simple/base
 cp "$STAGE/searxng/templates/simple/search.html" "$SRC/searx/templates/simple/search.html"
 cp "$STAGE/searxng/settings.yml" "$CONFIG/settings.yml"
 cp "$STAGE/deploy/alwaysdata/start.sh" "$ROOT/start.sh"
+cp "$STAGE/deploy/alwaysdata/interkid_app.py" "$ROOT/interkid_app.py"
+cp "$STAGE/verification.html" "$ROOT/verification.html"
 chmod 755 "$ROOT/start.sh"
 
 "$VENV/bin/python" - <<'PY' > "$ROOT/secret"
@@ -44,4 +46,4 @@ path.write_text(text)
 PY
 
 printf '%s\n' "Interkid SearXNG installed at $ROOT"
-printf '%s\n' "Templates: homepage + base + search copied exactly from the tested repository revision"
+printf '%s\n' "Templates: homepage + base + search + verification route wrapper installed"
