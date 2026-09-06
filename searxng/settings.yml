@@ -4,7 +4,7 @@ general:
   instance_name: "interkid"
 
 search:
-  safe_search: 1
+  safe_search: 2
   autocomplete: "duckduckgo"
   formats:
     - html
@@ -24,5 +24,6 @@ ui:
 
 preferences:
   lock:
+    - safesearch
     - theme
     - simple_style
