@@ -183,3 +183,4 @@ jobs:
           # Intentionally DO NOT revoke or delete the alwaysdata API token.
 
 # live-sync verifier aligned with current templates; includes 2-second verification page
+# trigger rebuilt responsive header deployment 2026-09-06
