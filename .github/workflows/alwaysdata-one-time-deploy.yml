@@ -87,8 +87,12 @@ jobs:
           deploy_user="$(cat /tmp/alwaysdata-ssh-user)"
           deploy_password="$(cat /tmp/alwaysdata-ssh-password)"
           host="ssh-${ALWAYSDATA_ACCOUNT}.alwaysdata.net"
+          account_root="/home/${ALWAYSDATA_ACCOUNT}"
+          remote_tar="${account_root}/admin/tmp/interkid-alwaysdata-${GITHUB_RUN_ID}.tgz"
+          remote_stage="${account_root}/admin/tmp/interkid-deploy-${GITHUB_RUN_ID}"
           deploy_name="interkid-search-${GITHUB_RUN_ID}"
           printf '%s' "$deploy_name" > /tmp/alwaysdata-deploy-name
+
           tar -czf /tmp/interkid-alwaysdata.tgz \
             index.html \
             searxng/settings.yml \
@@ -96,22 +100,35 @@ jobs:
             searxng/templates/simple/search.html \
             deploy/alwaysdata/install.sh \
             deploy/alwaysdata/start.sh
-          uploaded=0
-          for attempt in $(seq 1 12); do
-            if SSHPASS="$deploy_password" sshpass -e scp -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 \
-              /tmp/interkid-alwaysdata.tgz "${deploy_user}@${host}:~/interkid-alwaysdata.tgz"; then uploaded=1; break; fi
-            sleep 5
+
+          ready=0
+          for attempt in $(seq 1 15); do
+            if SSHPASS="$deploy_password" sshpass -e ssh \
+              -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 \
+              "${deploy_user}@${host}" \
+              "test -w '${account_root}/admin/tmp' && test -w '${account_root}'"; then
+              ready=1
+              break
+            fi
+            sleep 4
           done
-          [ "$uploaded" = 1 ] || { echo "Could not upload Interkid package"; exit 1; }
-          SSHPASS="$deploy_password" sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 "${deploy_user}@${host}" \
-            "DEPLOY_NAME='${deploy_name}' bash -s" <<'REMOTE'
-            set -eu
-            rm -rf "$HOME/interkid-deploy"
-            mkdir -p "$HOME/interkid-deploy"
-            tar -xzf "$HOME/interkid-alwaysdata.tgz" -C "$HOME/interkid-deploy"
-            HOME="$HOME" INTERKID_ROOT="$HOME/$DEPLOY_NAME" INTERKID_STAGE="$HOME/interkid-deploy" \
-              sh "$HOME/interkid-deploy/deploy/alwaysdata/install.sh"
-            rm -f "$HOME/interkid-alwaysdata.tgz"
+          [ "$ready" = 1 ] || { echo "Temporary SSH user did not gain writable account access"; exit 1; }
+
+          SSHPASS="$deploy_password" sshpass -e scp \
+            -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 \
+            /tmp/interkid-alwaysdata.tgz "${deploy_user}@${host}:${remote_tar}"
+
+          SSHPASS="$deploy_password" sshpass -e ssh \
+            -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 \
+            "${deploy_user}@${host}" \
+            "ACCOUNT_ROOT='${account_root}' REMOTE_TAR='${remote_tar}' REMOTE_STAGE='${remote_stage}' DEPLOY_NAME='${deploy_name}' bash -s" <<'REMOTE'
+          set -eu
+          rm -rf "$REMOTE_STAGE"
+          mkdir -p "$REMOTE_STAGE"
+          tar -xzf "$REMOTE_TAR" -C "$REMOTE_STAGE"
+          HOME="$ACCOUNT_ROOT" INTERKID_ROOT="$ACCOUNT_ROOT/$DEPLOY_NAME" INTERKID_STAGE="$REMOTE_STAGE" \
+            sh "$REMOTE_STAGE/deploy/alwaysdata/install.sh"
+          rm -f "$REMOTE_TAR"
           REMOTE
 
       - name: Point alwaysdata site at new release
@@ -140,17 +157,22 @@ jobs:
           ok=0
           for attempt in $(seq 1 60); do
             if curl -LfsS --max-time 20 "$base/" -o /tmp/interkid-home.html \
-              && grep -q '© 2024–2026 OpenRockets Inc. All rights reserved.' /tmp/interkid-home.html; then
+              && grep -q '2024–2026 OpenRockets Inc. All rights reserved.' /tmp/interkid-home.html; then
               ok=1
               break
             fi
             sleep 5
           done
           [ "$ok" = 1 ] || { echo "Updated homepage did not become ready"; exit 1; }
+
           curl -LfsS --max-time 60 "$base/search?q=openrockets&safesearch=0" -o /tmp/interkid-search.html
           grep -q 'interkid-results-wordmark' /tmp/interkid-search.html
           grep -Eq 'name="safesearch"[^>]*value="2"|value="2"[^>]*name="safesearch"' /tmp/interkid-search.html
           grep -q 'https://openrockets.com/' /tmp/interkid-search.html
+          if grep -q 'simple/filters/safesearch' /tmp/interkid-search.html; then
+            echo "Safe Search selector unexpectedly present"
+            exit 1
+          fi
           echo "INTERKID_LIVE_URL=$base"
 
       - name: Remove temporary SSH login and runner credentials
