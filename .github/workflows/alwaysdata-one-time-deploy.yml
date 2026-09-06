@@ -112,7 +112,7 @@ jobs:
             HOME="$HOME" INTERKID_ROOT="$HOME/$DEPLOY_NAME" INTERKID_STAGE="$HOME/interkid-deploy" \
               sh "$HOME/interkid-deploy/deploy/alwaysdata/install.sh"
             rm -f "$HOME/interkid-alwaysdata.tgz"
-REMOTE
+          REMOTE
 
       - name: Point alwaysdata site at new release
         run: |
