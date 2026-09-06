@@ -1,0 +1,67 @@
+name: Verify polished Interkid UI publicly
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/interkid-public-live-verify.yml
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Verify alwaysdata origin
+        run: |
+          set -euxo pipefail
+          base="https://interkidtest.alwaysdata.net"
+
+          code="$(curl -sS -o /tmp/root.html -D /tmp/root.headers -w '%{http_code}' --max-time 20 "$base/")"
+          test "$code" = "302"
+          grep -qi '^location: /verification' /tmp/root.headers
+
+          curl -LfsS --max-time 25 "$base/verification" -o /tmp/verification.html
+          grep -q 'Max-Age=86400' /tmp/verification.html
+
+          curl -LfsS --cookie 'interkid_verification_seen=1' --max-time 30 "$base/" -o /tmp/home.html
+          grep -q 'browser-download-spinner' /tmp/home.html
+          grep -q 'Downloading' /tmp/home.html
+          grep -q 'https://about.openrockets.com/docs/legal/legal-information' /tmp/home.html
+          grep -q 'openthread_logo_bash-trans-removebg-preview%20(1).png' /tmp/home.html
+          grep -q 'site-ribbon-icon' /tmp/home.html
+          grep -q 'width: 20px; height: 20px' /tmp/home.html
+          grep -q 'no localStorage/sessionStorage' /tmp/home.html
+
+          curl -LfsS --max-time 60 "$base/search?q=interkidtitlecheck" -o /tmp/search.html
+          grep -q '<title>interkidtitlecheck - Interkid Search</title>' /tmp/search.html
+          grep -q 'data-testid="home-footer"' /tmp/search.html
+          grep -q 'OpenRockets is a 100% teen-run United States C-Corporation.' /tmp/search.html
+          grep -q 'An infrastructure service provider for nonprofits run by exceptional minors and teenagers worldwide.' /tmp/search.html
+          grep -q 'https://about.openrockets.com/docs/legal/legal-information' /tmp/search.html
+          grep -q 'interkid-about-icon' /tmp/search.html
+          grep -q 'openthread_logo_bash-trans-removebg-preview%20(1).png' /tmp/search.html
+          grep -q 'interkid-results-mobile-top-row' /tmp/search.html
+          grep -q 'top: 13px' /tmp/search.html
+          ! grep -q 'Powered by' /tmp/search.html
+          ! grep -q 'Engine stats' /tmp/search.html
+
+          echo 'PASS alwaysdata polished UI'
+
+      - name: Verify public www bridge
+        run: |
+          set -euxo pipefail
+          curl -LfsS --cookie 'interkid_verification_seen=1' --max-time 40 https://www.interkid.org/ -o /tmp/www-home.html
+          grep -q 'browser-download-spinner' /tmp/www-home.html
+          grep -q 'https://about.openrockets.com/docs/legal/legal-information' /tmp/www-home.html
+          grep -q 'openthread_logo_bash-trans-removebg-preview%20(1).png' /tmp/www-home.html
+
+          curl -LfsS --max-time 60 'https://www.interkid.org/search?q=interkidtitlecheck' -o /tmp/www-search.html
+          grep -q '<title>interkidtitlecheck - Interkid Search</title>' /tmp/www-search.html
+          grep -q 'data-testid="home-footer"' /tmp/www-search.html
+          grep -q 'interkid-about-icon' /tmp/www-search.html
+          grep -q 'interkid-results-mobile-top-row' /tmp/www-search.html
+          grep -q 'OpenRockets is a 100% teen-run United States C-Corporation.' /tmp/www-search.html
+          echo 'PASS public www polished UI'
