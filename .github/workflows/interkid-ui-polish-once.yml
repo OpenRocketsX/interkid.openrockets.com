@@ -1,0 +1,144 @@
+name: Apply coordinated Interkid UI polish
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/interkid-ui-polish-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch homepage and results UI
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          LEGAL = "https://about.openrockets.com/docs/legal/legal-information"
+          OPENTHREAD = "https://openrockets.com/i/assets/static/openthread_logo_bash-trans-removebg-preview%20(1).png"
+
+          def require(text, needle, label):
+              if needle not in text:
+                  raise SystemExit(f"missing expected {label}: {needle[:120]!r}")
+
+          # ---------------- homepage ----------------
+          p = Path("index.html")
+          s = p.read_text()
+
+          # Legal links: Terms and Privacy intentionally share the same authoritative page.
+          s = s.replace("https://about.openrockets.com/legal/privacy-policy", LEGAL)
+          s = s.replace("https://about.openrockets.com/legal/terms", LEGAL)
+
+          old_icon = 'src="https://raw.githubusercontent.com/OpenRocketsX/interkid.openrockets.com/main/assets/interkid-browser-icon.png" alt="" draggable="false"'
+          require(s, old_icon, "homepage ribbon icon")
+          s = s.replace(old_icon, f'src="{OPENTHREAD}" alt="" draggable="false"', 1)
+
+          s = s.replace(
+              '.site-ribbon-icon { width: 28px; height: 28px; object-fit: contain; flex: 0 0 auto; }',
+              '.site-ribbon-icon { width: 20px; height: 20px; object-fit: contain; flex: 0 0 auto; filter: invert(1); }'
+          )
+          s = s.replace(
+              '.site-ribbon-icon { width: 24px; height: 24px; }',
+              '.site-ribbon-icon { width: 17px; height: 17px; }'
+          )
+
+          require(s, '.browser-download {', "browser download CSS")
+          spinner_css = '''\n    .browser-download-spinner {\n      width: 14px; height: 14px; margin-right: 7px; display: none; flex: 0 0 auto;\n      border: 2px solid rgba(255,255,255,.38); border-top-color: #fff; border-radius: 50%;\n      animation: interkid-download-spin .7s linear infinite;\n    }\n    .browser-download.is-loading .browser-download-spinner { display: inline-block; }\n    @keyframes interkid-download-spin { to { transform: rotate(360deg); } }\n'''
+          s = s.replace('    .browser-download:hover, .browser-download:focus-visible { background: #242424; }',
+                        '    .browser-download:hover, .browser-download:focus-visible { background: #242424; }' + spinner_css)
+
+          old_download = '<a class="browser-download" href="https://github.com/OpenRocketsX/InterKid-browser/releases/download/browser-latest/Browser-Setup.exe" download="Browser-Setup.exe">Download</a>'
+          require(s, old_download, "browser download anchor")
+          new_download = '<a class="browser-download" id="browser-download" href="https://github.com/OpenRocketsX/InterKid-browser/releases/download/browser-latest/Browser-Setup.exe" download="Browser-Setup.exe"><span class="browser-download-spinner" aria-hidden="true"></span><span class="browser-download-label">Download</span></a>'
+          s = s.replace(old_download, new_download)
+
+          # Mobile promo: deliberately narrower than search, icon/close on top row, text then button.
+          old_mobile = '''      .browser-promo { width: 100%; grid-template-columns: 40px minmax(0,1fr); gap: 9px; padding: 9px 34px 9px 10px; }\n      .browser-promo-icon { width: 40px; height: 40px; }\n      .browser-download { grid-column: 1 / -1; width: 100%; min-height: 32px; margin-top: 2px; }\n      .browser-promo-title { font-size: 0.88rem; }\n      .browser-promo-subtitle { font-size: 0.72rem; }'''
+          require(s, old_mobile, "mobile browser promo CSS")
+          new_mobile = '''      .browser-promo {\n        width: min(92%, 520px);\n        grid-template-columns: 1fr auto;\n        grid-template-areas: "icon close" "copy copy" "download download";\n        gap: 7px 10px;\n        padding: 9px 10px 10px;\n      }\n      .browser-promo-icon { grid-area: icon; width: 36px; height: 36px; }\n      .browser-promo-close { grid-area: close; position: static; justify-self: end; align-self: start; width: 25px; height: 25px; }\n      .browser-promo-copy { grid-area: copy; }\n      .browser-download { grid-area: download; width: 100%; min-height: 32px; margin-top: 1px; }\n      .browser-promo-title { font-size: 0.82rem; }\n      .browser-promo-subtitle { font-size: 0.67rem; }'''
+          s = s.replace(old_mobile, new_mobile)
+
+          old_js = '''      const promo = document.getElementById("browser-promo");\n      const promoClose = document.getElementById("browser-promo-close");\n      const syncClearButton = () => clearButton.classList.toggle("visible", input.value.length > 0);'''
+          require(s, old_js, "homepage promo JS setup")
+          new_js = '''      const promo = document.getElementById("browser-promo");\n      const promoClose = document.getElementById("browser-promo-close");\n      const browserDownload = document.getElementById("browser-download");\n      const browserDownloadLabel = browserDownload ? browserDownload.querySelector(".browser-download-label") : null;\n      const syncClearButton = () => clearButton.classList.toggle("visible", input.value.length > 0);'''
+          s = s.replace(old_js, new_js)
+
+          old_close = '      promoClose.addEventListener("click", () => { promo.hidden = true; });\n      syncClearButton();'
+          require(s, old_close, "homepage close behavior")
+          new_close = '''      // Deliberately no localStorage/sessionStorage: a close lasts only for this page view.\n      promoClose.addEventListener("click", () => { promo.hidden = true; });\n      if (browserDownload) {\n        browserDownload.addEventListener("click", () => {\n          browserDownload.classList.add("is-loading");\n          browserDownload.setAttribute("aria-busy", "true");\n          if (browserDownloadLabel) browserDownloadLabel.textContent = "Downloading";\n          window.setTimeout(() => {\n            browserDownload.classList.remove("is-loading");\n            browserDownload.removeAttribute("aria-busy");\n            if (browserDownloadLabel) browserDownloadLabel.textContent = "Download";\n          }, 2000);\n        });\n      }\n      syncClearButton();'''
+          s = s.replace(old_close, new_close)
+          p.write_text(s)
+
+          # ---------------- results base ----------------
+          p = Path("searxng/templates/simple/base.html")
+          s = p.read_text()
+
+          old_about = '<a href="https://about.openrockets.com/" class="link_on_top_about">{{ icon_big(\'information-circle\') }}<span>{{ _(\'About\') }}</span></a>'
+          if old_about not in s:
+              # alternate formatting found in older template revision
+              old_about = '''<a href="https://about.openrockets.com/" class="link_on_top_about">{{ icon_big('information-circle') }}<span>{{ _('About') }}</span></a>'''
+          require(s, old_about, "results About link")
+          new_about = f'''<a href="https://about.openrockets.com/" class="link_on_top_about"><img class="interkid-about-icon" src="{OPENTHREAD}" alt="" draggable="false"><span>{{{{ _('About') }}}}</span></a>'''
+          s = s.replace(old_about, new_about)
+
+          # Replace custom footer with the authoritative OpenRockets.com black home-footer section,
+          # intentionally omitting the DARKMODEFAVICON row and the status/API iframe below it.
+          start = s.find('  {% if endpoint == \'results\' %}')
+          script_marker = '  <script type="text/javascript" src="https://www.termsfeed.com/public/cookie-consent/4.2.0/cookie-consent.js" charset="UTF-8"></script>'
+          end = s.find(script_marker, start)
+          if start < 0 or end < 0:
+              raise SystemExit("could not locate results footer region")
+
+          footer = f'''  {{% if endpoint == 'results' %}}\n  <footer class="home-footer or-results-footer" data-testid="home-footer" aria-label="OpenRockets footer">\n    <div class="home-shell footer-content">\n      <div class="footer-top-row">\n        <div class="footer-col footer-about-col">\n          <img class="footer-openrockets-logo" src="https://openrockets.com/i/assets/static/brand/271742354.png" alt="OpenRockets Logo">\n          <p>An infrastructure service provider for nonprofits run by exceptional minors and teenagers worldwide.</p>\n          <p>Revitalize youth volunteering. Make a difference. Join the network of elites.</p>\n        </div>\n\n        <div class="footer-col">\n          <h4>Legal &amp; Press</h4>\n          <div class="footer-link-stack">\n            <a href="{LEGAL}">Terms of Service</a>\n            <a href="{LEGAL}">Privacy Policy</a>\n            <a href="https://about.openrockets.com/legal/parental-consent-form">Parental Consent</a>\n            <a href="https://about.openrockets.com">About OpenRockets Press</a>\n          </div>\n        </div>\n\n        <div class="footer-col">\n          <h4>Social</h4>\n          <div class="footer-link-stack footer-social-links">\n            <a href="https://discord.gg/djXh8udpbn"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>Discord</a>\n            <a href="https://linkedin.com/company/openrocketsinc"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.924 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a>\n            <a href="https://x.com/openrockets"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>Twitter / X</a>\n            <a href="https://blog.openrockets.com"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3h18v18H3V3zm15 15V6H6v12h12zm-2-9H8v2h8V9zm0 4H8v2h8v-2z"/></svg>OpenRockets Blog</a>\n            <a href="https://www.crunchbase.com/organization/openrockets"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 0H2.4A2.4 2.4 0 000 2.4v19.2A2.4 2.4 0 002.4 24h19.2a2.4 2.4 0 002.4-2.4V2.4A2.4 2.4 0 0021.6 0zM17.65 16.53c-1.25 1.4-3.08 2.22-5.4 2.22-3.8 0-6.85-2.86-6.85-6.8 0-3.9 3.1-6.72 6.88-6.72 2.37 0 4.14.88 5.4 2.25l-2.12 2.2c-.85-.85-1.85-1.28-3.26-1.28-2.02 0-3.6 1.58-3.6 3.55s1.58 3.55 3.6 3.55c1.45 0 2.4-.48 3.24-1.32l2.1 2.35zm1.5-6.85v4.5h-1.5v-4.5h1.5z"/></svg>Crunchbase</a>\n          </div>\n        </div>\n\n        <div class="footer-col">\n          <h4>Ping us anytime</h4>\n          <div class="footer-contact-stack">\n            <div><strong>Contact (24/7)</strong><a href="mailto:team@openrockets.com">team@openrockets.com</a><a href="tel:+16468207984">+1 (646) 820 7984 (NYC)</a></div>\n            <div><strong>Mail us, visit us!</strong><span>266 Elmwood Ave, Ste 420, Buffalo, New York 14222, United States of America<br>Melville Lane Area, FairFax, VA, United States 22033</span></div>\n          </div>\n        </div>\n      </div>\n\n      <div class="footer-bottom-row">\n        <span>OpenRockets is a 100% teen-run United States C-Corporation.<br>© &amp; (TM) 2022-2026 OpenRockets. All Rights Reserved.</span>\n        <a href="#" id="open_preferences_center">Update cookies preferences</a>\n      </div>\n    </div>\n  </footer>\n\n'''
+          s = s[:start] + footer + s[end:]
+          s = s.replace("https://about.openrockets.com/legal/privacy-policy", LEGAL)
+          s = s.replace("https://about.openrockets.com/legal/terms", LEGAL)
+
+          # Last-in-head stylesheet: exact footer geometry + About OpenThread icon + mobile top-row alignment.
+          extra = f'''\n  <style id="interkid-openrockets-footer-and-about-fix">\n    body.results_endpoint #main_results {{ display: flow-root !important; min-height: 70vh !important; }}\n    body.results_endpoint #results, body.results_endpoint #urls {{ float: none !important; }}\n    body.results_endpoint #pagination {{ clear: both !important; }}\n\n    body.results_endpoint #links_on_top .link_on_top_about {{ display: inline-flex !important; align-items: center !important; gap: 6px !important; }}\n    .interkid-about-icon {{ width: 22px; height: 22px; object-fit: contain; display: block; filter: none !important; }}\n\n    .home-footer.or-results-footer {{\n      position: static !important; clear: both !important; width: 100% !important; margin: 3rem 0 0 !important;\n      padding: 40px 2rem !important; border-top: 1px solid #fff !important; background: #000 !important; color: #fff !important;\n      font-family: var(--ik-font) !important;\n    }}\n    .home-footer .home-shell {{ width: 100% !important; max-width: 1200px !important; margin-inline: auto !important; padding-inline: 16px !important; }}\n    .home-footer .footer-content {{ display: flex !important; flex-direction: column !important; gap: 30px !important; font-size: .875rem !important; }}\n    .home-footer .footer-top-row {{ display: grid !important; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important; gap: 40px !important; }}\n    .home-footer .footer-col {{ min-width: 0 !important; text-align: left !important; display: flex !important; flex-direction: column !important; align-items: flex-start !important; }}\n    .home-footer .footer-openrockets-logo {{ width: 220px !important; max-width: 100% !important; height: auto !important; margin-bottom: 15px !important; display: block !important; filter: invert(1) brightness(100) !important; }}\n    .home-footer .footer-col p {{ margin: 0 0 10px !important; color: #fff !important; font-size: 14px !important; line-height: 1.6 !important; text-align: left !important; }}\n    .home-footer .footer-col h4 {{ margin: 0 0 15px !important; color: #fff !important; font-size: 14px !important; font-weight: 700 !important; text-transform: uppercase !important; }}\n    .home-footer .footer-link-stack {{ display: flex !important; flex-direction: column !important; gap: 8px !important; align-items: flex-start !important; }}\n    .home-footer .footer-social-links {{ gap: 12px !important; }}\n    .home-footer a {{ color: #fff !important; text-decoration: none !important; font-size: 14px !important; text-align: left !important; }}\n    .home-footer a:hover, .home-footer a:focus-visible {{ text-decoration: underline !important; }}\n    .home-footer .footer-social-links a {{ display: flex !important; align-items: center !important; gap: 8px !important; }}\n    .home-footer .footer-social-links svg {{ flex: 0 0 auto !important; }}\n    .home-footer .footer-contact-stack {{ display: flex !important; flex-direction: column !important; gap: 15px !important; align-items: flex-start !important; text-align: left !important; }}\n    .home-footer .footer-contact-stack div {{ display: flex !important; flex-direction: column !important; align-items: flex-start !important; }}\n    .home-footer .footer-contact-stack strong {{ margin-bottom: 4px !important; color: #fff !important; font-size: 12px !important; text-transform: uppercase !important; }}\n    .home-footer .footer-contact-stack span {{ color: #fff !important; font-size: 14px !important; line-height: 1.5 !important; }}\n    .home-footer .footer-bottom-row {{ border-top: 1px solid #fff !important; padding-top: 20px !important; display: flex !important; flex-wrap: wrap !important; justify-content: space-between !important; gap: 15px !important; }}\n    .home-footer .footer-bottom-row span, .home-footer .footer-bottom-row a {{ color: #fff !important; font-size: 13px !important; text-align: left !important; }}\n\n    @media (max-width: 700px) {{\n      body.results_endpoint #links_on_top {{ top: 8px !important; right: 9px !important; }}\n      body.results_endpoint #links_on_top .link_on_top_about {{ padding: 6px 7px !important; }}\n      .interkid-about-icon {{ width: 21px !important; height: 21px !important; }}\n      .home-footer.or-results-footer {{ margin-top: 2rem !important; padding: 34px 1rem !important; }}\n      .home-footer .home-shell {{ padding-inline: 0 !important; }}\n      .home-footer .footer-top-row {{ grid-template-columns: 1fr !important; gap: 30px !important; }}\n      .home-footer .footer-bottom-row {{ flex-direction: column !important; }}\n    }}\n  </style>\n'''
+          require(s, '</head>', "base head close")
+          s = s.replace('</head>', extra + '</head>', 1)
+          p.write_text(s)
+
+          # ---------------- results search mobile header ----------------
+          p = Path("searxng/templates/simple/search.html")
+          s = p.read_text()
+          mobile = '''\n<style id="interkid-results-mobile-top-row">\n  @media (max-width: 700px) {\n    body.results_endpoint #search_header {\n      position: relative !important;\n      padding: 58px 9px 8px !important;\n    }\n    body.results_endpoint .interkid-search-unit {\n      width: 100% !important;\n      display: block !important;\n      margin: 0 auto !important;\n    }\n    body.results_endpoint #search_logo {\n      position: absolute !important;\n      top: 13px !important;\n      left: 12px !important;\n      width: auto !important;\n      height: 31px !important;\n      z-index: 40 !important;\n      display: flex !important;\n      align-items: center !important;\n    }\n    body.results_endpoint .interkid-results-wordmark {\n      font-size: 1.42rem !important;\n      line-height: 31px !important;\n    }\n    body.results_endpoint #search_view,\n    body.results_endpoint #search_view:focus-within {\n      position: static !important;\n      width: 100% !important;\n      max-width: 760px !important;\n      margin: 0 auto !important;\n    }\n  }\n  @media (max-width: 420px) {\n    body.results_endpoint #search_logo { left: 10px !important; }\n    body.results_endpoint .interkid-results-wordmark { font-size: 1.3rem !important; }\n  }\n</style>\n'''
+          marker = '<form id="search"'
+          require(s, marker, "results search form")
+          if 'interkid-results-mobile-top-row' not in s:
+              s = s.replace(marker, mobile + '\n' + marker, 1)
+          p.write_text(s)
+
+          # Simple static checks before committing.
+          checks = {
+              "index.html": [LEGAL, "browser-download-spinner", "Downloading", OPENTHREAD],
+              "searxng/templates/simple/base.html": [LEGAL, "OpenRockets is a 100% teen-run United States C-Corporation.", "Ping us anytime", "Crunchbase", "interkid-about-icon"],
+              "searxng/templates/simple/search.html": ["interkid-results-mobile-top-row", "top: 13px", "display: block !important"],
+          }
+          for name, needles in checks.items():
+              text = Path(name).read_text()
+              for needle in needles:
+                  if needle not in text:
+                      raise SystemExit(f"post-patch check failed: {name}: {needle}")
+          print("UI patch checks passed")
+          PY
+
+      - name: Commit UI changes
+        run: |
+          set -eu
+          git config user.name "Neksha DeSilva"
+          git config user.email "rohandesilvahotmail@gmail.com"
+          git add index.html searxng/templates/simple/base.html searxng/templates/simple/search.html
+          git diff --cached --check
+          git commit -m "Polish Interkid legal footer browser promo and mobile results header"
+          git push origin HEAD:main
