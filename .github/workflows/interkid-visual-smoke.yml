@@ -1,0 +1,35 @@
+name: Visual smoke check Interkid results
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/interkid-visual-smoke.yml
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Capture live desktop and mobile results
+        run: |
+          set -eu
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          [ -n "$CHROME" ] || { echo "Chrome not found"; exit 1; }
+          URL='https://www.interkid.org/search?q=hello'
+          "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --force-device-scale-factor=1 --virtual-time-budget=6000 --window-size=1440,1800 --screenshot=/tmp/interkid-desktop.png "$URL"
+          "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --force-device-scale-factor=1 --virtual-time-budget=6000 --window-size=390,1000 --screenshot=/tmp/interkid-mobile.png "$URL"
+          file /tmp/interkid-desktop.png /tmp/interkid-mobile.png
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: interkid-live-results-screenshots
+          path: |
+            /tmp/interkid-desktop.png
+            /tmp/interkid-mobile.png
+          if-no-files-found: error
+          retention-days: 3
