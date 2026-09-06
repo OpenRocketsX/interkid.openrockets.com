@@ -28,26 +28,14 @@
   </style>
 </head>
 <body>
-  <iframe id="accounts-frame" title="OpenRockets Accounts" src="about:blank" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  <iframe id="accounts-frame" title="OpenRockets Accounts" src="https://accounts.openrockets.com/" referrerpolicy="strict-origin-when-cross-origin"></iframe>
   <script>
     (() => {
-      const frame = document.getElementById("accounts-frame");
-      let targetStarted = false;
-      let completed = false;
-
-      frame.addEventListener("load", () => {
-        if (!targetStarted || completed) return;
-        completed = true;
-
-        window.setTimeout(() => {
-          const secure = window.location.protocol === "https:" ? "; Secure" : "";
-          document.cookie = `interkid_verification_seen=1; Max-Age=86400; Path=/; SameSite=Lax${secure}`;
-          window.location.replace("/");
-        }, 1000);
-      });
-
-      targetStarted = true;
-      frame.src = "https://accounts.openrockets.com/";
+      window.setTimeout(() => {
+        const secure = window.location.protocol === "https:" ? "; Secure" : "";
+        document.cookie = `interkid_verification_seen=1; Max-Age=86400; Path=/; SameSite=Lax${secure}`;
+        window.location.replace("/");
+      }, 2000);
     })();
   </script>
 </body>
