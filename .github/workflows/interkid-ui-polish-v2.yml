@@ -1,0 +1,29 @@
+name: Run deterministic Interkid UI polish
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/interkid-ui-polish-v2.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply exact UI patch
+        run: python tools/apply_interkid_ui_polish_v2.py
+      - name: Validate and commit
+        run: |
+          set -eu
+          git config user.name "Neksha DeSilva"
+          git config user.email "rohandesilvahotmail@gmail.com"
+          git add index.html searxng/templates/simple/base.html searxng/templates/simple/search.html
+          git diff --cached --check
+          git commit -m "Polish legal footer browser promo and mobile results header"
+          git push origin HEAD:main
