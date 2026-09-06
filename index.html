@@ -32,55 +32,28 @@
     }
 
     * { box-sizing: border-box; }
-
-    html, body {
-      width: 100%; min-width: 100%; min-height: 100%; margin: 0; padding: 0;
-      background: #0a0a0a; overflow: hidden;
-    }
-
+    html, body { width: 100%; min-width: 100%; min-height: 100%; margin: 0; padding: 0; background: #0a0a0a; overflow: hidden; }
     body { min-height: 100svh; -webkit-tap-highlight-color: transparent; }
 
     .verification-gate {
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      width: 100vw;
-      height: 100vh;
-      height: 100svh;
-      background: #fff;
-      overflow: hidden;
+      position: fixed; inset: 0; z-index: 10000; width: 100vw; height: 100vh; height: 100svh;
+      background: #fff; overflow: hidden;
     }
-
     .verification-gate[hidden] { display: none !important; }
-
-    .verification-gate iframe {
-      display: block;
-      width: 100%;
-      height: 100%;
-      border: 0;
-      margin: 0;
-      padding: 0;
-      background: #fff;
-    }
-
-    body.verification-active .hero,
-    body.verification-active .copyright-ribbon {
-      visibility: hidden;
-    }
+    .verification-gate iframe { display: block; width: 100%; height: 100%; border: 0; margin: 0; padding: 0; background: #fff; }
+    body.verification-active .hero, body.verification-active .site-ribbon { visibility: hidden; }
 
     .hero {
       position: relative; width: 100%; min-height: 100svh; display: grid; place-items: center;
       overflow: hidden; isolation: isolate; background: #0a0a0a;
-      padding-bottom: calc(42px + env(safe-area-inset-bottom));
+      padding: 24px 0 calc(58px + env(safe-area-inset-bottom));
     }
 
     .video-shell, .video-shade, .video-fallback {
       position: absolute; inset: 0; pointer-events: none; user-select: none;
       -webkit-user-select: none; -webkit-user-drag: none;
     }
-
     .video-shell { z-index: -3; overflow: hidden; background: transparent; }
-
     .video-fallback {
       z-index: -4;
       background:
@@ -90,7 +63,6 @@
       transform: scale(1.025);
       filter: brightness(0.72) contrast(1.08) saturate(0.88);
     }
-
     .video-shell iframe {
       position: absolute; top: 50%; left: 50%; width: 100vw; height: 56.25vw;
       min-width: 177.78vh; min-height: 100vh; transform: translate(-50%, -50%);
@@ -98,9 +70,7 @@
       filter: brightness(0.84) contrast(1.12) saturate(0.92);
       transition: opacity 500ms ease;
     }
-
     .video-shell iframe.is-playing { opacity: 0.48; }
-
     .video-shade {
       z-index: -2;
       background:
@@ -108,12 +78,7 @@
         linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.08) 45%, rgba(0,0,0,0.4) 100%);
     }
 
-    .hero-inner {
-      width: min(740px, calc(100% - 32px));
-      transform: translateY(-3vh);
-      text-align: center;
-    }
-
+    .hero-inner { width: min(740px, calc(100% - 32px)); transform: translateY(-2vh); text-align: center; }
     .brand {
       margin: 0 0 20px; color: #fff; font-family: "Google Sans Flex", "Outfit", sans-serif;
       font-size: clamp(3.6rem, 9vw, 5.5rem); font-weight: 500; line-height: 0.94;
@@ -122,7 +87,6 @@
     }
 
     .search-form { position: relative; width: 100%; margin: 0 auto; }
-
     .search-surface {
       position: relative; display: grid; grid-template-columns: 46px minmax(0, 1fr) auto;
       align-items: center; min-height: 52px; padding: 3px 5px 3px 2px;
@@ -132,99 +96,107 @@
       transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     }
-
     .search-surface:focus-within {
       transform: translateY(-1px); border-color: #000;
       box-shadow: 0 15px 50px rgba(0,0,0,0.26), 0 0 0 3px rgba(255,255,255,0.22), inset 0 0 0 1px rgba(255,255,255,0.8);
     }
-
     .search-icon { width: 20px; height: 20px; margin: auto; color: #151515; pointer-events: none; }
-
     #q {
       width: 100%; min-width: 0; height: 42px; padding: 0 9px 0 0; border: 0; outline: 0;
       background: transparent; color: #111;
       font: 500 1.02rem/1.2 "Google Sans Flex", "Outfit", system-ui, sans-serif;
       letter-spacing: -0.012em; appearance: none; -webkit-appearance: none;
     }
-
     #q::placeholder { color: #777; opacity: 1; font-weight: 400; }
     #q::-webkit-search-cancel-button { display: none; }
-
     .actions { display: flex; align-items: center; gap: 3px; }
-
     .icon-button {
       width: 38px; height: 38px; display: grid; place-items: center; padding: 0; border: 0;
       border-radius: 50%; cursor: pointer;
       transition: transform 140ms ease, background 140ms ease, opacity 140ms ease;
     }
-
     .clear-button { background: transparent; color: #333; opacity: 0; pointer-events: none; }
     .clear-button.visible { opacity: 1; pointer-events: auto; }
     .clear-button:hover, .clear-button:focus-visible { background: #ececec; }
-
     .submit-button { background: #0b0b0b; color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.24); }
     .submit-button:hover, .submit-button:focus-visible { background: #232323; transform: scale(1.035); }
     .icon-button:active { transform: scale(0.95); }
     .icon-button svg { width: 19px; height: 19px; }
 
-    .copyright-ribbon {
-      position: fixed;
-      left: 0; right: 0; bottom: 0; z-index: 5;
-      width: 100%; min-height: calc(40px + env(safe-area-inset-bottom));
-      display: flex; align-items: flex-start; justify-content: flex-start;
-      padding: 11px max(18px, env(safe-area-inset-left)) calc(10px + env(safe-area-inset-bottom));
-      border-top: 1px solid rgba(255,255,255,0.13);
-      background: rgba(6,6,6,0.56);
-      color: rgba(255,255,255,0.78);
-      font: 400 0.74rem/1.2 "Google Sans Flex", "Outfit", system-ui, sans-serif;
+    .browser-promo {
+      position: relative;
+      width: min(680px, calc(100% - 12px));
+      margin: 14px auto 0;
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 38px 11px 12px;
+      color: #101010;
+      background: rgba(255, 229, 92, 0.96);
+      border-radius: 0.2rem;
+      box-shadow: 0 9px 30px rgba(0,0,0,0.18);
+      text-align: left;
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .browser-promo[hidden] { display: none !important; }
+    .browser-promo-icon { width: 48px; height: 48px; object-fit: contain; display: block; }
+    .browser-promo-copy { min-width: 0; }
+    .browser-promo-title { display: block; margin: 0 0 3px; font-size: 0.94rem; line-height: 1.2; font-weight: 600; letter-spacing: -0.015em; }
+    .browser-promo-subtitle { display: block; color: rgba(0,0,0,0.72); font-size: 0.76rem; line-height: 1.35; font-weight: 400; }
+    .browser-download {
+      flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+      min-height: 34px; padding: 7px 12px; border: 0; border-radius: 0.2rem;
+      background: #0a0a0a; color: #fff; text-decoration: none;
+      font-size: 0.78rem; font-weight: 600; line-height: 1;
+    }
+    .browser-download:hover, .browser-download:focus-visible { background: #242424; }
+    .browser-promo-close {
+      position: absolute; top: 5px; right: 5px; width: 26px; height: 26px;
+      display: grid; place-items: center; padding: 0; border: 0; border-radius: 0.2rem;
+      background: transparent; color: #111; cursor: pointer; font-size: 18px; line-height: 1;
+    }
+    .browser-promo-close:hover, .browser-promo-close:focus-visible { background: rgba(0,0,0,0.08); }
+
+    .site-ribbon {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+      min-height: calc(44px + env(safe-area-inset-bottom));
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 8px max(18px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+      background: #050505; color: #fff; border: 0;
+      font: 400 0.73rem/1.25 "Google Sans Flex", "Outfit", system-ui, sans-serif;
       letter-spacing: -0.01em;
-      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-      user-select: none; -webkit-user-select: none;
     }
+    .site-ribbon-left { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .site-ribbon-icon { width: 28px; height: 28px; object-fit: contain; flex: 0 0 auto; }
+    .site-ribbon-copy { color: rgba(255,255,255,0.86); white-space: nowrap; }
+    .site-ribbon-links { display: flex; align-items: center; justify-content: flex-end; gap: 14px; flex-wrap: wrap; }
+    .site-ribbon a { color: #fff; text-decoration: none; white-space: nowrap; }
+    .site-ribbon a:hover, .site-ribbon a:focus-visible { text-decoration: underline; }
 
-    .sr-only {
-      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
-      clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
-    }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
-    @media (max-width: 640px) {
-      .hero {
-        place-items: initial;
-        align-items: start;
-      }
-
-      .hero-inner {
-        width: calc(100% - 22px);
-        margin: clamp(118px, 25svh, 190px) auto 0;
-        transform: none;
-      }
-
-      .brand {
-        margin-bottom: 16px;
-        font-size: clamp(3.1rem, 16vw, 4.35rem);
-      }
-
-      .search-surface {
-        min-height: 50px;
-        grid-template-columns: 40px minmax(0, 1fr) auto;
-        padding: 2px 5px 2px 2px;
-      }
-
+    @media (max-width: 700px) {
+      .hero { place-items: initial; align-items: start; padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+      .hero-inner { width: calc(100% - 22px); margin: clamp(104px, 22svh, 170px) auto 0; transform: none; }
+      .brand { margin-bottom: 16px; font-size: clamp(3.1rem, 16vw, 4.35rem); }
+      .search-surface { min-height: 50px; grid-template-columns: 40px minmax(0, 1fr) auto; padding: 2px 5px 2px 2px; }
       #q { height: 42px; font-size: 0.99rem; }
       .icon-button { width: 37px; height: 37px; }
       .search-icon { width: 19px; height: 19px; }
-
-      .copyright-ribbon {
-        justify-content: center;
-        padding-left: max(12px, env(safe-area-inset-left));
-        padding-right: max(12px, env(safe-area-inset-right));
-        font-size: 0.67rem;
-        text-align: center;
-      }
+      .browser-promo { width: 100%; grid-template-columns: 40px minmax(0,1fr); gap: 9px; padding: 9px 34px 9px 10px; }
+      .browser-promo-icon { width: 40px; height: 40px; }
+      .browser-download { grid-column: 1 / -1; width: 100%; min-height: 32px; margin-top: 2px; }
+      .browser-promo-title { font-size: 0.88rem; }
+      .browser-promo-subtitle { font-size: 0.72rem; }
+      .site-ribbon { align-items: flex-start; flex-direction: column; gap: 5px; padding-top: 7px; padding-bottom: calc(7px + env(safe-area-inset-bottom)); }
+      .site-ribbon-icon { width: 24px; height: 24px; }
+      .site-ribbon-copy { font-size: 0.66rem; white-space: normal; }
+      .site-ribbon-links { width: 100%; justify-content: flex-start; gap: 10px; font-size: 0.66rem; }
     }
 
     @media (max-width: 390px) {
-      .hero-inner { width: calc(100% - 18px); margin-top: clamp(106px, 23svh, 165px); }
+      .hero-inner { width: calc(100% - 18px); margin-top: clamp(94px, 20svh, 150px); }
       .brand { font-size: clamp(2.9rem, 15.5vw, 3.8rem); margin-bottom: 14px; }
       .search-surface { grid-template-columns: 38px minmax(0, 1fr) auto; }
       #q { font-size: 0.96rem; }
@@ -234,6 +206,7 @@
       .hero { place-items: center; }
       .hero-inner { margin: 0 auto; transform: translateY(-1vh); }
       .brand { margin-bottom: 12px; font-size: clamp(2.6rem, 11vh, 4rem); }
+      .browser-promo { margin-top: 8px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -249,11 +222,7 @@
   <script>
     (() => {
       const cookieName = "interkid_verification_seen";
-      const hasCookie = document.cookie
-        .split(";")
-        .map((part) => part.trim())
-        .some((part) => part === `${cookieName}=1`);
-
+      const hasCookie = document.cookie.split(";").map((part) => part.trim()).some((part) => part === `${cookieName}=1`);
       if (hasCookie) return;
 
       const gate = document.getElementById("verification-gate");
@@ -269,7 +238,7 @@
         frame.src = "about:blank";
         gate.remove();
         document.body.classList.remove("verification-active");
-      }, 3000);
+      }, 2000);
     })();
   </script>
 
@@ -287,11 +256,8 @@
           <svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
             <path d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
-
-          <input id="q" name="q" type="search" placeholder="Search the internet" autocomplete="off"
-            autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="search">
+          <input id="q" name="q" type="search" placeholder="Search the internet" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="search">
           <input type="hidden" name="safesearch" value="2">
-
           <div class="actions">
             <button class="icon-button clear-button" id="clear-search" type="button" aria-label="Clear search">
               <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M7 7l10 10M17 7 7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -302,22 +268,46 @@
           </div>
         </div>
       </form>
+
+      <aside class="browser-promo" id="browser-promo" aria-label="Download Interkid Browser">
+        <button class="browser-promo-close" id="browser-promo-close" type="button" aria-label="Close browser download message">×</button>
+        <img class="browser-promo-icon" src="https://raw.githubusercontent.com/OpenRocketsX/interkid.openrockets.com/main/assets/interkid-browser-icon.png" alt="Interkid Browser icon" draggable="false">
+        <div class="browser-promo-copy">
+          <strong class="browser-promo-title">Download the free, secure and safe Interkid Browser</strong>
+          <span class="browser-promo-subtitle">Built with advanced algorithms to help keep your browsing safer. Built by teenagers.</span>
+        </div>
+        <a class="browser-download" href="https://github.com/OpenRocketsX/interkid.openrockets.com/raw/main/downloads/Browser-Setup.exe" download="Browser-Setup.exe">Download</a>
+      </aside>
     </section>
   </main>
 
-  <div class="copyright-ribbon" aria-label="Copyright">© 2024–2026 OpenRockets Inc. All rights reserved.</div>
+  <footer class="site-ribbon" aria-label="OpenRockets legal links">
+    <div class="site-ribbon-left">
+      <img class="site-ribbon-icon" src="https://raw.githubusercontent.com/OpenRocketsX/interkid.openrockets.com/main/assets/interkid-browser-icon.png" alt="" draggable="false">
+      <span class="site-ribbon-copy">© 2024–2026 OpenRockets Inc. All rights reserved.</span>
+    </div>
+    <nav class="site-ribbon-links" aria-label="Legal">
+      <a href="https://about.openrockets.com/legal/privacy-policy">Privacy Policy</a>
+      <a href="https://about.openrockets.com/legal/terms">Terms of Service</a>
+      <a href="https://about.openrockets.com/">About OpenRockets</a>
+    </nav>
+  </footer>
 
   <script>
     (() => {
       const input = document.getElementById("q");
       const clearButton = document.getElementById("clear-search");
+      const promo = document.getElementById("browser-promo");
+      const promoClose = document.getElementById("browser-promo-close");
       const syncClearButton = () => clearButton.classList.toggle("visible", input.value.length > 0);
+
       input.addEventListener("input", syncClearButton);
       clearButton.addEventListener("click", () => {
         input.value = "";
         syncClearButton();
         input.focus();
       });
+      promoClose.addEventListener("click", () => { promo.hidden = true; });
       syncClearButton();
 
       if (window.matchMedia("(pointer:fine)").matches && window.innerWidth > 720) {
@@ -347,22 +337,11 @@
         player = new YT.Player("hero-video", {
           videoId: "IUN664s7N-c",
           playerVars: {
-            autoplay: 1,
-            controls: 0,
-            disablekb: 1,
-            fs: 0,
-            iv_load_policy: 3,
-            playsinline: 1,
-            rel: 0,
-            modestbranding: 1,
-            enablejsapi: 1,
-            origin: window.location.origin
+            autoplay: 1, controls: 0, disablekb: 1, fs: 0, iv_load_policy: 3,
+            playsinline: 1, rel: 0, modestbranding: 1, enablejsapi: 1, origin: window.location.origin
           },
           events: {
-            onReady: (event) => {
-              event.target.mute();
-              event.target.playVideo();
-            },
+            onReady: (event) => { event.target.mute(); event.target.playVideo(); },
             onStateChange: (event) => {
               if (event.data === YT.PlayerState.PLAYING) {
                 const frame = event.target.getIframe();
