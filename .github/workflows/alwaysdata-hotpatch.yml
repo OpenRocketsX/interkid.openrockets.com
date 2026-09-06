@@ -105,15 +105,26 @@ jobs:
           SSHPASS="$pass" sshpass -e scp -o StrictHostKeyChecking=accept-new searxng/templates/simple/base.html "$user@$host:$templates/base.html"
           SSHPASS="$pass" sshpass -e scp -o StrictHostKeyChecking=accept-new verification.html "$user@$host:$release/verification.html"
           SSHPASS="$pass" sshpass -e scp -o StrictHostKeyChecking=accept-new deploy/alwaysdata/interkid_app.py "$user@$host:$release/interkid_app.py"
-          SSHPASS="$pass" sshpass -e scp -o StrictHostKeyChecking=accept-new deploy/alwaysdata/start.sh "$user@$host:$release/start.sh"
-          SSHPASS="$pass" sshpass -e ssh -o StrictHostKeyChecking=accept-new "$user@$host" "chmod 755 '$release/start.sh'"
+          SSHPASS="$pass" sshpass -e scp -o StrictHostKeyChecking=accept-new deploy/alwaysdata/start.sh "$user@$host:$release/start-verification.sh"
+          SSHPASS="$pass" sshpass -e ssh -o StrictHostKeyChecking=accept-new "$user@$host" "chmod 755 '$release/start-verification.sh'"
 
-      - name: Restart and verify live behavior
+      - name: Switch launcher, restart and verify live behavior
         run: |
           set -eu
           token="$(cat /tmp/token)"
           site_id="$(cat /tmp/site-id)"
           auth="${token} account=${ALWAYSDATA_ACCOUNT}:"
+
+          payload='{"command":"./start-verification.sh"}'
+          code="$(curl -sS -o /tmp/site-patch.json -w '%{http_code}' -X PATCH --basic --user "$auth" \
+            -H 'Content-Type: application/json' -H 'alwaysdata-synchronous: yes' \
+            --data "$payload" "https://api.alwaysdata.com/v1/site/${site_id}/")"
+          if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
+            cat /tmp/site-patch.json
+            echo "Could not switch Interkid launcher (HTTP $code)"
+            exit 1
+          fi
+
           curl -fsS -X POST --basic --user "$auth" -H 'alwaysdata-synchronous: yes' \
             "https://api.alwaysdata.com/v1/site/${site_id}/restart/" >/dev/null
 
