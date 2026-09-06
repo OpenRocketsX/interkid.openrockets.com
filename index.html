@@ -15,6 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://www.youtube.com">
   <link rel="preconnect" href="https://i.ytimg.com">
+  <link rel="preconnect" href="https://accounts.openrockets.com">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
@@ -38,6 +39,34 @@
     }
 
     body { min-height: 100svh; -webkit-tap-highlight-color: transparent; }
+
+    .verification-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      width: 100vw;
+      height: 100vh;
+      height: 100svh;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .verification-gate[hidden] { display: none !important; }
+
+    .verification-gate iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+    }
+
+    body.verification-active .hero,
+    body.verification-active .copyright-ribbon {
+      visibility: hidden;
+    }
 
     .hero {
       position: relative; width: 100%; min-height: 100svh; display: grid; place-items: center;
@@ -213,6 +242,37 @@
   </style>
 </head>
 <body>
+  <div class="verification-gate" id="verification-gate" hidden>
+    <iframe id="verification-frame" title="OpenRockets verification" src="about:blank" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+
+  <script>
+    (() => {
+      const cookieName = "interkid_verification_seen";
+      const hasCookie = document.cookie
+        .split(";")
+        .map((part) => part.trim())
+        .some((part) => part === `${cookieName}=1`);
+
+      if (hasCookie) return;
+
+      const gate = document.getElementById("verification-gate");
+      const frame = document.getElementById("verification-frame");
+      const secureFlag = window.location.protocol === "https:" ? "; Secure" : "";
+
+      document.cookie = `${cookieName}=1; Max-Age=86400; Path=/; SameSite=Lax${secureFlag}`;
+      document.body.classList.add("verification-active");
+      gate.hidden = false;
+      frame.src = "https://accounts.openrockets.com/verification/";
+
+      window.setTimeout(() => {
+        frame.src = "about:blank";
+        gate.remove();
+        document.body.classList.remove("verification-active");
+      }, 3000);
+    })();
+  </script>
+
   <main class="hero" aria-labelledby="interkid-title">
     <div class="video-fallback" aria-hidden="true"></div>
     <div class="video-shell" aria-hidden="true"><div id="hero-video"></div></div>
