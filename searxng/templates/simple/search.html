@@ -1,3 +1,290 @@
+<style id="interkid-results-layout-fix">
+  /* SearXNG's stock results header is a two-column grid. Our custom wrapper must
+     own the whole row, otherwise it gets squeezed into the native 3rem logo cell. */
+  body.results_endpoint #search_header {
+    display: block !important;
+  }
+
+  body.results_endpoint .interkid-search-unit {
+    width: min(980px, calc(100% - 32px)) !important;
+    margin: 0 auto !important;
+    display: grid !important;
+    grid-template-columns: max-content minmax(360px, 760px) !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 16px !important;
+  }
+
+  body.results_endpoint #search_logo {
+    grid-area: auto !important;
+    position: static !important;
+    flex: none !important;
+  }
+
+  body.results_endpoint #search_view,
+  body.results_endpoint #search_view:focus-within {
+    grid-area: auto !important;
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-width: 760px !important;
+    min-width: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    background: transparent !important;
+    z-index: auto !important;
+  }
+
+  body.results_endpoint #search_view:focus-within .search_box {
+    width: 100% !important;
+    border-radius: 999px !important;
+    border: 1px solid #111 !important;
+    box-shadow: 0 10px 34px rgba(0,0,0,.13), 0 0 0 3px rgba(0,0,0,.035) !important;
+  }
+
+  body.results_endpoint .search_box {
+    max-width: none !important;
+  }
+
+  body.results_endpoint #q {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-width: 0 !important;
+    flex: none !important;
+  }
+
+  body.results_endpoint #main_results #q:placeholder-shown ~ #send_search {
+    margin-right: 0 !important;
+  }
+
+  body.results_endpoint .interkid-categories-row {
+    clear: both !important;
+  }
+
+  body.results_endpoint .interkid-categories-row #categories_container {
+    width: max-content !important;
+    max-width: none !important;
+    margin: 0 auto !important;
+  }
+
+  body.results_endpoint .interkid-categories-row .category_checkbox,
+  body.results_endpoint .interkid-categories-row .category_button {
+    margin: 0 .12rem !important;
+  }
+
+  body.results_endpoint .interkid-categories-row .category_checkbox label,
+  body.results_endpoint .interkid-categories-row .category_button {
+    padding: .5rem .58rem !important;
+  }
+
+  body.results_endpoint .search_filters > * {
+    min-width: 0 !important;
+  }
+
+  body.results_endpoint .search_filters select {
+    width: min(260px, 100%) !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  body.results_endpoint .result {
+    display: flow-root !important;
+  }
+
+  /* Keep the consent notice useful without letting it dominate the results UI. */
+  body.results_endpoint .termsfeed-com---nb {
+    width: min(560px, calc(100vw - 32px)) !important;
+  }
+
+  body.results_endpoint .termsfeed-com---nb .cc-nb-main-container {
+    padding: 14px 15px !important;
+  }
+
+  body.results_endpoint .termsfeed-com---nb .cc-nb-text {
+    font-size: .73rem !important;
+    line-height: 1.38 !important;
+    margin-bottom: 9px !important;
+  }
+
+  body.results_endpoint .termsfeed-com---nb .cc-nb-okagree,
+  body.results_endpoint .termsfeed-com---nb .cc-nb-reject,
+  body.results_endpoint .termsfeed-com---nb .cc-nb-changep {
+    min-height: 31px !important;
+    padding: 7px 10px !important;
+    font-size: .72rem !important;
+  }
+
+  @media (max-width: 700px) {
+    body.results_endpoint #search_header {
+      padding: 44px 9px 8px !important;
+    }
+
+    body.results_endpoint .interkid-search-unit {
+      width: 100% !important;
+      grid-template-columns: max-content minmax(0, 1fr) !important;
+      gap: 8px !important;
+    }
+
+    body.results_endpoint .interkid-results-wordmark {
+      font-size: 1.42rem !important;
+    }
+
+    body.results_endpoint #search_view,
+    body.results_endpoint #search_view:focus-within {
+      width: 100% !important;
+      max-width: none !important;
+    }
+
+    body.results_endpoint .search_box,
+    body.results_endpoint #search_view:focus-within .search_box {
+      min-height: 46px !important;
+      grid-template-columns: 35px minmax(0, 1fr) 32px 32px !important;
+      padding: 2px 4px 2px 1px !important;
+      border-radius: 999px !important;
+    }
+
+    body.results_endpoint #q {
+      width: 100% !important;
+      height: 39px !important;
+      padding-right: 4px !important;
+      font-size: .94rem !important;
+    }
+
+    body.results_endpoint #clear_search,
+    body.results_endpoint #send_search {
+      width: 30px !important;
+      height: 30px !important;
+      min-width: 30px !important;
+      min-height: 30px !important;
+    }
+
+    body.results_endpoint .interkid-categories-row {
+      width: calc(100% + 18px) !important;
+      max-width: none !important;
+      margin: 8px -9px 0 !important;
+      padding: 0 6px !important;
+      display: block !important;
+      overflow-x: auto !important;
+      overflow-y: hidden !important;
+      white-space: nowrap !important;
+      scrollbar-width: none !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+
+    body.results_endpoint .interkid-categories-row::-webkit-scrollbar {
+      display: none !important;
+    }
+
+    body.results_endpoint .interkid-categories-row #categories,
+    body.results_endpoint .interkid-categories-row #categories_container,
+    body.results_endpoint .interkid-categories-row .categories {
+      width: max-content !important;
+      min-width: max-content !important;
+      max-width: none !important;
+      margin: 0 !important;
+      justify-content: flex-start !important;
+      overflow: visible !important;
+    }
+
+    body.results_endpoint .interkid-categories-row .category_checkbox label,
+    body.results_endpoint .interkid-categories-row .category_button {
+      padding: .62rem .54rem !important;
+      font-size: .78rem !important;
+    }
+
+    body.results_endpoint .search_filters {
+      width: calc(100% - 16px) !important;
+      margin: 8px auto 0 !important;
+      padding: 0 !important;
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+      gap: 8px !important;
+      overflow: visible !important;
+    }
+
+    body.results_endpoint .search_filters > * {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      margin: 0 !important;
+    }
+
+    body.results_endpoint .search_filters select {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      height: 36px !important;
+      padding: 5px 24px 5px 8px !important;
+      font-size: .78rem !important;
+    }
+
+    body.results_endpoint .termsfeed-com---nb {
+      right: 7px !important;
+      bottom: 7px !important;
+      width: calc(100vw - 14px) !important;
+      max-width: none !important;
+    }
+
+    body.results_endpoint .termsfeed-com---nb .cc-nb-main-container {
+      padding: 11px 12px !important;
+    }
+
+    body.results_endpoint .termsfeed-com---nb .cc-nb-title {
+      margin-bottom: 4px !important;
+      font-size: .9rem !important;
+    }
+
+    body.results_endpoint .termsfeed-com---nb .cc-nb-text {
+      margin-bottom: 7px !important;
+      font-size: .67rem !important;
+      line-height: 1.32 !important;
+    }
+
+    body.results_endpoint .termsfeed-com---nb .cc-nb-buttons {
+      gap: 5px !important;
+    }
+
+    body.results_endpoint .termsfeed-com---nb .cc-nb-okagree,
+    body.results_endpoint .termsfeed-com---nb .cc-nb-reject,
+    body.results_endpoint .termsfeed-com---nb .cc-nb-changep {
+      min-height: 29px !important;
+      padding: 6px 8px !important;
+      font-size: .68rem !important;
+    }
+  }
+
+  @media (max-width: 420px) {
+    body.results_endpoint #search_header {
+      padding-left: 7px !important;
+      padding-right: 7px !important;
+    }
+
+    body.results_endpoint .interkid-results-wordmark {
+      font-size: 1.28rem !important;
+    }
+
+    body.results_endpoint .interkid-search-unit {
+      gap: 6px !important;
+    }
+
+    body.results_endpoint .search_box,
+    body.results_endpoint #search_view:focus-within .search_box {
+      grid-template-columns: 32px minmax(0, 1fr) 29px 29px !important;
+    }
+
+    body.results_endpoint #clear_search,
+    body.results_endpoint #send_search {
+      width: 28px !important;
+      height: 28px !important;
+      min-width: 28px !important;
+      min-height: 28px !important;
+    }
+  }
+</style>
+
 <form id="search" method="{{ method }}" action="{{ url_for('search') }}" role="search">
   <div id="search_header">
     <div class="interkid-search-unit">
