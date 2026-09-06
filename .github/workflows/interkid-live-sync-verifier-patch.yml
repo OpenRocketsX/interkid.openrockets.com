@@ -1,0 +1,65 @@
+name: Update Interkid live-sync verifier
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/interkid-live-sync-verifier-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update live assertions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('.github/workflows/alwaysdata-live-sync.yml')
+          s = p.read_text()
+          old = """          grep -q 'Privacy Policy' /tmp/home.html
+          grep -q 'Terms of Service' /tmp/home.html
+          grep -q 'About OpenRockets' /tmp/home.html
+          echo \"PASS homepage browser download and legal ribbon\"
+
+          curl -LfsS --max-time 60 \"$base/search?q=interkidtitlecheck\" -o /tmp/search.html
+          grep -q '<title>interkidtitlecheck - Interkid Search</title>' /tmp/search.html
+          grep -q 'or-results-footer' /tmp/search.html
+          grep -q '© 2024–2026 OpenRockets Inc. All rights reserved.' /tmp/search.html
+          ! grep -q 'Powered by' /tmp/search.html
+          ! grep -q 'Engine stats' /tmp/search.html
+          echo \"PASS centered results template, title suffix, and OpenRockets footer\""" 
+          new = """          grep -q 'Privacy Policy' /tmp/home.html
+          grep -q 'Terms of Service' /tmp/home.html
+          grep -q 'About OpenRockets' /tmp/home.html
+          grep -q 'https://about.openrockets.com/docs/legal/legal-information' /tmp/home.html
+          grep -q 'browser-download-spinner' /tmp/home.html
+          echo \"PASS homepage browser download, spinner, legal ribbon, and legal URL\"
+
+          curl -LfsS --max-time 60 \"$base/search?q=interkidtitlecheck\" -o /tmp/search.html
+          grep -q '<title>interkidtitlecheck - Interkid Search</title>' /tmp/search.html
+          grep -q 'data-testid=\"home-footer\"' /tmp/search.html
+          grep -q 'OpenRockets is a 100% teen-run United States C-Corporation.' /tmp/search.html
+          grep -q 'An infrastructure service provider for nonprofits run by exceptional minors and teenagers worldwide.' /tmp/search.html
+          grep -q 'https://about.openrockets.com/docs/legal/legal-information' /tmp/search.html
+          grep -q 'interkid-about-icon' /tmp/search.html
+          grep -q 'interkid-results-mobile-top-row' /tmp/search.html
+          ! grep -q 'Powered by' /tmp/search.html
+          ! grep -q 'Engine stats' /tmp/search.html
+          echo \"PASS centered results, mobile header, title suffix, and authoritative OpenRockets footer\""" 
+          if old not in s:
+              raise SystemExit('expected old live verifier block not found')
+          p.write_text(s.replace(old, new, 1))
+          PY
+      - name: Commit verifier update
+        run: |
+          set -eu
+          git config user.name "Neksha DeSilva"
+          git config user.email "rohandesilvahotmail@gmail.com"
+          git add .github/workflows/alwaysdata-live-sync.yml
+          git diff --cached --check
+          git commit -m "Verify authoritative footer and legal UI live"
+          git push origin HEAD:main
