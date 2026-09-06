@@ -102,13 +102,13 @@ jobs:
           ready=0
           for attempt in $(seq 1 18); do
             if SSHPASS="$pass" sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 \
-              "$user@$host" "test -w '$templates/index.html' && test -w '$templates/base.html' && test -w '$templates/search.html' && test -w '$release/verification.html'"; then
+              "$user@$host" "test -w '$release' && test -w '$templates/index.html' && test -w '$templates/base.html' && test -w '$templates/search.html'"; then
               ready=1
               break
             fi
             sleep 4
           done
-          [ "$ready" = 1 ] || { echo "Live Interkid files are not writable by temporary SSH user"; exit 1; }
+          [ "$ready" = 1 ] || { echo "Live Interkid release/templates are not writable by temporary SSH user"; exit 1; }
 
           SSHPASS="$pass" sshpass -e scp -o StrictHostKeyChecking=accept-new index.html "$user@$host:$templates/index.html"
           SSHPASS="$pass" sshpass -e scp -o StrictHostKeyChecking=accept-new verification.html "$user@$host:$release/verification.html"
@@ -184,3 +184,4 @@ jobs:
 
 # live-sync verifier aligned with current templates; includes 2-second verification page
 # trigger rebuilt responsive header deployment 2026-09-06
+# use proven release-directory permission check for verification replacement
