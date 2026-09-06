@@ -150,7 +150,7 @@ jobs:
           fi
           curl -fsS -X POST --basic --user "$auth" -H 'alwaysdata-synchronous: yes' "https://api.alwaysdata.com/v1/site/${site_id}/restart/" >/dev/null
 
-      - name: Verify live Interkid homepage, branding and strict search
+      - name: Verify live Interkid homepage, verification gate, footer and strict search
         run: |
           set -eu
           base="https://${ALWAYSDATA_ACCOUNT}.alwaysdata.net"
@@ -165,14 +165,32 @@ jobs:
           done
           [ "$ok" = 1 ] || { echo "Updated homepage did not become ready"; exit 1; }
 
+          grep -q 'interkid_verification_seen' /tmp/interkid-home.html
+          grep -q 'Max-Age=86400' /tmp/interkid-home.html
+          grep -q 'accounts.openrockets.com/verification/' /tmp/interkid-home.html
+          grep -q '3000' /tmp/interkid-home.html
+
           curl -LfsS --max-time 60 "$base/search?q=openrockets&safesearch=0" -o /tmp/interkid-search.html
           grep -q 'interkid-results-wordmark' /tmp/interkid-search.html
           grep -Eq 'name="safesearch"[^>]*value="2"|value="2"[^>]*name="safesearch"' /tmp/interkid-search.html
           grep -q 'https://openrockets.com/' /tmp/interkid-search.html
+          grep -q '© 2024–2026 OpenRockets Inc. All rights reserved.' /tmp/interkid-search.html
+          if grep -q 'Powered by' /tmp/interkid-search.html; then
+            echo "Powered-by footer text unexpectedly present"
+            exit 1
+          fi
+          if grep -q 'Engine stats' /tmp/interkid-search.html; then
+            echo "Engine stats footer link unexpectedly present"
+            exit 1
+          fi
           if grep -q 'simple/filters/safesearch' /tmp/interkid-search.html; then
             echo "Safe Search selector unexpectedly present"
             exit 1
           fi
+
+          echo '=== accounts.openrockets.com framing headers ==='
+          curl -LIsS --max-time 20 https://accounts.openrockets.com/verification/ \
+            | grep -Ei '^(HTTP/|x-frame-options:|content-security-policy:)' || true
           echo "INTERKID_LIVE_URL=$base"
 
       - name: Remove temporary SSH login and runner credentials
