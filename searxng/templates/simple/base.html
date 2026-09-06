@@ -171,6 +171,27 @@
       .or-footer-columns{grid-template-columns:1fr}
     }
   </style>
+
+  <style id="interkid-authoritative-footer-about-mobile-fix">
+    body.results_endpoint #main_results { display: flow-root !important; min-height: 70vh !important; }
+    body.results_endpoint #results, body.results_endpoint #urls { float: none !important; }
+    body.results_endpoint #pagination { clear: both !important; }
+    body.results_endpoint #links_on_top .link_on_top_about { display: inline-flex !important; align-items: center !important; gap: 6px !important; }
+    .interkid-about-icon { width: 22px !important; height: 22px !important; object-fit: contain !important; display: block !important; filter: none !important; }
+    .home-footer { position: static !important; clear: both !important; width: 100% !important; margin-top: 3rem !important; box-sizing: border-box !important; }
+    .home-footer .home-shell { width: 100% !important; max-width: 1280px !important; margin-inline: auto !important; padding-inline: 16px !important; box-sizing: border-box !important; }
+    .home-footer .footer-content { font-size: .875rem !important; }
+    .home-footer a:hover, .home-footer a:focus-visible { text-decoration: underline !important; }
+    @media (max-width: 700px) {
+      body.results_endpoint #links_on_top { top: 8px !important; right: 9px !important; }
+      body.results_endpoint #links_on_top .link_on_top_about { padding: 6px 7px !important; }
+      .interkid-about-icon { width: 21px !important; height: 21px !important; }
+      .home-footer { margin-top: 2rem !important; padding-left: 1rem !important; padding-right: 1rem !important; }
+      .home-footer .home-shell { padding-inline: 0 !important; }
+      .home-footer .footer-top-row { grid-template-columns: 1fr !important; gap: 30px !important; }
+      .home-footer .footer-bottom-row { flex-direction: column !important; align-items: flex-start !important; }
+    }
+  </style>
 </head>
 <body class="{{ endpoint }}_endpoint">
   <main id="main_{{ self._TemplateReference__context.name|replace('simple/', '')|replace('.html', '') }}" class="{{ body_class }}">
@@ -179,7 +200,7 @@
     {% endif %}
     <nav id="links_on_top">
       {%- from 'simple/icons.html' import icon_big -%}
-      {%- block linkto_about -%}<a href="https://about.openrockets.com/" class="link_on_top_about">{{ icon_big('information-circle') }}<span>{{ _('About') }}</span></a>{%- endblock -%}
+      {%- block linkto_about -%}<a href="https://about.openrockets.com/" class="link_on_top_about"><img class="interkid-about-icon" src="https://openrockets.com/i/assets/static/openthread_logo_bash-trans-removebg-preview%20(1).png" alt="" draggable="false"><span>{{ _('About') }}</span></a>{%- endblock -%}
       {%- block linkto_donate -%}{%- endblock -%}
       {%- block linkto_preferences -%}{%- endblock -%}
     </nav>
@@ -188,16 +209,49 @@
   </main>
 
   {% if endpoint == 'results' %}
-  <footer class="or-results-footer" aria-label="OpenRockets footer">
-    <div class="or-footer-inner">
-      <div class="or-footer-columns">
-        <section class="or-footer-column"><h2>OpenRockets</h2><div class="or-footer-links"><a class="or-footer-link" href="https://about.openrockets.com/">About OpenRockets</a><a class="or-footer-link" href="https://openrockets.com/">OpenRockets.com</a></div></section>
-        <section class="or-footer-column"><h2>Explore</h2><div class="or-footer-links"><a class="or-footer-link" href="https://press.openrockets.com/">OpenRockets Press</a><a class="or-footer-link" href="https://about.openrockets.com/">About</a></div></section>
-        <section class="or-footer-column"><h2>Legal &amp; Press</h2><div class="or-footer-links"><a class="or-footer-link" href="https://about.openrockets.com/legal/terms">Terms of Service</a><a class="or-footer-link" href="https://about.openrockets.com/legal/privacy-policy">Privacy Policy</a></div></section>
-        <section class="or-footer-column"><h2>Social</h2><div class="or-footer-links"><a class="or-footer-link" href="https://discord.gg/djXh8udpbn">Discord</a><a class="or-footer-link" href="https://linkedin.com/company/openrocketsinc">LinkedIn</a></div></section>
+  <footer class="home-footer" data-testid="home-footer" style="border-top: 1px solid #ffffff; padding-top: 40px; padding-bottom: 40px; padding-left:2rem; padding-right:2rem; background-color:#000; color:#fff;">
+    <div class="home-shell footer-content" style="display:flex;flex-direction:column;gap:30px;">
+      <div class="footer-top-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;">
+        <div class="footer-col" style="display:flex;flex-direction:column;align-items:flex-start;">
+          <img src="https://openrockets.com/i/assets/static/brand/271742354.png" alt="OpenRockets Logo" width="220" style="margin-bottom:15px;display:block;filter:invert(1) brightness(100);">
+          <p style="margin:0 0 10px;font-size:14px;line-height:1.6;">An infrastructure service provider for nonprofits run by exceptional minors and teenagers worldwide.</p>
+          <p style="margin:0;font-size:14px;line-height:1.6;">Revitalize youth volunteering. Make a difference. Join the network of elites.</p>
+        </div>
+
+        <div class="footer-col" style="display:flex;flex-direction:column;align-items:flex-start;">
+          <h4 style="margin:0 0 15px;font-size:14px;text-transform:uppercase;">Legal &amp; Press</h4>
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start;">
+            <a href="https://about.openrockets.com/docs/legal/legal-information" style="color:#fff;text-decoration:none;font-size:14px;">Terms of Service</a>
+            <a href="https://about.openrockets.com/docs/legal/legal-information" style="color:#fff;text-decoration:none;font-size:14px;">Privacy Policy</a>
+            <a href="https://about.openrockets.com/legal/parental-consent-form" style="color:#fff;text-decoration:none;font-size:14px;">Parental Consent</a>
+            <a href="https://about.openrockets.com" style="color:#fff;text-decoration:none;font-size:14px;">About OpenRockets Press</a>
+          </div>
+        </div>
+
+        <div class="footer-col" style="display:flex;flex-direction:column;align-items:flex-start;">
+          <h4 style="margin:0 0 15px;font-size:14px;text-transform:uppercase;">Social</h4>
+          <div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start;">
+            <a href="https://discord.gg/djXh8udpbn" style="display:flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-size:14px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>Discord</a>
+            <a href="https://linkedin.com/company/openrocketsinc" style="display:flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-size:14px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.924 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a>
+            <a href="https://x.com/openrockets" style="display:flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-size:14px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>Twitter / X</a>
+            <a href="https://blog.openrockets.com" style="display:flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-size:14px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3h18v18H3V3zm15 15V6H6v12h12zm-2-9H8v2h8V9zm0 4H8v2h8v-2z"/></svg>OpenRockets Blog</a>
+            <a href="https://www.crunchbase.com/organization/openrockets" style="display:flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-size:14px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 0H2.4A2.4 2.4 0 000 2.4v19.2A2.4 2.4 0 002.4 24h19.2a2.4 2.4 0 002.4-2.4V2.4A2.4 2.4 0 0021.6 0zM17.65 16.53c-1.25 1.4-3.08 2.22-5.4 2.22-3.8 0-6.85-2.86-6.85-6.8 0-3.9 3.1-6.72 6.88-6.72 2.37 0 4.14.88 5.4 2.25l-2.12 2.2c-.85-.85-1.85-1.28-3.26-1.28-2.02 0-3.6 1.58-3.6 3.55s1.58 3.55 3.6 3.55c1.45 0 2.4-.48 3.24-1.32l2.1 2.35zm1.5-6.85v4.5h-1.5v-4.5h1.5z"/></svg>Crunchbase</a>
+          </div>
+        </div>
+
+        <div class="footer-col" style="display:flex;flex-direction:column;align-items:flex-start;">
+          <h4 style="margin:0 0 15px;font-size:14px;text-transform:uppercase;">Ping us anytime</h4>
+          <div style="display:flex;flex-direction:column;gap:15px;align-items:flex-start;">
+            <div style="display:flex;flex-direction:column;align-items:flex-start;"><strong style="margin-bottom:4px;font-size:12px;text-transform:uppercase;">Contact (24/7)</strong><a href="mailto:team@openrockets.com" style="color:#fff;text-decoration:none;font-size:14px;">team@openrockets.com</a><a href="tel:+16468207984" style="color:#fff;text-decoration:none;font-size:14px;">+1 (646) 820 7984 (NYC)</a></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-start;"><strong style="margin-bottom:4px;font-size:12px;text-transform:uppercase;">Mail us, visit us!</strong><span style="font-size:14px;line-height:1.5;">266 Elmwood Ave, Ste 420, Buffalo, New York 14222, United States of America<br>Melville Lane Area, FairFax, VA, United States 22033</span></div>
+          </div>
+        </div>
       </div>
-      <div class="or-footer-rule" aria-hidden="true"></div>
-      <div class="or-footer-bottom"><span class="or-footer-bottom-copy">OpenRockets is a teen-run organization building infrastructure and services for the public web.<br>© 2024–2026 OpenRockets Inc. All rights reserved.</span><a href="#" id="open_preferences_center">Update cookies preferences</a></div>
+
+      <div class="footer-bottom-row" style="border-top:1px solid #fff;padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:15px;">
+        <span style="font-size:13px;">OpenRockets is a 100% teen-run United States C-Corporation.<br>© &amp; (TM) 2022-2026 OpenRockets. All Rights Reserved.</span>
+        <a href="#" id="open_preferences_center" style="color:#fff;text-decoration:none;font-size:13px;">Update cookies preferences</a>
+      </div>
     </div>
   </footer>
 
@@ -216,7 +270,7 @@
         "notice_banner_reject_button_hide":false,
         "preferences_center_close_button_hide":false,
         "page_refresh_confirmation_buttons":false,
-        "website_privacy_policy_url":"https://about.openrockets.com/legal/privacy-policy"
+        "website_privacy_policy_url":"https://about.openrockets.com/docs/legal/legal-information"
       });
     });
   </script>

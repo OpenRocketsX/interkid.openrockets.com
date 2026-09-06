@@ -329,6 +329,21 @@
   }
 </style>
 
+
+<style id="interkid-results-mobile-top-row">
+  @media (max-width: 700px) {
+    body.results_endpoint #search_header { position: relative !important; padding: 58px 9px 8px !important; }
+    body.results_endpoint .interkid-search-unit { width: 100% !important; display: block !important; margin: 0 auto !important; }
+    body.results_endpoint #search_logo { position: absolute !important; top: 13px !important; left: 12px !important; width: auto !important; height: 31px !important; z-index: 40 !important; display: flex !important; align-items: center !important; }
+    body.results_endpoint .interkid-results-wordmark { font-size: 1.42rem !important; line-height: 31px !important; }
+    body.results_endpoint #search_view, body.results_endpoint #search_view:focus-within { position: static !important; width: 100% !important; max-width: 760px !important; margin: 0 auto !important; }
+  }
+  @media (max-width: 420px) {
+    body.results_endpoint #search_logo { left: 10px !important; }
+    body.results_endpoint .interkid-results-wordmark { font-size: 1.3rem !important; }
+  }
+</style>
+
 <form id="search" method="{{ method }}" action="{{ url_for('search') }}" role="search">
   <div id="search_header">
     <div class="interkid-search-unit">

@@ -151,6 +151,9 @@
       font-size: 0.78rem; font-weight: 600; line-height: 1;
     }
     .browser-download:hover, .browser-download:focus-visible { background: #242424; }
+    .browser-download-spinner { width: 14px; height: 14px; margin-right: 7px; display: none; flex: 0 0 auto; border: 2px solid rgba(255,255,255,.38); border-top-color: #fff; border-radius: 50%; animation: interkid-download-spin .7s linear infinite; }
+    .browser-download.is-loading .browser-download-spinner { display: inline-block; }
+    @keyframes interkid-download-spin { to { transform: rotate(360deg); } }
     .browser-promo-close {
       position: absolute; top: 5px; right: 5px; width: 26px; height: 26px;
       display: grid; place-items: center; padding: 0; border: 0; border-radius: 0.2rem;
@@ -168,7 +171,7 @@
       letter-spacing: -0.01em;
     }
     .site-ribbon-left { display: flex; align-items: center; gap: 9px; min-width: 0; }
-    .site-ribbon-icon { width: 28px; height: 28px; object-fit: contain; flex: 0 0 auto; }
+    .site-ribbon-icon { width: 20px; height: 20px; object-fit: contain; flex: 0 0 auto; filter: invert(1); }
     .site-ribbon-copy { color: rgba(255,255,255,0.86); white-space: nowrap; }
     .site-ribbon-links { display: flex; align-items: center; justify-content: flex-end; gap: 14px; flex-wrap: wrap; }
     .site-ribbon a { color: #fff; text-decoration: none; white-space: nowrap; }
@@ -184,13 +187,21 @@
       #q { height: 42px; font-size: 0.99rem; }
       .icon-button { width: 37px; height: 37px; }
       .search-icon { width: 19px; height: 19px; }
-      .browser-promo { width: 100%; grid-template-columns: 40px minmax(0,1fr); gap: 9px; padding: 9px 34px 9px 10px; }
-      .browser-promo-icon { width: 40px; height: 40px; }
-      .browser-download { grid-column: 1 / -1; width: 100%; min-height: 32px; margin-top: 2px; }
-      .browser-promo-title { font-size: 0.88rem; }
-      .browser-promo-subtitle { font-size: 0.72rem; }
+      .browser-promo {
+        width: min(92%, 520px);
+        grid-template-columns: 1fr auto;
+        grid-template-areas: "icon close" "copy copy" "download download";
+        gap: 7px 10px;
+        padding: 9px 10px 10px;
+      }
+      .browser-promo-icon { grid-area: icon; width: 36px; height: 36px; }
+      .browser-promo-close { grid-area: close; position: static; justify-self: end; align-self: start; width: 25px; height: 25px; }
+      .browser-promo-copy { grid-area: copy; }
+      .browser-download { grid-area: download; width: 100%; min-height: 32px; margin-top: 1px; }
+      .browser-promo-title { font-size: 0.82rem; }
+      .browser-promo-subtitle { font-size: 0.67rem; }
       .site-ribbon { align-items: flex-start; flex-direction: column; gap: 5px; padding-top: 7px; padding-bottom: calc(7px + env(safe-area-inset-bottom)); }
-      .site-ribbon-icon { width: 24px; height: 24px; }
+      .site-ribbon-icon { width: 17px; height: 17px; }
       .site-ribbon-copy { font-size: 0.66rem; white-space: normal; }
       .site-ribbon-links { width: 100%; justify-content: flex-start; gap: 10px; font-size: 0.66rem; }
     }
@@ -276,19 +287,19 @@
           <strong class="browser-promo-title">Download the free, secure and safe Interkid Browser</strong>
           <span class="browser-promo-subtitle">Built with advanced algorithms to help keep your browsing safer. Built by teenagers.</span>
         </div>
-        <a class="browser-download" href="https://github.com/OpenRocketsX/InterKid-browser/releases/download/browser-latest/Browser-Setup.exe" download="Browser-Setup.exe">Download</a>
+        <a class="browser-download" id="browser-download" href="https://github.com/OpenRocketsX/InterKid-browser/releases/download/browser-latest/Browser-Setup.exe" download="Browser-Setup.exe"><span class="browser-download-spinner" aria-hidden="true"></span><span class="browser-download-label">Download</span></a>
       </aside>
     </section>
   </main>
 
   <footer class="site-ribbon" aria-label="OpenRockets legal links">
     <div class="site-ribbon-left">
-      <img class="site-ribbon-icon" src="https://raw.githubusercontent.com/OpenRocketsX/interkid.openrockets.com/main/assets/interkid-browser-icon.png" alt="" draggable="false">
+      <img class="site-ribbon-icon" src="https://openrockets.com/i/assets/static/openthread_logo_bash-trans-removebg-preview%20(1).png" alt="" draggable="false">
       <span class="site-ribbon-copy">© 2024–2026 OpenRockets Inc. All rights reserved.</span>
     </div>
     <nav class="site-ribbon-links" aria-label="Legal">
-      <a href="https://about.openrockets.com/legal/privacy-policy">Privacy Policy</a>
-      <a href="https://about.openrockets.com/legal/terms">Terms of Service</a>
+      <a href="https://about.openrockets.com/docs/legal/legal-information">Privacy Policy</a>
+      <a href="https://about.openrockets.com/docs/legal/legal-information">Terms of Service</a>
       <a href="https://about.openrockets.com/">About OpenRockets</a>
     </nav>
   </footer>
@@ -299,6 +310,8 @@
       const clearButton = document.getElementById("clear-search");
       const promo = document.getElementById("browser-promo");
       const promoClose = document.getElementById("browser-promo-close");
+      const browserDownload = document.getElementById("browser-download");
+      const browserDownloadLabel = browserDownload ? browserDownload.querySelector(".browser-download-label") : null;
       const syncClearButton = () => clearButton.classList.toggle("visible", input.value.length > 0);
 
       input.addEventListener("input", syncClearButton);
@@ -307,7 +320,20 @@
         syncClearButton();
         input.focus();
       });
+      // Dismissal is intentionally page-view-only: no localStorage/sessionStorage.
       promoClose.addEventListener("click", () => { promo.hidden = true; });
+      if (browserDownload) {
+        browserDownload.addEventListener("click", () => {
+          browserDownload.classList.add("is-loading");
+          browserDownload.setAttribute("aria-busy", "true");
+          if (browserDownloadLabel) browserDownloadLabel.textContent = "Downloading";
+          window.setTimeout(() => {
+            browserDownload.classList.remove("is-loading");
+            browserDownload.removeAttribute("aria-busy");
+            if (browserDownloadLabel) browserDownloadLabel.textContent = "Download";
+          }, 2000);
+        });
+      }
       syncClearButton();
 
       if (window.matchMedia("(pointer:fine)").matches && window.innerWidth > 720) {
