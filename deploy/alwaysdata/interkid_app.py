@@ -4,7 +4,7 @@ from flask import redirect, request, send_file
 from searx.webapp import app
 
 COOKIE_NAME = "interkid_verification_seen"
-VERIFICATION_PAGE = Path(__file__).resolve().parents[2] / "verification.html"
+VERIFICATION_PAGE = Path(__file__).with_name("verification.html")
 
 
 @app.before_request
