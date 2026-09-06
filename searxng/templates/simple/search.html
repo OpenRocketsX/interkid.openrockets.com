@@ -1,3 +1,13 @@
+{% if q %}
+<span id="interkid-query-title" data-query="{{ q|e }}" hidden></span>
+<script>
+  (() => {
+    const titleData = document.getElementById('interkid-query-title');
+    if (titleData) document.title = `${titleData.dataset.query} - Interkid Search`;
+  })();
+</script>
+{% endif %}
+
 <form id="search" method="{{ method }}" action="{{ url_for('search') }}" role="search">
   <div id="search_header">
     <div class="interkid-search-unit">
