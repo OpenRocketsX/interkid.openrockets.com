@@ -7,7 +7,11 @@
   <meta name="keywords" content="Interkid, OpenRockets, safe search, web search">
   <meta name="generator" content="searxng/{{ searxng_version }}">
   <meta name="referrer" content="no-referrer">
+  {% if endpoint == 'results' %}
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  {% else %}
   <meta name="robots" content="noarchive">
+  {% endif %}
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#ffffff">
   <title>{% block title %}{% endblock %}{{ instance_name }}</title>
@@ -42,24 +46,45 @@
       font-display: swap;
     }
 
-    body,
-    input,
-    button,
-    select,
-    textarea {
+    body, input, button, select, textarea {
       font-family: "Google Sans Flex", "Outfit", "Google Sans", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    #search_header {
-      grid-template-columns: 7.3rem minmax(0, 1fr);
-      gap: 0.8rem 1rem;
+    body.results_endpoint { background: #fff; }
+    body.results_endpoint #main_results { min-height: 66vh; }
+
+    /* Keep the About control in the corner without affecting centered search geometry. */
+    #links_on_top { position: relative; z-index: 5; }
+    #links_on_top .link_on_top_about span { display: inline; }
+    #links_on_top .link_on_top_preferences { display: none !important; }
+
+    /* Center the wordmark + search field as one unit. */
+    body.results_endpoint #search { width: 100%; margin: 0; }
+    body.results_endpoint #search_header {
+      display: block !important;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 1rem 1rem 0;
+    }
+
+    .interkid-search-unit {
+      width: min(900px, calc(100% - 2rem));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: auto minmax(0, 720px);
+      align-items: center;
+      justify-content: center;
+      gap: 0.9rem;
     }
 
     #search_logo {
       width: auto;
       min-width: 0;
-      padding: 0.45rem 0.35rem 0;
-      justify-content: flex-start;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
       text-decoration: none;
       overflow: visible;
     }
@@ -68,7 +93,7 @@
       display: inline-block;
       color: var(--color-base-font);
       font-family: "Google Sans Flex", "Outfit", sans-serif;
-      font-size: 1.62rem;
+      font-size: 1.72rem;
       font-weight: 500;
       line-height: 1;
       letter-spacing: -0.055em;
@@ -78,136 +103,275 @@
       -webkit-user-drag: none;
     }
 
-    #search_view { min-width: 0; }
+    #search_view { width: 100%; min-width: 0; padding: 0 !important; }
 
+    /* Same visual language as the homepage search field, scaled down for results. */
     .search_box {
-      border-radius: 999px;
+      position: relative !important;
+      width: 100% !important;
+      min-height: 46px;
+      display: grid !important;
+      grid-template-columns: 40px minmax(0, 1fr) auto auto;
+      align-items: center;
+      padding: 2px 5px 2px 1px !important;
+      overflow: visible !important;
+      border: 1px solid rgba(0,0,0,0.16) !important;
+      border-radius: 999px !important;
+      background: rgba(255,255,255,0.98) !important;
+      box-shadow: 0 7px 24px rgba(0,0,0,0.10), 0 1px 5px rgba(0,0,0,0.07) !important;
+      transition: box-shadow 150ms ease, border-color 150ms ease, transform 150ms ease;
+    }
+
+    .search_box:focus-within {
+      transform: translateY(-1px);
+      border-color: #111 !important;
+      box-shadow: 0 9px 28px rgba(0,0,0,0.14), 0 0 0 2px rgba(0,0,0,0.035) !important;
+    }
+
+    .interkid-results-search-icon {
+      width: 18px;
+      height: 18px;
+      margin: auto;
+      color: #151515;
+      pointer-events: none;
+    }
+
+    body.results_endpoint #q {
+      width: 100% !important;
+      min-width: 0 !important;
+      height: 40px !important;
+      padding: 0 7px 0 0 !important;
+      margin: 0 !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      color: #111 !important;
+      font-size: 0.98rem !important;
+      font-weight: 500 !important;
+      box-shadow: none !important;
+    }
+
+    body.results_endpoint #q::placeholder { color: #777; opacity: 1; font-weight: 400; }
+
+    #clear_search, #send_search {
+      width: 36px !important;
+      height: 36px !important;
+      min-width: 36px !important;
+      min-height: 36px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      display: grid !important;
+      place-items: center;
+      border: 0 !important;
+      cursor: pointer;
+    }
+
+    #clear_search {
+      border-radius: 50% !important;
+      background: transparent !important;
+      color: #333 !important;
+    }
+    #clear_search:hover, #clear_search:focus-visible { background: #ececec !important; }
+
+    #send_search {
+      border-radius: 50% !important;
+      background: #0b0b0b !important;
+      color: #fff !important;
+      box-shadow: 0 2px 7px rgba(0,0,0,0.20) !important;
+    }
+    #send_search:hover, #send_search:focus-visible { background: #232323 !important; }
+    #send_search svg { width: 18px; height: 18px; }
+
+    .search_box .autocomplete {
+      top: calc(100% + 5px) !important;
+      left: 40px !important;
+      right: 40px !important;
+      width: auto !important;
+      border-radius: 0.2rem !important;
+    }
+
+    .interkid-categories-row {
+      width: min(900px, calc(100% - 2rem));
+      margin: 0.75rem auto 0;
+      display: flex;
+      justify-content: center;
       overflow: hidden;
     }
-
-    #q { border-radius: 999px 0 0 999px; }
-    #send_search { border-radius: 0 999px 999px 0; }
-
-    #links_on_top .link_on_top_about span { display: inline; }
-    #links_on_top .link_on_top_preferences { display: none !important; }
-
-    body.results_endpoint footer {
-      margin-top: 2.25rem;
-      padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+    .interkid-categories-row #categories,
+    .interkid-categories-row .categories {
+      width: auto !important;
+      max-width: 100%;
+      margin: 0 auto !important;
+      justify-content: center;
     }
 
-    body.results_endpoint footer p {
-      font-size: 0.82rem;
-      opacity: 0.72;
+    body.results_endpoint .search_filters {
+      width: min(900px, calc(100% - 2rem));
+      margin: 0.55rem auto 0 !important;
+      padding: 0 !important;
+      display: flex !important;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
-    @media screen and (max-width: 720px) {
+    /* Center the whole results layout, not the text inside each result. */
+    body.results_endpoint #results {
+      width: min(1100px, calc(100% - 2rem)) !important;
+      max-width: 1100px !important;
+      margin: 1.25rem auto 0 !important;
+      padding: 0 !important;
+      display: grid !important;
+      grid-template-columns: minmax(0, 760px) minmax(220px, 280px);
+      justify-content: center;
+      align-items: start;
+      gap: 2rem;
+    }
+
+    body.results_endpoint #urls {
+      width: 100% !important;
+      max-width: 760px !important;
+      min-width: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    body.results_endpoint #sidebar {
+      width: 100% !important;
+      max-width: 280px !important;
+      margin: 0 !important;
+    }
+
+    body.results_endpoint article.result,
+    body.results_endpoint .result {
+      text-align: start;
+      border-radius: 0.25rem;
+    }
+
+    body.results_endpoint #pagination {
+      width: min(760px, calc(100% - 2rem));
+      margin: 0 auto;
+    }
+
+    /* OpenRockets footer adaptation: legal/press + social, no Press logo. */
+    .or-results-footer {
+      width: 100%;
+      margin: 3rem 0 0;
+      padding: 2.6rem max(1.25rem, env(safe-area-inset-right)) max(1.6rem, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+      background: #050505;
+      color: #fff;
+      border: 0;
+    }
+
+    .or-footer-inner { width: min(1100px, 100%); margin: 0 auto; }
+    .or-footer-columns {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 2.5rem;
+      align-items: start;
+    }
+    .or-footer-column h2 {
+      margin: 0 0 0.8rem;
+      color: rgba(255,255,255,0.58);
+      font-size: 0.73rem;
+      line-height: 1.2;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .or-footer-links { display: flex; flex-direction: column; gap: 0.58rem; align-items: flex-start; }
+    .or-footer-link, .or-footer-bottom a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+    .or-footer-link:hover, .or-footer-link:focus-visible,
+    .or-footer-bottom a:hover, .or-footer-bottom a:focus-visible { text-decoration: underline; }
+    .or-footer-rule { width: 100%; height: 1px; margin: 2rem 0 1.15rem; background: rgba(255,255,255,0.20); }
+    .or-footer-bottom {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1.2rem;
+      color: rgba(255,255,255,0.80);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+    .or-footer-bottom-copy { max-width: 720px; }
+    .interkid-simple-footer { margin-top: 2rem; padding: 1rem; text-align: center; }
+    .interkid-simple-footer p { font-size: 0.82rem; opacity: 0.72; }
+
+    @media screen and (max-width: 760px) {
       html, body { width: 100%; overflow-x: hidden; }
-
-      #search_header {
+      body.results_endpoint #search_header { padding: 0.75rem 0.65rem 0; }
+      .interkid-search-unit {
         width: 100%;
-        padding: 0.72rem 0.72rem 0;
         grid-template-columns: 1fr;
-        grid-template-areas:
-          "logo"
-          "search"
-          "categories";
-        gap: 0.5rem;
+        gap: 0.55rem;
+        justify-items: center;
       }
-
-      #search_logo {
-        padding: 0.12rem 0.2rem 0.08rem;
+      #search_logo { justify-content: center; }
+      .interkid-results-wordmark { font-size: 1.5rem; }
+      #search_view { width: 100%; }
+      .search_box { min-height: 47px; grid-template-columns: 38px minmax(0,1fr) auto auto; }
+      body.results_endpoint #q { height: 41px !important; font-size: 0.98rem !important; }
+      #clear_search, #send_search { width: 36px !important; height: 36px !important; }
+      .interkid-categories-row {
+        width: 100%;
+        margin-top: 0.55rem;
+        justify-content: flex-start;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+      .interkid-categories-row::-webkit-scrollbar { display: none; }
+      .interkid-categories-row #categories,
+      .interkid-categories-row .categories {
+        max-width: none;
+        width: max-content !important;
+        min-width: 100%;
         justify-content: flex-start;
       }
-
-      .interkid-results-wordmark { font-size: 1.42rem; }
-
-      #search_view,
-      body.results_endpoint #search_view {
-        width: 100%;
-        min-width: 0;
-        padding: 0;
-      }
-
-      .search_box {
-        width: 100%;
-        max-width: none;
-        min-height: 47px;
-        box-shadow: 0 1px 6px rgba(0,0,0,0.08);
-      }
-
-      #q,
-      #send_search { font-size: 1rem; }
-
-      #q {
-        min-width: 0;
-        height: 46px;
-      }
-
-      #send_search,
-      #clear_search { min-width: 44px; min-height: 44px; }
-
-      #categories,
-      .categories {
-        max-width: 100vw;
+      body.results_endpoint .search_filters {
+        width: calc(100% - 1.3rem);
+        justify-content: flex-start;
         overflow-x: auto;
         overflow-y: hidden;
-        white-space: nowrap;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
       }
+      body.results_endpoint .search_filters::-webkit-scrollbar { display: none; }
+      body.results_endpoint .search_filters > * { flex: 0 0 auto; }
 
-      #categories::-webkit-scrollbar,
-      .categories::-webkit-scrollbar { display: none; }
-
-      .search_filters {
-        display: flex;
-        gap: 0.45rem;
-        overflow-x: auto;
-        overflow-y: hidden;
-        margin: 0.45rem 0.72rem 0 !important;
-        padding: 0 0 0.25rem;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      .search_filters::-webkit-scrollbar { display: none; }
-      .search_filters > * { flex: 0 0 auto; }
-
-      #results {
-        display: block !important;
+      body.results_endpoint #results {
         width: 100% !important;
         max-width: 100% !important;
-        margin: 0 !important;
-        padding: 0 0.72rem !important;
+        margin: 0.9rem auto 0 !important;
+        padding: 0 0.65rem !important;
+        display: block !important;
       }
-
-      #urls {
+      body.results_endpoint #urls {
         width: 100% !important;
         max-width: none !important;
-        min-width: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
       }
-
-      #sidebar {
+      body.results_endpoint #sidebar {
         width: 100% !important;
         max-width: none !important;
-        margin: 0 0 0.55rem !important;
+        margin: 0 0 0.6rem !important;
       }
-
-      article.result,
-      .result {
+      body.results_endpoint article.result,
+      body.results_endpoint .result {
         width: 100% !important;
         max-width: 100% !important;
         min-width: 0 !important;
         margin: 0 0 0.78rem !important;
         padding: 0.9rem 0.78rem 1rem !important;
-        border-radius: 14px;
+        border-radius: 0.25rem !important;
         overflow: hidden;
         box-shadow: 0 1px 0 rgba(0,0,0,0.06);
       }
-
       .result h3 {
         margin-top: 0.42rem;
         margin-bottom: 0.42rem;
@@ -215,7 +379,6 @@
         line-height: 1.28 !important;
         overflow-wrap: anywhere;
       }
-
       .result .content {
         margin-top: 0.36rem !important;
         margin-bottom: 0.4rem !important;
@@ -223,62 +386,24 @@
         line-height: 1.46 !important;
         overflow-wrap: anywhere;
       }
-
-      .url_header,
-      .url_wrapper {
-        min-width: 0 !important;
-        max-width: 100% !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis;
-      }
-
-      .url_wrapper {
-        font-size: 0.78rem !important;
-        white-space: nowrap;
-      }
-
-      .result .thumbnail {
-        max-width: 112px !important;
-        max-height: 92px !important;
-        border-radius: 10px !important;
-        object-fit: cover;
-      }
-
-      .engines {
-        max-width: 100%;
-        overflow-x: auto;
-        white-space: nowrap;
-        scrollbar-width: none;
-      }
-
+      .url_header, .url_wrapper { min-width: 0 !important; max-width: 100% !important; overflow: hidden !important; text-overflow: ellipsis; }
+      .url_wrapper { font-size: 0.78rem !important; white-space: nowrap; }
+      .result .thumbnail { max-width: 112px !important; max-height: 92px !important; border-radius: 0.25rem !important; object-fit: cover; }
+      .engines { max-width: 100%; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
       .engines::-webkit-scrollbar { display: none; }
-
-      #pagination {
-        width: 100%;
-        max-width: 100%;
-        padding: 0.8rem 0.72rem 1.2rem;
-      }
-
+      body.results_endpoint #pagination { width: 100%; max-width: 100%; padding: 0.8rem 0.65rem 1.2rem; }
       #pagination .numbered_pagination { display: none; }
 
-      body.results_endpoint footer {
-        width: 100%;
-        margin-top: 1.2rem;
-        padding: 0.85rem 0.9rem max(1rem, env(safe-area-inset-bottom));
-        text-align: center;
-      }
-
-      body.results_endpoint footer p {
-        margin: 0;
-        font-size: 0.72rem;
-        line-height: 1.45;
-      }
+      .or-results-footer { margin-top: 1.5rem; padding-top: 2rem; }
+      .or-footer-columns { grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+      .or-footer-bottom { flex-direction: column; gap: 0.7rem; }
     }
 
-    @media screen and (max-width: 390px) {
-      #search_header { padding-left: 0.55rem; padding-right: 0.55rem; }
-      #results { padding-left: 0.55rem !important; padding-right: 0.55rem !important; }
-      article.result, .result { padding: 0.82rem 0.7rem 0.92rem !important; }
+    @media screen and (max-width: 430px) {
+      .or-footer-columns { grid-template-columns: 1fr; }
+      .or-footer-link, .or-footer-bottom a { font-size: 0.84rem; }
+      body.results_endpoint #results { padding-left: 0.55rem !important; padding-right: 0.55rem !important; }
+      body.results_endpoint article.result, body.results_endpoint .result { padding: 0.82rem 0.7rem 0.92rem !important; }
       .result h3 { font-size: 1.03rem !important; }
       .result .content { font-size: 0.91rem !important; }
     }
@@ -300,7 +425,7 @@
     <nav id="links_on_top">
       {%- from 'simple/icons.html' import icon_big -%}
       {%- block linkto_about -%}
-        <a href="https://openrockets.com/" class="link_on_top_about">{{ icon_big('information-circle') }}<span>{{ _('About') }}</span></a>
+        <a href="https://about.openrockets.com/" class="link_on_top_about">{{ icon_big('information-circle') }}<span>{{ _('About') }}</span></a>
       {%- endblock -%}
       {%- block linkto_donate -%}{%- endblock -%}
       {%- block linkto_preferences -%}{%- endblock -%}
@@ -310,8 +435,57 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer>
+  {% if endpoint == 'results' %}
+  <footer class="or-results-footer" aria-label="OpenRockets footer">
+    <div class="or-footer-inner">
+      <div class="or-footer-columns">
+        <section class="or-footer-column" aria-labelledby="or-legal-title">
+          <h2 id="or-legal-title">Legal &amp; Press</h2>
+          <div class="or-footer-links">
+            <a class="or-footer-link" href="https://about.openrockets.com/legal/terms">Terms of Service</a>
+            <a class="or-footer-link" href="https://about.openrockets.com/legal/privacy-policy">Privacy Policy</a>
+            <a class="or-footer-link" href="https://about.openrockets.com/">About OpenRockets</a>
+            <a class="or-footer-link" href="https://press.openrockets.com/">OpenRockets Press</a>
+          </div>
+        </section>
+        <section class="or-footer-column" aria-labelledby="or-social-title">
+          <h2 id="or-social-title">Social</h2>
+          <div class="or-footer-links">
+            <a class="or-footer-link" href="https://discord.gg/djXh8udpbn">Discord</a>
+            <a class="or-footer-link" href="https://linkedin.com/company/openrocketsinc">LinkedIn</a>
+          </div>
+        </section>
+      </div>
+      <div class="or-footer-rule" aria-hidden="true"></div>
+      <div class="or-footer-bottom">
+        <span class="or-footer-bottom-copy">OpenRockets is a teen-run organization building infrastructure and services for the public web.<br>© 2024–2026 OpenRockets Inc. All rights reserved.</span>
+        <a href="#" id="open_preferences_center">Update cookies preferences</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="text/javascript" src="https://www.termsfeed.com/public/cookie-consent/4.2.0/cookie-consent.js" charset="UTF-8"></script>
+  <script type="text/javascript" charset="UTF-8">
+    document.addEventListener('DOMContentLoaded', function () {
+      if (typeof cookieconsent === 'undefined') return;
+      cookieconsent.run({
+        "notice_banner_type":"simple",
+        "consent_type":"implied",
+        "palette":"dark",
+        "language":"en",
+        "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+        "notice_banner_reject_button_hide":false,
+        "preferences_center_close_button_hide":false,
+        "page_refresh_confirmation_buttons":false,
+        "website_privacy_policy_url":"https://about.openrockets.com/legal/privacy-policy"
+      });
+    });
+  </script>
+  <noscript>Cookie preferences are available when JavaScript is enabled.</noscript>
+  {% else %}
+  <footer class="interkid-simple-footer">
     <p>© 2024–2026 OpenRockets Inc. All rights reserved.</p>
   </footer>
+  {% endif %}
 </body>
 </html>
