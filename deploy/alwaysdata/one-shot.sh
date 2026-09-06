@@ -1,0 +1,154 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ACCOUNT="${ALWAYSDATA_ACCOUNT:-interkidtest}"
+TOKEN_APP="iutuy"
+API_ROOT="https://api.alwaysdata.com/v1"
+ACCOUNT_ROOT="/home/${ACCOUNT}"
+REMOTE_STAGE="${ACCOUNT_ROOT}/admin/tmp/interkid-deploy-${GITHUB_RUN_ID}"
+REMOTE_TARBALL="${ACCOUNT_ROOT}/admin/tmp/interkid-alwaysdata-${GITHUB_RUN_ID}.tgz"
+DEPLOY_DIR_NAME="interkid-search-${GITHUB_RUN_ID}"
+DEPLOY_ROOT="${ACCOUNT_ROOT}/${DEPLOY_DIR_NAME}"
+
+DEPLOY_COMMENT="$(jq -r '.comment.body // ""' "$GITHUB_EVENT_PATH")"
+TOKEN="${DEPLOY_COMMENT#alwaysdata-deploy:}"
+TOKEN="$(printf '%s' "$TOKEN" | tr -d '[:space:]')"
+if [ -z "$TOKEN" ] || [ "$TOKEN" = "$DEPLOY_COMMENT" ]; then
+  echo 'No deployment token found.' >&2
+  exit 1
+fi
+
+echo "::add-mask::$TOKEN"
+AUTH="${TOKEN} account=${ACCOUNT}:"
+SSH_USER="${ACCOUNT}_deploy"
+SSH_PASS="$(openssl rand -hex 24)"
+echo "::add-mask::$SSH_PASS"
+TEMP_SSH_ID=""
+
+api() {
+  local method="$1" url="$2"
+  shift 2
+  curl --fail --silent --show-error --basic --user "$AUTH" \
+    -H 'alwaysdata-synchronous: yes' \
+    -X "$method" "$url" "$@"
+}
+
+cleanup() {
+  set +e
+  if [ -n "$TEMP_SSH_ID" ]; then
+    api DELETE "$API_ROOT/ssh/$TEMP_SSH_ID/" >/dev/null 2>&1 || true
+  fi
+  rm -f /tmp/interkid-alwaysdata.tgz /tmp/sites.json /tmp/site.json /tmp/search.html /tmp/home.html
+}
+trap cleanup EXIT
+
+sudo apt-get update -qq
+sudo apt-get install -y -qq sshpass jq >/dev/null
+
+api GET "$API_ROOT/site/" > /tmp/sites.json
+echo 'alwaysdata API access verified.'
+
+api GET "$API_ROOT/ssh/" > /tmp/ssh-users.json
+OLD_ID="$(jq -r --arg n "$SSH_USER" '.[] | select(.name==$n) | .id' /tmp/ssh-users.json | head -n1)"
+if [ -n "$OLD_ID" ]; then
+  api DELETE "$API_ROOT/ssh/$OLD_ID/" >/dev/null
+fi
+
+jq -n \
+  --arg name "$SSH_USER" \
+  --arg password "$SSH_PASS" \
+  '{name:$name,password:$password,home_directory:".",shell:"BASH",can_use_password:true,annotation:"Temporary Interkid deployment user"}' \
+  > /tmp/ssh-create.json
+
+api POST "$API_ROOT/ssh/" \
+  -H 'Content-Type: application/json' \
+  --data-binary @/tmp/ssh-create.json > /tmp/ssh-created.json
+TEMP_SSH_ID="$(jq -r '.id' /tmp/ssh-created.json)"
+test -n "$TEMP_SSH_ID" && test "$TEMP_SSH_ID" != null
+
+SSH_HOST="ssh-${ACCOUNT}.alwaysdata.net"
+SSH_OPTS=(-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=20)
+
+for attempt in {1..12}; do
+  if sshpass -p "$SSH_PASS" ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_HOST" "test -w '${ACCOUNT_ROOT}/admin/tmp' && test -w '${ACCOUNT_ROOT}'" >/dev/null 2>&1; then
+    break
+  fi
+  if [ "$attempt" -eq 12 ]; then
+    echo 'Temporary alwaysdata SSH access did not become writable.' >&2
+    exit 1
+  fi
+  sleep 5
+done
+
+tar -czf /tmp/interkid-alwaysdata.tgz \
+  index.html \
+  searxng/settings.yml \
+  deploy/alwaysdata/install.sh \
+  deploy/alwaysdata/start.sh
+
+sshpass -p "$SSH_PASS" scp "${SSH_OPTS[@]}" \
+  /tmp/interkid-alwaysdata.tgz \
+  "$SSH_USER@$SSH_HOST:${REMOTE_TARBALL}"
+
+sshpass -p "$SSH_PASS" ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_HOST" \
+  "ACCOUNT_ROOT='${ACCOUNT_ROOT}' REMOTE_STAGE='${REMOTE_STAGE}' REMOTE_TARBALL='${REMOTE_TARBALL}' DEPLOY_ROOT='${DEPLOY_ROOT}' sh -s" <<'REMOTE'
+set -eu
+rm -rf "$REMOTE_STAGE"
+mkdir -p "$REMOTE_STAGE"
+tar -xzf "$REMOTE_TARBALL" -C "$REMOTE_STAGE"
+HOME="$ACCOUNT_ROOT" INTERKID_ROOT="$DEPLOY_ROOT" INTERKID_STAGE="$REMOTE_STAGE" \
+  sh "$REMOTE_STAGE/deploy/alwaysdata/install.sh"
+rm -f "$REMOTE_TARBALL"
+REMOTE
+
+api GET "$API_ROOT/site/" > /tmp/sites.json
+ADDRESS="${ACCOUNT}.alwaysdata.net"
+SITE_ID="$(jq -r --arg a "$ADDRESS" '.[] | select((.addresses // []) | index($a)) | .id' /tmp/sites.json | head -n1)"
+
+jq -n \
+  --arg address "$ADDRESS" \
+  --arg base_url "https://${ADDRESS}/" \
+  --arg workdir "$DEPLOY_DIR_NAME" \
+  '{type:"user_program",addresses:[$address],command:"./start.sh",working_directory:$workdir,environment:("SEARXNG_BASE_URL="+$base_url),ssl_force:true,max_idle_time:0,annotation:"Interkid SearXNG"}' \
+  > /tmp/site.json
+
+if [ -n "$SITE_ID" ]; then
+  api PATCH "$API_ROOT/site/$SITE_ID/" \
+    -H 'Content-Type: application/json' \
+    --data-binary @/tmp/site.json > /tmp/site-result.json
+else
+  api POST "$API_ROOT/site/" \
+    -H 'Content-Type: application/json' \
+    --data-binary @/tmp/site.json > /tmp/site-result.json
+  SITE_ID="$(jq -r '.id' /tmp/site-result.json)"
+fi
+
+api POST "$API_ROOT/site/$SITE_ID/restart/" >/dev/null
+
+URL="https://${ADDRESS}/"
+for attempt in {1..36}; do
+  if curl --fail --silent --show-error --max-time 15 "$URL" > /tmp/home.html 2>/dev/null && grep -qi 'interkid' /tmp/home.html; then
+    echo "Homepage OK: $URL"
+    break
+  fi
+  if [ "$attempt" -eq 36 ]; then
+    echo 'Interkid homepage did not become healthy.' >&2
+    exit 1
+  fi
+  sleep 5
+done
+
+curl --fail --silent --show-error --max-time 60 \
+  "${URL}search?q=openrockets" > /tmp/search.html
+test -s /tmp/search.html
+echo "Search endpoint OK: ${URL}search?q=openrockets"
+
+TOKEN_AUTH="${TOKEN}:"
+TOKENS_JSON="$(curl --fail --silent --show-error --basic --user "$TOKEN_AUTH" "$API_ROOT/token/" 2>/dev/null || true)"
+TOKEN_ID="$(printf '%s' "$TOKENS_JSON" | jq -r --arg app "$TOKEN_APP" '.[] | select(.app_name==$app) | .id' 2>/dev/null | head -n1 || true)"
+if [ -n "$TOKEN_ID" ]; then
+  curl --silent --show-error --basic --user "$TOKEN_AUTH" -X DELETE "$API_ROOT/token/$TOKEN_ID/" >/dev/null || true
+  echo 'Temporary alwaysdata API token revoked.'
+else
+  echo 'Deployment complete; automatic API-token revocation could not identify the token.'
+fi

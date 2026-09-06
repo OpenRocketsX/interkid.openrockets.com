@@ -19,8 +19,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure installed SearXNG and verify
-        run: bash deploy/alwaysdata/configure-only.sh
+      - name: Deploy
+        run: bash deploy/alwaysdata/one-shot.sh
 
       - name: Redact deployment trigger
         if: always()
