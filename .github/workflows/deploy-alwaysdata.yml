@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - index.html
+      - verification.html
       - searxng/**
       - .github/workflows/deploy-alwaysdata.yml
   workflow_dispatch:
@@ -21,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ALWAYSDATA_ACCOUNT: interkidtest
-      LIVE_DIR: interkid-search-33972538951
+      LIVE_DIR: interkid-search-34003778331
 
     steps:
       - name: Checkout
@@ -46,6 +47,7 @@ jobs:
         run: |
           tar -czf /tmp/interkid-update.tgz \
             index.html \
+            verification.html \
             searxng/settings.yml \
             searxng/templates/simple/base.html \
             searxng/templates/simple/search.html
@@ -71,6 +73,7 @@ jobs:
           tar -xzf "$HOME/interkid-update.tgz" -C "$STAGE"
 
           cp "$STAGE/index.html" "$LIVE/searxng-src/searx/templates/simple/index.html"
+          cp "$STAGE/verification.html" "$LIVE/verification.html"
           cp "$STAGE/searxng/templates/simple/base.html" "$LIVE/searxng-src/searx/templates/simple/base.html"
           cp "$STAGE/searxng/templates/simple/search.html" "$LIVE/searxng-src/searx/templates/simple/search.html"
           cp "$STAGE/searxng/settings.yml" "$LIVE/config/settings.yml"
@@ -87,14 +90,13 @@ jobs:
           PY
 
           rm -rf "$STAGE" "$HOME/interkid-update.tgz"
-          pkill -f "$LIVE/venv/bin/granian searx.webapp:app" 2>/dev/null || true
           REMOTE
 
-      - name: Verify live homepage and search
+      - name: Verify live homepage, verification and search
         run: |
           URL="https://${ALWAYSDATA_ACCOUNT}.alwaysdata.net"
           for attempt in {1..30}; do
-            if curl --fail --silent --show-error --max-time 10 "$URL/" -o /tmp/home.html; then
+            if curl --fail --silent --show-error --max-time 10 -H 'Cookie: interkid_verification_seen=1' "$URL/" -o /tmp/home.html; then
               grep -qi '© 2024–2026 OpenRockets Inc. All rights reserved.' /tmp/home.html
               break
             fi
@@ -104,8 +106,13 @@ jobs:
             sleep 3
           done
 
+          curl --fail --silent --show-error --max-time 20 "$URL/verification" -o /tmp/verification.html
+          grep -q 'accounts.openrockets.com/' /tmp/verification.html
+          grep -q 'Max-Age=86400' /tmp/verification.html
+          grep -q '2000' /tmp/verification.html
+
           curl --fail --silent --show-error --max-time 45 \
             "$URL/search?q=openrockets&safesearch=0" -o /tmp/search.html
           grep -q 'interkid-results-wordmark' /tmp/search.html
           grep -q 'https://openrockets.com/' /tmp/search.html
-          grep -q 'name="safesearch" value="2"' /tmp/search.html
+          grep -Eq 'name="safesearch"[^>]*value="2"|value="2"[^>]*name="safesearch"' /tmp/search.html
