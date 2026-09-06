@@ -87,7 +87,7 @@ jobs:
           printf '%s' "$site_id" >/tmp/site-id
           printf '%s' "$workdir" >/tmp/workdir
 
-      - name: Upload current homepage and results templates
+      - name: Upload current homepage, verification, and results templates
         run: |
           set -eu
           sudo apt-get update -qq
@@ -102,15 +102,16 @@ jobs:
           ready=0
           for attempt in $(seq 1 18); do
             if SSHPASS="$pass" sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 \
-              "$user@$host" "test -w '$templates/index.html' && test -w '$templates/base.html' && test -w '$templates/search.html'"; then
+              "$user@$host" "test -w '$templates/index.html' && test -w '$templates/base.html' && test -w '$templates/search.html' && test -w '$release/verification.html'"; then
               ready=1
               break
             fi
             sleep 4
           done
-          [ "$ready" = 1 ] || { echo "Live template directory is not writable by temporary SSH user"; exit 1; }
+          [ "$ready" = 1 ] || { echo "Live Interkid files are not writable by temporary SSH user"; exit 1; }
 
           SSHPASS="$pass" sshpass -e scp -o StrictHostKeyChecking=accept-new index.html "$user@$host:$templates/index.html"
+          SSHPASS="$pass" sshpass -e scp -o StrictHostKeyChecking=accept-new verification.html "$user@$host:$release/verification.html"
           SSHPASS="$pass" sshpass -e scp -o StrictHostKeyChecking=accept-new searxng/templates/simple/base.html "$user@$host:$templates/base.html"
           SSHPASS="$pass" sshpass -e scp -o StrictHostKeyChecking=accept-new searxng/templates/simple/search.html "$user@$host:$templates/search.html"
 
@@ -134,6 +135,12 @@ jobs:
             sleep 3
           done
           [ "$ready" = 1 ] || { echo "Verification redirect failed"; cat /tmp/root.headers; exit 1; }
+          echo "PASS root verification redirect"
+
+          curl -LfsS --max-time 25 "$base/verification" -o /tmp/verification.html
+          grep -q '2000' /tmp/verification.html
+          grep -q 'Max-Age=86400' /tmp/verification.html
+          echo "PASS 2-second verification page"
 
           curl -LfsS --cookie 'interkid_verification_seen=1' --max-time 25 "$base/" -o /tmp/home.html
           grep -q 'Download the free, secure and safe Interkid Browser' /tmp/home.html
@@ -141,16 +148,19 @@ jobs:
           grep -q 'Privacy Policy' /tmp/home.html
           grep -q 'Terms of Service' /tmp/home.html
           grep -q 'About OpenRockets' /tmp/home.html
+          echo "PASS homepage browser download and legal ribbon"
 
           curl -LfsS --max-time 60 "$base/search?q=interkidtitlecheck" -o /tmp/search.html
-          grep -q 'data-query="interkidtitlecheck"' /tmp/search.html
-          grep -q -- '- Interkid Search' /tmp/search.html
+          grep -q '<title>interkidtitlecheck - Interkid Search</title>' /tmp/search.html
+          grep -q 'or-results-footer' /tmp/search.html
           grep -q '© 2024–2026 OpenRockets Inc. All rights reserved.' /tmp/search.html
           ! grep -q 'Powered by' /tmp/search.html
           ! grep -q 'Engine stats' /tmp/search.html
+          echo "PASS centered results template, title suffix, and OpenRockets footer"
 
           curl -LfsS --cookie 'interkid_verification_seen=1' --max-time 30 https://www.interkid.org/ -o /tmp/www.html
           grep -q 'releases/download/browser-latest/Browser-Setup.exe' /tmp/www.html
+          echo "PASS public www bridge"
           echo "LIVE_ORIGIN=$base"
           echo "LIVE_PUBLIC=https://www.interkid.org/"
 
@@ -172,4 +182,4 @@ jobs:
           rm -f /tmp/token /tmp/token.enc /tmp/private.pem /tmp/public.pem /tmp/ssh-pass /tmp/ssh-id /tmp/site-id /tmp/workdir /tmp/cipher-comment-id /tmp/public-comment-id
           # Intentionally DO NOT revoke or delete the alwaysdata API token.
 
-# trigger redeploy of current Interkid UI — 2026-09-06
+# live-sync verifier aligned with current templates; includes 2-second verification page
