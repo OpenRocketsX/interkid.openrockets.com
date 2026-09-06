@@ -48,7 +48,6 @@ from pathlib import Path
 
 src = Path(os.environ["SRC_DIR"])
 base_path = src / "searx/templates/simple/base.html"
-search_path = src / "searx/templates/simple/search.html"
 
 base = base_path.read_text()
 base = base.replace(
@@ -86,24 +85,51 @@ base = re.sub(
     flags=re.S,
 )
 base_path.write_text(base)
-
-search = search_path.read_text()
-search = re.sub(
-    r'(<a id="search_logo".*?>).*?(</a>)',
-    r'\1\n      <span class="interkid-results-wordmark" draggable="false">interkid</span>\n    \2',
-    search,
-    count=1,
-    flags=re.S,
-)
-search = re.sub(r"\s*\{% include ['\"]simple/filters/safesearch\.html['\"] %\}", "", search)
-if 'name="safesearch" value="2"' not in search:
-    search = search.replace(
-        '<input type="hidden" name="theme"',
-        '<input type="hidden" name="safesearch" value="2">\n  <input type="hidden" name="theme"',
-        1,
-    )
-search_path.write_text(search)
 PY
+
+# Use the exact result-page search template that already passed Interkid CI.
+cat > "$ROOT/search-template.b64" <<'EOF'
+PGZvcm0gaWQ9InNlYXJjaCIgbWV0aG9kPSJ7eyBtZXRob2QgfX0iIGFjdGlv
+bj0ie3sgdXJsX2Zvcignc2VhcmNoJykgfX0iIHJvbGU9InNlYXJjaCI+CiAg
+PGRpdiBpZD0ic2VhcmNoX2hlYWRlciI+CiAgICA8YSBpZD0ic2VhcmNoX2xv
+Z28iIGhyZWY9Int7IHVybF9mb3IoJ2luZGV4JykgfX0iIHRhYmluZGV4PSIw
+IiB0aXRsZT0ie3sgXygnRGlzcGxheSB0aGUgZnJvbnQgcGFnZScpIH19Ij4K
+ICAgICAgPHNwYW4gY2xhc3M9ImludGVya2lkLXJlc3VsdHMtd29yZG1hcmsi
+IGRyYWdnYWJsZT0iZmFsc2UiPmludGVya2lkPC9zcGFuPgogICAgPC9hPgoK
+ICAgIDxkaXYgaWQ9InNlYXJjaF92aWV3Ij4KICAgICAgPGRpdiBjbGFzcz0i
+c2VhcmNoX2JveCI+CiAgICAgICAgPGlucHV0IGlkPSJxIiBuYW1lPSJxIiB0
+eXBlPSJ0ZXh0IiBwbGFjZWhvbGRlcj0ie3sgXygnU2VhcmNoIGZvci4uLicp
+IH19IiB0YWJpbmRleD0iMSIKICAgICAgICAgIGF1dG9jb21wbGV0ZT0ib2Zm
+IiBhdXRvY2FwaXRhbGl6ZT0ibm9uZSIgc3BlbGxjaGVjaz0iZmFsc2UiIGF1
+dG9jb3JyZWN0PSJvZmYiCiAgICAgICAgICBlbnRlcmtleWhpbnQ9InNlYXJj
+aCIgZGlyPSJhdXRvIiB2YWx1ZT0ie3sgcSBvciAnJyB9fSI+CiAgICAgICAg
+PGJ1dHRvbiBpZD0iY2xlYXJfc2VhcmNoIiB0eXBlPSJyZXNldCIgYXJpYS1s
+YWJlbD0ie3sgXygnY2xlYXInKSB9fSIgY2xhc3M9ImhpZGVfaWZfbm9qcyI+
+CiAgICAgICAgICA8c3Bhbj57eyBpY29uX2JpZygnY2xvc2UnKSB9fTwvc3Bh
+bj48c3BhbiBjbGFzcz0ic2hvd19pZl9ub2pzIj57eyBfKCdjbGVhcicpIH19
+PC9zcGFuPgogICAgICAgIDwvYnV0dG9uPgogICAgICAgIDxidXR0b24gaWQ9
+InNlbmRfc2VhcmNoIiB0eXBlPSJzdWJtaXQiIHslLSBpZiBzZWFyY2hfb25f
+Y2F0ZWdvcnlfc2VsZWN0IC0lfW5hbWU9ImNhdGVnb3J5X3t7IHNlbGVjdGVk
+X2NhdGVnb3JpZXNbMF18cmVwbGFjZSgnICcsICdfJykgfX0ieyUtIGVuZGlm
+IC0lfSBhcmlhLWxhYmVsPSJ7eyBfKCdzZWFyY2gnKSB9fSI+CiAgICAgICAg
+ICA8c3BhbiBjbGFzcz0iaGlkZV9pZl9ub2pzIj57eyBpY29uX2JpZygnc2Vh
+cmNoJykgfX08L3NwYW4+PHNwYW4gY2xhc3M9InNob3dfaWZfbm9qcyI+e3sg
+Xygnc2VhcmNoJykgfX08L3NwYW4+CiAgICAgICAgPC9idXR0b24+CiAgICAg
+ICAgPGRpdiBjbGFzcz0iYXV0b2NvbXBsZXRlIGhpZGVfaWZfbm9qcyI+PHVs
+PjwvdWw+PC9kaXY+CiAgICAgIDwvZGl2PgogICAgPC9kaXY+CgogICAgeyUg
+c2V0IGRpc3BsYXlfdG9vbHRpcCA9IHRydWUgJX0KICAgIHslIGluY2x1ZGUg
+J3NpbXBsZS9jYXRlZ29yaWVzLmh0bWwnICV9CiAgPC9kaXY+CgogIDxkaXYg
+Y2xhc3M9InNlYXJjaF9maWx0ZXJzIj4KICAgIHslIGluY2x1ZGUgJ3NpbXBs
+ZS9maWx0ZXJzL2xhbmd1YWdlcy5odG1sJyAlfQogICAgeyUgaW5jbHVkZSAn
+c2ltcGxlL2ZpbHRlcnMvdGltZV9yYW5nZS5odG1sJyAlfQogIDwvZGl2PgoK
+ICA8aW5wdXQgdHlwZT0iaGlkZGVuIiBuYW1lPSJzYWZlc2VhcmNoIiB2YWx1
+ZT0iMiI+CiAgPGlucHV0IHR5cGU9ImhpZGRlbiIgbmFtZT0idGhlbWUiIHZh
+bHVlPSJ7eyB0aGVtZSB9fSI+CiAgeyUgaWYgdGltZW91dF9saW1pdCAlfTxp
+bnB1dCB0eXBlPSJoaWRkZW4iIG5hbWU9InRpbWVvdXRfbGltaXQiIHZhbHVl
+PSJ7eyB0aW1lb3V0X2xpbWl0fGUgfX0iPnslIGVuZGlmICV9CjwvZm9ybT4K
+EOF
+base64 -d "$ROOT/search-template.b64" > "$SRC/searx/templates/simple/search.html"
+rm -f "$ROOT/search-template.b64"
 
 # Atomically repoint the existing alwaysdata working directory name to the new build.
 if [ -e "$LIVE_ALIAS" ] || [ -L "$LIVE_ALIAS" ]; then
