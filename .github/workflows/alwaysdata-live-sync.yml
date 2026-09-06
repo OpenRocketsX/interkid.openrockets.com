@@ -37,18 +37,22 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -eu
-          payload_path=".github/handoff/${GITHUB_RUN_ID}.b64"
-          payload=""
+          prefix="ALWAYSDATA_CIPHERTEXT_RUN_${GITHUB_RUN_ID}="
+          body=""
+          comment_id=""
           for attempt in $(seq 1 150); do
-            encoded="$(gh api "repos/${GITHUB_REPOSITORY}/contents/${payload_path}" --jq '.content' 2>/dev/null || true)"
-            if [ -n "$encoded" ]; then
-              payload="$(printf '%s' "$encoded" | tr -d '\n' | base64 -d)"
-              [ -n "$payload" ] && break
+            comments="$(gh api "repos/${GITHUB_REPOSITORY}/issues/${HANDOFF_ISSUE}/comments" --paginate)"
+            row="$(printf '%s' "$comments" | jq -r --arg prefix "$prefix" '[.[] | select((.body | startswith($prefix)) and .body != ($prefix + "REDACTED"))][-1] | if . then ((.id|tostring) + "\t" + .body) else "" end')"
+            if [ -n "$row" ]; then
+              comment_id="${row%%$'\t'*}"
+              body="${row#*$'\t'}"
+              break
             fi
             sleep 4
           done
-          [ -n "$payload" ] || { echo "Encrypted credential handoff timed out"; exit 1; }
-          printf '%s' "$payload" | base64 -d >/tmp/token.enc
+          [ -n "$body" ] || { echo "Encrypted credential handoff timed out"; exit 1; }
+          printf '%s' "$comment_id" >/tmp/cipher-comment-id
+          printf '%s' "${body#"$prefix"}" | base64 -d >/tmp/token.enc
           openssl pkeyutl -decrypt -inkey /tmp/private.pem -in /tmp/token.enc -out /tmp/token \
             -pkeyopt rsa_padding_mode:oaep -pkeyopt rsa_oaep_md:sha256
           chmod 600 /tmp/token
@@ -161,16 +165,22 @@ jobs:
           echo "LIVE_ORIGIN=$base"
           echo "LIVE_PUBLIC=https://www.interkid.org/"
 
-      - name: Remove temporary access
+      - name: Remove temporary access and redact handoff
         if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set +e
           token="$(cat /tmp/token 2>/dev/null || true)"
           ssh_id="$(cat /tmp/ssh-id 2>/dev/null || true)"
+          cipher_comment_id="$(cat /tmp/cipher-comment-id 2>/dev/null || true)"
           if [ -n "$token" ] && [ -n "$ssh_id" ]; then
             curl -fsS -X DELETE --basic --user "${token} account=${ALWAYSDATA_ACCOUNT}:" "https://api.alwaysdata.com/v1/ssh/${ssh_id}/" >/dev/null || true
           fi
-          rm -f /tmp/token /tmp/token.enc /tmp/private.pem /tmp/public.pem /tmp/ssh-pass /tmp/ssh-id /tmp/site-id /tmp/workdir /tmp/public-comment-id
+          if [ -n "$cipher_comment_id" ]; then
+            gh api -X PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${cipher_comment_id}" -f body="ALWAYSDATA_CIPHERTEXT_RUN_${GITHUB_RUN_ID}=REDACTED" >/dev/null || true
+          fi
+          rm -f /tmp/token /tmp/token.enc /tmp/private.pem /tmp/public.pem /tmp/ssh-pass /tmp/ssh-id /tmp/site-id /tmp/workdir /tmp/cipher-comment-id /tmp/public-comment-id
           # Intentionally DO NOT revoke or delete the alwaysdata API token.
 
-# run-specific encrypted file handoff; atomic verification replacement
+# ignore REDACTED markers on reruns and atomically replace protected verification.html
