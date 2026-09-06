@@ -171,3 +171,5 @@ jobs:
           fi
           rm -f /tmp/token /tmp/token.enc /tmp/private.pem /tmp/public.pem /tmp/ssh-pass /tmp/ssh-id /tmp/site-id /tmp/workdir /tmp/cipher-comment-id /tmp/public-comment-id
           # Intentionally DO NOT revoke or delete the alwaysdata API token.
+
+# trigger redeploy of current Interkid UI
