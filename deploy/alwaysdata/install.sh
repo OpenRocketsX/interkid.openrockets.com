@@ -21,6 +21,8 @@ fi
 "$VENV/bin/python" -m pip install -U granian
 
 cp "$STAGE/index.html" "$SRC/searx/templates/simple/index.html"
+cp "$STAGE/searxng/templates/simple/base.html" "$SRC/searx/templates/simple/base.html"
+cp "$STAGE/searxng/templates/simple/search.html" "$SRC/searx/templates/simple/search.html"
 cp "$STAGE/searxng/settings.yml" "$CONFIG/settings.yml"
 cp "$STAGE/deploy/alwaysdata/start.sh" "$ROOT/start.sh"
 chmod 755 "$ROOT/start.sh"
