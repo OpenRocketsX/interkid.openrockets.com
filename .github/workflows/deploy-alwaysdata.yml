@@ -40,6 +40,8 @@ jobs:
           tar -czf /tmp/interkid-alwaysdata.tgz \
             index.html \
             searxng/settings.yml \
+            searxng/templates/simple/base.html \
+            searxng/templates/simple/search.html \
             deploy/alwaysdata/install.sh \
             deploy/alwaysdata/start.sh
 
